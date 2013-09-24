@@ -1,0 +1,435 @@
+/*Author : Abhishek Gaurav*/
+html,body {
+	font-family: Arial;
+}
+
+#container {
+	background: #FFF;
+	border: 1px solid;
+	font-size: 100%;
+	font-weight: normal;
+	margin: 0;
+	padding: 0;
+}
+
+#header {
+	background: #A0C2FA;
+	border: 1px solid #FFF;
+	color: #FFF;
+	font-size: 3.5em;
+	height: 1.2em;
+	text-align: center;
+}
+
+#login {
+	margin-top: 2em;
+	margin-bottom: 3em;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#login .dataEntry {
+	width: 20em;
+	border: 1px solid #A0C2FA;
+	background: #EEF0FF;
+	font-size: 1em;
+	padding-left: 0.2em;
+}
+
+#account {
+	margin-top: 2em;
+	margin-bottom: 3em;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#account .titleBar {
+	color: #FFF;
+	background: #609AFA;
+	text-align: center;
+	font-weight: bold;
+}
+
+#account .dataEntry {
+	width: 20em;
+	border: 1px solid #A0C2FA;
+	background: #EEF0FF;
+}
+
+#menuarea {
+	background: #609AFA;
+	border: 1px solid #FFF;
+	color: #FFF;
+	font-size: 1.2em;
+	height: 1.6em;
+	text-align: left;
+}
+
+#menubar {
+	float: left;
+	display: block;
+	height: inherit;
+	width: 50%;
+	line-height: 1.6em;
+}
+
+#menubar ul {
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
+}
+
+#menubar ul li {
+	display: inline;
+}
+
+#menubar ul li a {
+	float: left;
+	text-decoration: none;
+	padding: 0 0.5em;
+	border-right: 1px solid #FFF;
+	color: #FFF;
+}
+
+#menubar ul li a:hover {
+	filter: none;
+	background-color: #FFF;
+	color: #609AFA;
+	border: none;
+}
+
+#menubar .activeMenu {
+	background-color: #FFF;
+	color: #609AFA;
+	border: 1px solid #609AFA;
+	height: 1.5em;
+}
+
+#userbar {
+	float: right;
+	display: block;
+	width: 12em;
+	line-height: 1.5em;
+	text-align: right;
+	padding: 0;
+	margin: 0;
+}
+
+#userbar ul {
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
+}
+
+#userbar ul li {
+	display: inline;
+}
+
+#userbar ul li a {
+	float: left;
+	text-decoration: none;
+	padding-right: 0.5em;
+	color: #FFF;
+}
+
+#logoffbar {
+	float: right;
+	display: block;
+	width: 4%;
+	line-height: 1.6em;
+	text-align: right;
+	font-size: 0.7em;
+	margin-top: 0.2em;
+	margin-right: 0.5em;
+}
+
+#content {
+	border: 1px solid #FFF;
+	background: #FFF;
+	font-size: 1em;
+	min-height: 80%;
+	text-align: left;
+	padding: 0.5em;
+	font-family: Arial;
+}
+
+#content select {
+	width: 100%;
+}
+
+#content table {
+	border-color: #A0C2FA;
+	border-width: 1px;
+	border-style: solid;
+	border-collapse: collapse;
+}
+
+#content table th {
+	font-weight: bold;
+}
+
+#content tr {
+	height: 2em;
+}
+
+#content td,th {
+	border-color: #A0C2FA;
+	border-width: 1px;
+	border-style: solid;
+	margin: 0;
+	padding: 0.2em;
+	font-family: Arial;
+}
+
+#content td select {
+	width: 100%;
+	border: 1px solid #A0C2FA;
+	height: 1.6em;
+	background: #EEF0FF;
+	font-family: Arial;
+}
+
+#content p {
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	font-family: Arial;
+}
+
+#searchBar {
+	line-height: 2em;
+	margin-bottom: 1em;
+	font-family: Arial;
+	font-family: Arial;
+}
+
+#searchBar .dateSearch {
+	border: 1px solid #A0C2FA;
+	background: #EEF0FF;
+	text-align: left;
+	width: 11em;
+	margin-right: 0.2em;
+	color: black;
+}
+
+#searchBar .projectSearch {
+	margin-right: 0.2em;
+	border: 1px solid #A0C2FA;
+	background: #FFFFBF;
+	text-align: left;
+	width: 15em;
+	height: 2em;
+	padding-left: 0.2em;
+}
+
+#content .timeEntry {
+	text-align: center;
+	width: 100%;
+	border: 1px solid #A0C2FA;
+	background: #EEF0FF;
+}
+
+#content .timeEntryEdit {
+	text-align: center;
+	width: 100%;
+	border: 1px solid #A0C2FA;
+	background: #FFFFBF;
+}
+
+#content .timeEntrySelectEdit {
+	width: 100%;
+	border: 1px solid #A0C2FA;
+	background: #FFFFBF;
+}
+
+#content .projectArea {
+	height: 2em;
+	padding: 0;
+	margin: 0;
+	font-weight: bold;
+	text-align: center;;
+}
+
+#content .label {
+	padding-left: 0.5em;
+	font-weight: bold;
+}
+
+#content .data {
+	padding-left: 0.5em;
+	font-weight: normal;
+}
+
+#content .projectAreaEdit {
+	border: 1px solid #A0C2FA;
+	background: #FFFFBF;
+	text-align: center;
+	padding: 0;
+	margin: 0;
+	font-weight: bold;
+	width: 98%;
+	height: 82%;
+}
+
+#content .leadArea {
+	height: 1.5em;
+	padding-left: 0.5em;
+	margin: 0;
+	font-weight: bold;
+}
+
+#content .leadAreaEdit {
+	height: 100%;
+	border: 1px solid #A0C2FA;
+	background: #FFFFBF;
+	text-align: left;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	font-weight: bold;
+}
+
+#content .activityArea {
+	height: 2em;
+	text-align: left;
+	padding-left: 1.5em;
+	margin: 0;
+}
+
+#content .activityAreaEdit {
+	height: 2em;
+	border: 1px solid #A0C2FA;
+	background: #FFFFBF;
+	text-align: left;
+	padding-left: 1.5em;
+	margin: 0;
+	width: 100%;
+}
+
+#content .accountAreaEdit {
+	height: 1.5em;
+	border: 1px solid #A0C2FA;
+	background: #FFFFBF;
+	text-align: left;
+	width: 19.5em;
+	margin: 0;
+	padding: 0;
+}
+
+#content .weekEnd {
+	background: #FFF;
+	color: #609AFA;
+	font-weight: bold;
+}
+
+#content .rowTotal {
+	text-align: center;
+	font-weight: bold;
+}
+
+#content .rowButton,.reportBody,.leadColumn {
+	text-align: center;
+}
+
+#content .button {
+	background: #FFF;
+	color: #609AFA;
+	height: 2em;
+}
+
+#content .message {
+	margin: 0;
+	margin-top: -1em;
+	padding: 0;
+}
+
+#content .error {
+	margin: 0;
+	margin-top: -1em;
+	margin-bottom: -0.5em;
+	padding: 0;
+	display: block;
+	font-weight: normal;
+	font-style: italic;
+	color: RED;
+	padding-bottom: 2em;padding-top: 1em;
+}
+
+.icon {
+	width: 1.5em;
+	height: 1.5em;
+	text-align: center;
+	border: none;
+}
+
+.titleBar {
+	color: #FFF;
+	background: #609AFA;
+	text-align: center;
+	font-family: Arial;
+	font-weight: bold;
+}
+
+.thin {
+	display: inline;
+	padding: 0;
+	margin: 0;
+}
+
+#content .reportTotal {
+	background: #F5F6FF;
+	font-weight: bold;
+}
+
+#content .newUser {
+	border: 1px solid #A0C2FA;
+	background: #EEF0FF;
+	text-align: center;
+}
+
+#content .newUserEdit {
+	border: 1px solid #A0C2FA;
+	background: #FFFFBF;
+	text-align: center;
+	width: 100%;
+	height: 100%;
+}
+
+#content .reportResult {
+	margin-bottom: 2em;
+	margin-right: 2em;
+	padding: 0;
+	display: inline-block;
+	border: none;
+	vertical-align: top;
+}
+
+#projectSection .projectTable {
+	width: 24em;
+	margin-bottom: 2em;
+	margin-right: 2em;
+	margin-top: 2em;
+	float: left;
+}
+
+#toolbar {
+	width: 100%;
+	line-height: 2em;
+	text-align: right;
+	margin-top: 1em;
+	font-family: Arial;
+}
+
+#footerarea {
+	background: #A0C2FA;
+	border: 1px solid #FFF;
+	color: #FFF;
+	font-size: 0.8em;
+	height: 2em;
+	text-align: left;
+	padding-left: 0.5em;
+	line-height: 2em;
+	font-family: Arial;
+}
