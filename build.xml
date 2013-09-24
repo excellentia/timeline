@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     project		timeline
+     description	Timeline Application
+                   
+     Abhishek Gaurav                                                                
+     ====================================================================== -->
+<project name="build" default="deploy" basedir=".">
+
+	<!-- Deploy related properties-->
+	
+	<!-- Provide the location of webserver that will contain the deplyed app -->
+	<!-- eg <property name="server.root" value="/Software/apache-tomcat-7.0.26" /> -->
+	<property name="server.root" value="" />
+	
+	<property name="deploy.root" value="${server.root}/webapps" />
+	<property name="deploy.target" value="${deploy.root}/timeline" />
+	<property name="deploy.src" value="../timeline" />
+
+	<!-- Build related properties-->
+	<property name="build.src" value="./src" />
+	<property name="build.path" value="./WEB-INF/classes" />
+
+	<!-- Compiles the code-->
+	<target name="test-compile">
+		<path id="master-classpath">
+			<fileset dir="./WEB-INF/lib">
+				<include name="*.jar" />
+			</fileset>
+			<pathelement path="${build.path}" />
+		</path>
+		<echo>Testing code for compilation issues...</echo>
+
+		<javac destdir="${build.path}" includeantruntime="true" failonerror="true">
+			<src path="${build.src}" />
+			<classpath refid="master-classpath" />
+		</javac>
+		<echo>Done.</echo>
+	</target>
+
+	<!-- Deploys the code-->
+	<target name="deploy" depends="test-compile">
+		<!-- Delete existing application -->
+		<echo>Clean existing application</echo>
+		<delete dir="${deploy.target}" />
+		<delete dir="${server.root}/work/Catalina/localhost/timeline" />
+
+		<!-- Deploy -->
+		<echo>Deploy</echo>
+		<copy todir="${deploy.target}" includeemptydirs="true" overwrite="true">
+			<fileset dir="${deploy.src}">
+				<include name="database/**"/>
+				<include name="META-INF/**"/>
+				<include name="pages/**"/>
+				<include name="WEB-INF/**"/>
+			</fileset>
+		</copy>
+		
+		<!-- Delete servlet-api -->
+		<delete file="${deploy.target}/WEB-INF/lib/servlet-api.jar" />
+		
+		<!-- Delete hibernate test config -->
+		<delete file="${deploy.target}/WEB-INF/classes/hibernate-test.cfg.xml" />
+
+		<!-- Clean Logs -->
+		<echo>Cleaning logs</echo>
+		<delete dir="${server.root}/logs" includes="*" />
+
+	</target>
+	
+	<!-- Packages application as WAR -->
+	<target name="package" depends="deploy">
+		<echo>Creating WAR</echo>
+		<war destfile="${deploy.root}/timeline.war" basedir="${deploy.target}"/>
+	</target>
+</project>
