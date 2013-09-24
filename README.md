@@ -1,4 +1,4 @@
 timeline
 ========
 
-Simple time-tracker
+Simple time tracker
