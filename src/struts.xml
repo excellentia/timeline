@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+
+	<constant name="struts.enable.DynamicMethodInvocation" value="false" />
+	<constant name="struts.devMode" value="true" />
+	<constant name="struts.ui.theme" value="simple" />
+	<constant name="struts.action.excludePattern" value="/ajax" />
+
+	<package name="timeline" namespace="/" extends="struts-default">
+		<action name="Login" class="org.ag.timeline.presentation.action.LoginAction">
+			<result name="success" type="redirect">/MyTime</result>
+			<result name="error">pages/login.jsp</result>
+		</action>
+
+		<action name="MyTime" class="org.ag.timeline.presentation.action.MyTimeAction">
+			<result name="success">pages/mytime.jsp</result>
+			<result name="error">pages/login.jsp</result>
+		</action>
+		<action name="Admin" class="org.ag.timeline.presentation.action.AdminAction">
+			<result name="success">pages/admin.jsp</result>
+			<result name="error">pages/login.jsp</result>
+		</action>
+
+		<action name="Report" class="org.ag.timeline.presentation.action.ReportAction">
+			<result name="success">pages/report.jsp</result>
+			<result name="error">pages/login.jsp</result>
+		</action>
+
+		<action name="Account"
+			class="org.ag.timeline.presentation.action.AccountSettingsAction">
+			<result name="success">pages/account-settings.jsp</result>
+			<result name="error">pages/login.jsp</result>
+		</action>
+
+		<action name="Changes"
+			class="org.ag.timeline.presentation.action.ChangeSearchAction">
+			<result name="success">pages/changes.jsp</result>
+			<result name="error">pages/login.jsp</result>
+		</action>
+
+		<action name="Logout" class="org.ag.timeline.presentation.action.LogoutAction">
+			<result name="success">pages/login.jsp</result>
+			<result name="error">pages/login.jsp</result>
+		</action>
+
+		<action name="Reset"
+			class="org.ag.timeline.presentation.action.ForgotPasswordAction">
+			<result name="success" type="redirect">/Account</result>
+			<result name="stepTwo">pages/password-reset.jsp</result>
+			<result name="error">pages/password-reset.jsp</result>
+		</action>
+
+	</package>
+
+</struts>
