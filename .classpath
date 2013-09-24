@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/hibernate_antlr-2.7.7.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/hibernate_dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/hibernate_hibernate-commons-annotations-4.0.1.Final.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/hibernate_hibernate-core-4.1.7.Final.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/hibernate_hibernate-jpa-2.0-api-1.0.1.Final.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/hibernate_javassist-3.15.0-GA.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/hibernate_jboss-logging-3.1.0.GA.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/hibernate_jboss-transaction-api_1.1_spec-1.0.0.Final.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/hsqldb229.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/junit-4.10.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/poi-3.8-20120326.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/servelet_javax.servlet.jsp.jstl-1.2.1.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/servelet_javax.servlet.jsp.jstl-api-1.2.1.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/asm-3.3.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/asm-commons-3.3.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/asm-tree-3.3.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/commons-fileupload-1.2.2.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/commons-io-2.0.1.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/commons-lang3-3.1.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/freemarker-2.3.19.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/javassist-3.11.0.GA.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/ognl-3.0.5.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/struts2-core-2.3.4.1.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/xwork-core-2.3.4.1.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/json-rpc-1.0.jar"/>
+	<classpathentry kind="output" path="WEB-INF/classes"/>
+</classpath>
