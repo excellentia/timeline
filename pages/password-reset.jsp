@@ -23,10 +23,12 @@
 								<td><input type="text" class="dataEntry" id="userId" name="userId" tabindex="1" maxlength="20" /></td>
 							</tr>
 							<tr>
-								<td style="font-size: 0.8em; border-right: 1px solid white"><a style="text-decoration: none;" title="Login"
-									href="Login">Login !</a></td>
-								<td style="text-align: right"><input type="submit" value="Submit" id="loginButton" class="button"
-									tabindex="3" /></td>
+								<td style="font-size: 0.8em; border-right: 1px solid white">
+									<a style="text-decoration: none;" title="Login" href="Login">Login !</a>
+								</td>
+								<td style="text-align: right">
+									<input type="submit" value="Submit" id="loginButton" class="button" tabindex="3" />
+								</td>
 							</tr>
 						</tbody>
 					</table>
@@ -55,8 +57,7 @@
 								<td><input type="text" class="dataEntry" id="answer" name="answer" tabindex="2" maxlength="20" /></td>
 							</tr>
 							<tr style="text-align: right">
-								<td colspan="2"><input type="submit" value="Cross Your Fingers" id="loginButton" class="button"
-									tabindex="3" /></td>
+								<td colspan="2"><input type="submit" value="Cross Your Fingers" id="loginButton" class="button" tabindex="3" /></td>
 							</tr>
 						</tbody>
 					</table>
