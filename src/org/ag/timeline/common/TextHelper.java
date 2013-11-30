@@ -496,5 +496,6 @@ public class TextHelper {
 		System.out.println(getYear(date));
 		System.out.println(DISPLAY_FORMAT.format(date));
 		System.out.println(WEEK_FORMAT.format(date));
+		System.out.println("Week Number : "+getWeekNumber(getValidDate("31.12.2012")));
 	}
 }
