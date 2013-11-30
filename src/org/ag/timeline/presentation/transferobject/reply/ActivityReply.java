@@ -68,7 +68,7 @@ public class ActivityReply extends BusinessReply {
 		}
 	}
 
-	public List<CodeValue> getProjectActivities(final long projectId) {
+	public List<CodeValue> getProjectActivitiesById(final long projectId) {
 
 		List<CodeValue> activities = null;
 
@@ -79,7 +79,7 @@ public class ActivityReply extends BusinessReply {
 		return activities;
 	}
 
-	public List<CodeValue> getProjectActivities(final String projectName) {
+	public List<CodeValue> getProjectActivitiesByName(final String projectName) {
 
 		List<CodeValue> activities = null;
 		String projName = TextHelper.trimToNull(projectName);
