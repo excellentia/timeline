@@ -18,8 +18,7 @@
 			<c:set var="selectedActId" value="${activityId}" />
 			<c:set var="selectedUserId" value="${userId}" />
 			<div style="display: inline; padding: 0; margin: 0">
-				<select id="projectId" size="1" name="projectId" class="dateSearch" title="Select Project"
-					onchange="populateActivities('projectId','activityId')">
+				<select id="projectId" size="1" name="projectId" class="dateSearch" title="Select Project" onchange="populateActivities('projectId','activityId')">
 					<option value="0" <c:if test="${selectedProjId == 0}">selected="selected"</c:if>>All Projects</option>
 					<c:forEach var="project" items="${PROJECT_LIST.projects}">
 						<option value="${project.code}" <c:if test="${selectedProjId == project.code}">selected="selected"</c:if>>${project.value}</option>
@@ -30,7 +29,7 @@
 				<select id="activityId" size="1" name="activityId" class="dateSearch" title="Select Activity">
 					<option value="0" <c:if test="${selectedActId == 0}">selected="selected"</c:if>>All Activities</option>
 					<c:if test="${selectedProjId > 0}">
-						<c:forEach var="activity" items="${ACTIVITY_LIST.getProjectActivities(selectedProjId)}">
+						<c:forEach var="activity" items="${ACTIVITY_LIST.getProjectActivitiesById(selectedProjId)}">
 							<option value="${activity.code}" <c:if test="${selectedActId == activity.code}">selected="selected"</c:if>>${activity.value}</option>
 						</c:forEach>
 					</c:if>
@@ -51,30 +50,33 @@
 	</div>
 	<div>
 		<c:if test="${((reply != null) && (reply.rowCount > 0))}">
+			<form name="detailForm" id="detailForm" action="ReportDetail" method="POST">
+				<input type="hidden" name="projectId" value="0" />
+			</form>
 			<c:forEach var="projectId" items="${reply.projectIds}">
 				<table id="timeTable" class="reportResult">
+					<c:set var="activityList" value="${reply.getActivityRowList(projectId)}" />
+					<c:set var="userList" value="${reply.getUserRowList(projectId)}" />
+					<c:set var="activityCount" value="${activityList.size()}" />
+					<c:set var="userCount" value="${userList.size()}" />
+					<c:set var="activity" value="${activityList.get(0)}" />
+					<c:set var="activityId" value="${activityList.get(0).rowId}" />
+					<c:set var="total" value="0" />
 					<colgroup>
-						<col style="width: 30%" />
-						<col style="width: 40%" />
-						<col style="width: 30%" />
+						<col style="width: 50%" />
+						<col style="width: 50%" />
 					</colgroup>
 					<thead>
+						<tr>
+							<th colspan="2" style="font-size: 1.5em;">${activity.projectName}</th>
+						</tr>
 						<tr class="reportTotal">
-							<th>Project</th>
 							<th>Activity</th>
 							<th title="Total For Activity">&Sigma; Effort</th>
 						</tr>
 					</thead>
 					<tbody class="reportBody">
-						<c:set var="activityList" value="${reply.getActivityRowList(projectId)}" />
-						<c:set var="userList" value="${reply.getUserRowList(projectId)}" />
-						<c:set var="activityCount" value="${activityList.size()}" />
-						<c:set var="userCount" value="${userList.size()}" />
-						<c:set var="activity" value="${activityList.get(0)}" />
-						<c:set var="activityId" value="${activityList.get(0).rowId}" />
-						<c:set var="total" value="0" />
 						<tr>
-							<td rowspan="${activityCount + userCount + 4}">${activity.projectName}</td>
 							<td>${activity.rowName}</td>
 							<td>${activity.rowTime}</td>
 							<c:set var="total" value="${total+activity.rowTime}" />
@@ -109,6 +111,11 @@
 							<td>TOTAL</td>
 							<td title="Total Across All Team Members">${total}</td>
 						</tr>
+						<tr>
+							<td colspan="2">
+								<img id="showDetailReport" alt="View Details" align="middle" class="icon" title="${detailTitle}" src="${detailIconPath}" onclick="viewReportDetails(${projectId})" />
+							</td>
+						</tr>
 					</tbody>
 				</table>
 			</c:forEach>
@@ -117,6 +124,13 @@
 			<p class="error">No Data Found</p>
 		</c:if>
 	</div>
+	<div id="light" class="white_content" style="margin: 0; padding: 0.5em;">
+		<div id="reportDetails" style="display: inline; width: 100%; height: 95%; clear: both"></div>
+		<div id="closeBar" style="display: inline; width: 100%; padding-top: 0.5em; height: 5%; text-align: right; float: right; clear: both">
+			<a href="javascript:void(0)" onclick="hideReportDetails()" title="Click to Close / Press Esc">Close</a>
+		</div>
+	</div>
+	<div id="fade" class="black_overlay"></div>
 	<%--
 	<c:if test="${SESSION_USER.admin}">
 		<div id="toolbar">
