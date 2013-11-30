@@ -19,7 +19,7 @@ import org.ag.timeline.business.model.TimeData;
 import org.ag.timeline.business.model.User;
 import org.ag.timeline.business.model.UserPreferences;
 import org.ag.timeline.business.model.Week;
-import org.ag.timeline.business.service.iface.TimelineIface;
+import org.ag.timeline.business.service.iface.TimelineService;
 import org.ag.timeline.business.util.HibernateUtil;
 import org.ag.timeline.business.util.audit.AuditInterceptor;
 import org.ag.timeline.common.TextHelper;
@@ -36,10 +36,12 @@ import org.ag.timeline.presentation.transferobject.reply.AuditDataReply;
 import org.ag.timeline.presentation.transferobject.reply.AuditDetailRow;
 import org.ag.timeline.presentation.transferobject.reply.AuditRow;
 import org.ag.timeline.presentation.transferobject.reply.CodeValueReply;
+import org.ag.timeline.presentation.transferobject.reply.DetailedReportReply;
+import org.ag.timeline.presentation.transferobject.reply.DetailedReportRow;
 import org.ag.timeline.presentation.transferobject.reply.ProjectData;
 import org.ag.timeline.presentation.transferobject.reply.ProjectReply;
-import org.ag.timeline.presentation.transferobject.reply.ReportDataReply;
 import org.ag.timeline.presentation.transferobject.reply.ReportRow;
+import org.ag.timeline.presentation.transferobject.reply.SummaryReportReply;
 import org.ag.timeline.presentation.transferobject.reply.TimeDataReply;
 import org.ag.timeline.presentation.transferobject.reply.UserPreferenceReply;
 import org.ag.timeline.presentation.transferobject.reply.UserPreferenceSearchReply;
@@ -54,7 +56,6 @@ import org.ag.timeline.presentation.transferobject.search.TimeDataSearchParamete
 import org.ag.timeline.presentation.transferobject.search.UserPreferenceSearchParameter;
 import org.ag.timeline.presentation.transferobject.search.UserSearchParameter;
 import org.ag.timeline.presentation.transferobject.search.WeekSearchParameter;
-
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -68,11 +69,11 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
 
 /**
- * Implementation of {@link TimelineIface}.
+ * Implementation of {@link TimelineService}.
  * 
  * @author Abhishek Gaurav
  */
-public class TimelineImpl implements TimelineIface {
+public class TimelineServiceImpl implements TimelineService {
 
 	/**
 	 * Hibernate Session Factory.
@@ -401,9 +402,9 @@ public class TimelineImpl implements TimelineIface {
 
 					Activity activity = (Activity) session.get(Activity.class, new Long(myTimeData.getActivityId()));
 					User user = (User) session.get(User.class, myTimeData.getUserId());
-					Date date = myTimeData.getDate();
-					Long year = TextHelper.getYear(date);
-					Long weekNum = TextHelper.getWeekNumber(date);
+					Date startDate = myTimeData.getDate();
+					Long year = TextHelper.getYear(startDate);
+					Long weekNum = TextHelper.getWeekNumber(startDate);
 
 					if ((activity != null) && (user != null) && (weekNum > 0)) {
 
@@ -414,7 +415,7 @@ public class TimelineImpl implements TimelineIface {
 						if (week == null) {
 							Criteria criteria = session.createCriteria(Week.class);
 							criteria.add(Restrictions.and(Restrictions.eq("year", year),
-									Restrictions.eq("weekNumber", weekNum)));
+									Restrictions.eq("weekNumber", weekNum), Restrictions.eq("startDate", startDate)));
 							criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 							@SuppressWarnings("unchecked")
@@ -429,8 +430,8 @@ public class TimelineImpl implements TimelineIface {
 
 								week.setYear(year);
 								week.setWeekNumber(weekNum);
-								week.setStartDate(TextHelper.getFirstDayOfWeek(date));
-								week.setEndDate(TextHelper.getLastDayOfWeek(date));
+								week.setStartDate(TextHelper.getFirstDayOfWeek(startDate));
+								week.setEndDate(TextHelper.getLastDayOfWeek(startDate));
 
 								// save the week
 								session.saveOrUpdate(week);
@@ -1028,11 +1029,11 @@ public class TimelineImpl implements TimelineIface {
 	 * org.ag.timeline.business.service.iface.TimelineIface#resetUserCredentials
 	 * (long)
 	 */
-	public ReportDataReply getReport(ReportSearchParameters searchParameters) throws TimelineException {
+	public SummaryReportReply getSummaryReport(ReportSearchParameters searchParameters) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
-		final ReportDataReply reply = new ReportDataReply();
+		final SummaryReportReply reply = new SummaryReportReply();
 
 		try {
 			// read data, hence using normal session()
@@ -2140,14 +2141,15 @@ public class TimelineImpl implements TimelineIface {
 			Long userId = 0l;
 			Long projectId = 0l;
 			Long activityId = 0l;
-			Long startWeekId = 0l;
+			
+			Long startWeekId = 0l;			
 			Long startWeekNum = 0l;
 			Long startYear = 0l;
 
 			Long endWeekId = 0l;
 			Long endWeekNum = 0l;
 			Long endYear = 0l;
-
+			
 			Criteria criteria = session.createCriteria(TimeData.class);
 
 			if (searchParameters != null) {
@@ -2585,15 +2587,33 @@ public class TimelineImpl implements TimelineIface {
 								long count = 0;
 								Week week = null;
 								Date start = startDate;
+								Date weekStartDate = null;
+								Date weekEndDate = null;
+								long weekNum = 0;
+								long year = 0;
 								final Date createDate = new Date();
 								final long createUserId = RequestContext.getTimelineContext().getContextUserId();
 
 								while (start.before(endDate)) {
+
+									weekStartDate = TextHelper.getFirstDayOfWeek(start);
+									weekEndDate = TextHelper.getLastDayOfWeek(start);
+									weekNum = TextHelper.getWeekNumber(start);
+
 									week = new Week();
-									week.setStartDate(TextHelper.getFirstDayOfWeek(start));
-									week.setEndDate(TextHelper.getLastDayOfWeek(start));
-									week.setWeekNumber(TextHelper.getWeekNumber(start));
-									week.setYear(TextHelper.getYear(TextHelper.getFirstDayOfWeek(start)));
+									week.setStartDate(weekStartDate);
+									week.setEndDate(weekEndDate);
+									week.setWeekNumber(weekNum);
+
+									if (weekNum > 1) {
+										year = TextHelper.getYear(weekStartDate);
+									} else {
+										// Fix for setting the year correctly as new year
+										// for 1st week of year
+										year = TextHelper.getYear(weekEndDate);
+									}
+
+									week.setYear(year);
 									week.setCreateDate(createDate);
 									week.setCreateUserId(createUserId);
 
@@ -2611,7 +2631,7 @@ public class TimelineImpl implements TimelineIface {
 									}
 
 									// get day a week later
-									start = TextHelper.getDateAfter(TextHelper.getFirstDayOfWeek(start), 7);
+									start = TextHelper.getDateAfter(weekStartDate, 7);
 
 								}
 							}
@@ -2791,4 +2811,103 @@ public class TimelineImpl implements TimelineIface {
 
 	}
 
+	@Override
+	public DetailedReportReply getDetailedReport(ReportSearchParameters searchParameters) throws TimelineException {
+
+		Session session = null;
+		Transaction transaction = null;
+		DetailedReportReply reply = new DetailedReportReply();
+
+		try {
+
+			session = getNormalSession();
+			transaction = session.beginTransaction();
+
+			long time = System.nanoTime();
+
+			if (searchParameters != null) {
+				long projectId = searchParameters.getProjectDbId();
+
+				if (projectId > 0) {
+
+					StringBuilder builder = new StringBuilder(
+							" SELECT week.year, week.weekNumber, week.startDate, week.endDate, activity.id, activity.name ");
+					builder.append(" , sum(data_weekday_1+data_weekday_2+data_weekday_3+data_weekday_4+data_weekday_5+data_weekday_6+data_weekday_7) ");
+					builder.append(" FROM TimeData ");
+					builder.append(" WHERE ");
+					builder.append(" project.id = ").append(projectId);
+
+					builder.append(" GROUP BY ");
+					builder.append(" week.year, week.weekNumber, week.startDate, week.endDate, activity.id, activity.name ");
+
+					builder.append(" ORDER BY ");
+					builder.append(" week.year desc , week.weekNumber desc, activity.name asc");
+
+					Query query = session.createQuery(builder.toString());
+
+					@SuppressWarnings("rawtypes")
+					List list = query.list();
+
+					if ((list != null) && (list.size() > 0)) {
+
+						// create a new data object
+						DetailedReportRow row = null;
+						Object[] values = null;
+
+						for (int i = 0; i < list.size(); i++) {
+							values = (Object[]) list.get(i);
+
+							if ((values != null) && (values.length > 0)) {
+
+								// create new row
+								row = new DetailedReportRow();
+
+								// populate row
+								row.setYear((Long) values[0]);
+								row.setWeekNumber((Long) values[1]);
+								row.setWeekStartDate((Date) values[2]);
+								row.setWeekEndDate((Date) values[3]);
+								row.setActivityId((Long) values[4]);
+								row.setActivityName((String) values[5]);
+								row.setWeeklySum(TextHelper.getScaledDouble((BigDecimal) values[6]));
+
+								// update the rows in reply
+								reply.addRow(row);
+							}
+						}
+					}
+				} else {
+					reply.setErrorMessage("Invalid project id specified.");
+				}
+
+			} else {
+				reply.setErrorMessage("Missing search data.");
+			}
+
+			TextHelper.logMessage("getDetailedReport() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+
+			// commit the transaction
+			transaction.commit();
+
+		} catch (HibernateException hibernateException) {
+
+			// rollback transaction
+			if (transaction != null) {
+				transaction.rollback();
+			}
+
+			hibernateException.printStackTrace();
+
+			// create a reply for error message
+			reply.setErrorMessage("Report Details Search failed due to Technical Reasons.");
+
+		} finally {
+			// close the session
+			if (session != null) {
+				session.close();
+			}
+		}
+
+		return reply;
+	}
 }
