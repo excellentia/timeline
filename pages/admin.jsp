@@ -44,23 +44,22 @@
 								<td>${user.userId}</td>
 								<td>${user.firstName}</td>
 								<td>${user.lastName}</td>
-								<td><c:if test="${user.admin}">
+								<td>
+									<c:if test="${user.admin}">
 										<img alt="Admin" align="middle" class="icon" title="${adminTitle}" src="${adminIconPath}" />
 									</c:if></td>
-								<td><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}"
-									onclick="editUser('${userId}',${user.id})" /></td>
-								<td><img alt="Reset" align="middle" class="icon" title="${resetTitle}" src="${resetIconPath}"
-									onclick="resetUser('${userId}',${user.id})" /></td>
-								<td><img alt="Delete" align="middle" class="icon" title="${userDeleteTitle}" src="${deleteIconPath}"
-									onclick="deleteUser('${userId}',${user.id})" /></td>
+								<td><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" onclick="editUser('${userId}',${user.id})" /></td>
+								<td><img alt="Reset" align="middle" class="icon" title="${resetTitle}" src="${resetIconPath}" onclick="resetUser('${userId}',${user.id})" /></td>
+								<td><img alt="Delete" align="middle" class="icon" title="${userDeleteTitle}" src="${deleteIconPath}" onclick="deleteUser('${userId}',${user.id})" /></td>
 							</tr>
 						</c:forEach>
 					</tbody>
 				</c:if>
 				<tfoot>
 					<tr>
-						<td colspan="7" style="text-align: right"><input type="button" value="Add User" class="button"
-							onclick="addNewUser('userTable')" /></td>
+						<td colspan="7" style="text-align: right">
+							<input type="button" value="Add User" class="button" onclick="addNewUser('userTable')" />
+						</td>
 					</tr>
 				</tfoot>
 			</table>
@@ -71,8 +70,8 @@
 		</h3>
 		<div>
 			<div id="searchBar">
-				<input type="text" class="projectSearch" id="newProject" name="newProject" title="Enter New Project Name" maxlength="20"/> <input
-					type="button" value="Create Project" class="button" onclick="saveProject('projectSection',0, 'newProject')" />
+				<input type="text" class="projectSearch" id="newProject" name="newProject" title="Enter New Project Name" maxlength="20" /> 
+				<input type="button" value="Create Project" class="button"	onclick="saveProject('projectSection',0, 'newProject')" />
 			</div>
 			<div id="projectSection">
 				<c:if test="${(projectReply != null) && (projectReply.projects != null) && (projectReply.projects.size() > 0)}">
@@ -88,10 +87,8 @@
 								<c:set var="projTitleId">${projId}_title</c:set>
 								<tr id="${projTitleId}">
 									<td class="projectArea">${project.value}</td>
-									<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}"
-										onclick="editProject('${projTitleId}',${project.code})" /></td>
-									<td align="center"><img alt="Delete" align="middle" class="icon" title="${projectDeleteTitle}"
-										src="${deleteIconPath}" onclick="deleteProject('${projId}',${project.code})" /></td>
+									<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" onclick="editProject('${projTitleId}',${project.code})" /></td>
+									<td align="center"><img alt="Delete" align="middle" class="icon" title="${projectDeleteTitle}" src="${deleteIconPath}" onclick="deleteProject('${projId}',${project.code})" /></td>
 								</tr>
 								<c:set var="projLeadId">${projId}_lead</c:set>
 								<c:set var="leadName" value="${project.leadName}" />
@@ -100,26 +97,24 @@
 								</c:if>
 								<tr id="${projLeadId}">
 									<td class="leadArea">${leadName}</td>
-									<td align="center" colspan="2"><img alt="Edit Lead" align="middle" class="icon" title="${editTitle}"
-										src="${editIconPath}" onclick="editLead('${projLeadId}',${project.code})" /></td>
+									<td align="center" colspan="2"><img alt="Edit Lead" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" onclick="editLead('${projLeadId}',${project.code})" /></td>
 								</tr>
 								<c:if test="${activityReply != null}">
-									<c:forEach var="activity" items="${activityReply.getProjectActivities(project.code)}">
+									<c:forEach var="activity" items="${activityReply.getProjectActivitiesById(project.code)}">
 										<c:set var="actId">activity_${activity.code}</c:set>
 										<tr id='${actId}'>
 											<td class="activityArea">${activity.value}</td>
-											<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}"
-												src="${editIconPath}" onclick="editActivity('${actId}',${activity.code},${project.code})" /></td>
-											<td align="center"><img alt="Delete" align="middle" class="icon" title="${activityDeleteTitle}"
-												src="${deleteIconPath}" onclick="deleteActivity('${actId}', ${activity.code})" /></td>
+											<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" onclick="editActivity('${actId}',${activity.code},${project.code})" /></td>
+											<td align="center"><img alt="Delete" align="middle" class="icon" title="${activityDeleteTitle}" src="${deleteIconPath}" onclick="deleteActivity('${actId}', ${activity.code})" /></td>
 										</tr>
 									</c:forEach>
 								</c:if>
 							</tbody>
 							<tfoot>
 								<tr>
-									<td colspan="3" align="right"><input type="button" value="Add Activity" class="button"
-										onclick="addNewActivity('${projId}',${project.code})" /></td>
+									<td colspan="3" align="right">
+										<input type="button" value="Add Activity" class="button" onclick="addNewActivity('${projId}',${project.code})" />
+									</td>
 							</tfoot>
 						</table>
 					</c:forEach>
