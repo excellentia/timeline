@@ -11,8 +11,8 @@ import org.apache.struts2.interceptor.SessionAware;
 
 import org.ag.timeline.application.exception.TimelineException;
 import org.ag.timeline.business.model.User;
-import org.ag.timeline.business.service.iface.TimelineIface;
-import org.ag.timeline.business.service.impl.TimelineImpl;
+import org.ag.timeline.business.service.iface.TimelineService;
+import org.ag.timeline.business.service.impl.TimelineServiceImpl;
 import org.ag.timeline.common.TimelineConstants;
 import org.ag.timeline.presentation.transferobject.common.CodeValue;
 import org.ag.timeline.presentation.transferobject.reply.ActivityReply;
@@ -37,7 +37,7 @@ public abstract class BaseAction implements Action, SessionAware {
 	/**
 	 * Business service instance.
 	 */
-	protected final TimelineIface service = new TimelineImpl();
+	protected final TimelineService service = new TimelineServiceImpl();
 
 	/**
 	 * Returns current session user.
