@@ -4,22 +4,17 @@
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping schema="TIMELINE_SCHEMA">
-	<class name="org.ag.timeline.business.model.TimeData" table="TIME_DATA_T" dynamic-update="true"
-		dynamic-insert="true">
+	<class name="org.ag.timeline.business.model.TimeData" table="TIME_DATA_T" dynamic-update="true" dynamic-insert="true">
 		<id name="id" type="java.lang.Long" column="ID">
 			<generator class="sequence">
 				<param name="sequence">TIME_DATA_S</param>
 			</generator>
 		</id>
 
-		<many-to-one name="user" class="org.ag.timeline.business.model.User" column="USER_ID"
-			cascade="none" not-null="true" />
-		<many-to-one name="project" class="org.ag.timeline.business.model.Project" column="PROJECT_ID"
-			cascade="none" not-null="true" />
-		<many-to-one name="activity" class="org.ag.timeline.business.model.Activity" column="ACTIVITY_ID"
-			cascade="none" not-null="true" />
-		<many-to-one name="week" class="org.ag.timeline.business.model.Week" column="WEEK_ID"
-			cascade="none" not-null="true" />
+		<many-to-one name="user" class="org.ag.timeline.business.model.User" column="USER_ID" cascade="none" not-null="true" />
+		<many-to-one name="project" class="org.ag.timeline.business.model.Project" column="PROJECT_ID" cascade="none" not-null="true" />
+		<many-to-one name="activity" class="org.ag.timeline.business.model.Activity" column="ACTIVITY_ID" cascade="none" not-null="true" />
+		<many-to-one name="week" class="org.ag.timeline.business.model.Week" column="WEEK_ID" cascade="none" not-null="true" />
 
 		<property name="data_weekday_1" type="java.math.BigDecimal">
 			<column name="WEEK_DAY_1" />

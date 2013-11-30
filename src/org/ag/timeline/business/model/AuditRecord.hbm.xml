@@ -4,8 +4,7 @@
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping schema="TIMELINE_SCHEMA">
-	<class name="org.ag.timeline.business.model.AuditRecord" table="AUDIT_T" dynamic-update="true"
-		dynamic-insert="true">
+	<class name="org.ag.timeline.business.model.AuditRecord" table="AUDIT_T" dynamic-update="true" dynamic-insert="true">
 		<id name="id" type="java.lang.Long" column="ID">
 			<generator class="sequence">
 				<param name="sequence">AUDIT_S</param>
@@ -32,7 +31,7 @@
 		<property name="userId" type="java.lang.Long">
 			<column name="USER_ID" />
 		</property>
-		
+
 		<set name="details" cascade="all" inverse="true">
 			<key column="AUDIT_ID" />
 			<one-to-many class="org.ag.timeline.business.model.AuditRecordDetail" />

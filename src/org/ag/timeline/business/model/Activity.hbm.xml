@@ -5,8 +5,7 @@
 
 <hibernate-mapping schema="TIMELINE_SCHEMA">
 
-	<class name="org.ag.timeline.business.model.Activity" table="ACTIVITY_T" dynamic-update="true"
-		dynamic-insert="true">
+	<class name="org.ag.timeline.business.model.Activity" table="ACTIVITY_T" dynamic-update="true" dynamic-insert="true">
 
 		<id name="id" type="java.lang.Long" column="ID">
 			<generator class="sequence">
@@ -15,7 +14,7 @@
 		</id>
 
 		<property name="name" type="string" not-null="true" column="NAME" />
-		
+
 		<many-to-one name="project" class="org.ag.timeline.business.model.Project" cascade="none">
 			<column name="PROJECT_ID"></column>
 		</many-to-one>
