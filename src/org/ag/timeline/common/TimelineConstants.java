@@ -115,8 +115,28 @@ public interface TimelineConstants {
 	}
 
 	public static enum AjaxRequestParam {
-		operation, id, refId, text, field, entryId, projectId, activityId, weekStartDate, weekEndDate, weekStartYear,
-		weekEndYear, userDbId, day1, day2, day3, day4, day5, day6, day7;
+		operation,
+		id,
+		refId,
+		text,
+		field,
+		entryId,
+		projectId,
+		activityId,
+		weekStartDate,
+		weekEndDate,
+		startYear,
+		endYear,
+		startWeekNum,
+		endWeekNum,
+		userDbId,
+		day1,
+		day2,
+		day3,
+		day4,
+		day5,
+		day6,
+		day7;
 
 		public static final AjaxRequestParam getParam(String text) {
 			AjaxRequestParam type = null;
@@ -141,9 +161,23 @@ public interface TimelineConstants {
 	};
 
 	public static enum OperationType {
-		PROJECT(false), ACTIVTIES(false), LEAD(false), SAVE_PROJECT(true), SAVE_ACTIVITY(true), SAVE_LEAD(true),
-		SAVE_USER(true), SAVE_TIME_ENTRY(false), DELETE_PROJECT(true), DELETE_ACTIVITY(true), DELETE_USER(true),
-		DELETE_TIME_ENTRY(false), RESET_USER(true), MODIFY_USER(false), MODIFY_USER_PREF(false), SEARCH_ENTRIES(false);
+		PROJECT(false),
+		ACTIVTIES(false),
+		LEAD(false),
+		SAVE_PROJECT(true),
+		SAVE_ACTIVITY(true),
+		SAVE_LEAD(true),
+		SAVE_USER(true),
+		SAVE_TIME_ENTRY(false),
+		DELETE_PROJECT(true),
+		DELETE_ACTIVITY(true),
+		DELETE_USER(true),
+		DELETE_TIME_ENTRY(false),
+		RESET_USER(true),
+		MODIFY_USER(false),
+		MODIFY_USER_PREF(false),
+		SEARCH_ENTRIES(false),
+		REPORT_DETAIL(false);
 
 		/**
 		 * Denotes if an operation can be done by admin only.
