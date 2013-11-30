@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.ag.timeline.application.exception.TimelineException;
 import org.ag.timeline.business.model.User;
 import org.ag.timeline.business.model.UserPreferences;
-import org.ag.timeline.business.service.iface.TimelineIface;
-import org.ag.timeline.business.service.impl.TimelineImpl;
+import org.ag.timeline.business.service.iface.TimelineService;
+import org.ag.timeline.business.service.impl.TimelineServiceImpl;
 import org.ag.timeline.common.TextHelper;
 import org.ag.timeline.common.TimelineConstants;
 import org.ag.timeline.presentation.transferobject.common.CodeValue;
@@ -27,6 +27,8 @@ import org.ag.timeline.presentation.transferobject.input.UserPreferencesInput;
 import org.ag.timeline.presentation.transferobject.reply.ActivityReply;
 import org.ag.timeline.presentation.transferobject.reply.BusinessReply;
 import org.ag.timeline.presentation.transferobject.reply.CodeValueReply;
+import org.ag.timeline.presentation.transferobject.reply.DetailedReportReply;
+import org.ag.timeline.presentation.transferobject.reply.DetailedReportRow;
 import org.ag.timeline.presentation.transferobject.reply.ProjectData;
 import org.ag.timeline.presentation.transferobject.reply.ProjectReply;
 import org.ag.timeline.presentation.transferobject.reply.TimeDataReply;
@@ -36,6 +38,7 @@ import org.ag.timeline.presentation.transferobject.reply.UserReply;
 import org.ag.timeline.presentation.transferobject.reply.UserSearchReply;
 import org.ag.timeline.presentation.transferobject.search.ActivitySearchParameter;
 import org.ag.timeline.presentation.transferobject.search.ProjectSearchParameter;
+import org.ag.timeline.presentation.transferobject.search.ReportSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.TimeDataSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.UserSearchParameter;
 
@@ -54,7 +57,7 @@ public class AjaxServlet extends HttpServlet {
 	/**
 	 * Service interface to be used for backend calls.
 	 */
-	private static final TimelineIface SERVICE = new TimelineImpl();
+	private static final TimelineService SERVICE = new TimelineServiceImpl();
 
 	/**
 	 * Response type JSON.
@@ -96,7 +99,7 @@ public class AjaxServlet extends HttpServlet {
 					List<CodeValue> activities = new ArrayList<CodeValue>();
 
 					for (long projId : projectIds) {
-						activities.addAll(activityReply.getProjectActivities(projId));
+						activities.addAll(activityReply.getProjectActivitiesById(projId));
 					}
 
 					if (activities != null) {
@@ -170,6 +173,27 @@ public class AjaxServlet extends HttpServlet {
 
 				} else {
 					builder.append("\"error\" : \"" + preferenceReply.getMessage() + "\"");
+				}
+			} else if (reply instanceof DetailedReportReply) {
+
+				DetailedReportReply detailedReportReply = (DetailedReportReply) reply;
+
+				if ((detailedReportReply != null) && (detailedReportReply.isRowsPresent())) {
+
+					builder.append("\"totalSum\" : \"" + detailedReportReply.getTotal() + "\",");
+					builder.append("\"details\" : [");
+
+					for (DetailedReportRow row : detailedReportReply.getRowList()) {
+						builder.append("{\"weekStartDate\" : \"").append(TextHelper.getDisplayWeekDay(row.getWeekStartDate())).append("\",");
+						builder.append("\"weekEndDate\" : \"").append(TextHelper.getDisplayWeekDay(row.getWeekEndDate())).append("\",");
+						builder.append("\"activityName\" : \"").append(row.getActivityName()).append("\",");
+						builder.append("\"weeklySum\" : \"").append(row.getWeeklySum()).append("\"},");
+					}
+
+					builder = new StringBuilder(builder.substring(0, builder.length() - 1)).append("]");
+
+				} else {
+					builder.append("\"error\" : \"No Details Available.\"");
 				}
 
 			} else if (reply instanceof TimeDataReply) {
@@ -507,12 +531,12 @@ public class AjaxServlet extends HttpServlet {
 
 	private void saveActivity(HttpServletRequest request, HttpServletResponse response) {
 
-		long projId = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.id
-				.getParamText()));
+		long projId = TextHelper
+				.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.id.getParamText()));
 		long actId = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.refId
 				.getParamText()));
-		String text = TextHelper.trimToNull(request.getParameter(TimelineConstants.AjaxRequestParam.text
-				.getParamText()));
+		String text = TextHelper
+				.trimToNull(request.getParameter(TimelineConstants.AjaxRequestParam.text.getParamText()));
 
 		PrintWriter out = null;
 
@@ -565,28 +589,27 @@ public class AjaxServlet extends HttpServlet {
 
 				input.setId(id);
 
-				final TimelineConstants.UserDataFieldType type = TimelineConstants.UserDataFieldType
-						.getType(field);
+				final TimelineConstants.UserDataFieldType type = TimelineConstants.UserDataFieldType.getType(field);
 				input.setType(type);
 
 				switch (type) {
-					case FIRST_NAME:
-						input.setFirstName(value);
-						break;
-					case LAST_NAME:
-						input.setLastName(value);
-						break;
-					case USER_ID:
-						input.setUserId(value);
-						break;
-					case PASSWORD:
-						input.setPassword(value);
-						break;
-					case ADMIN:
-						input.setAdmin(Boolean.valueOf(value));
-						break;
-					default:
-						break;
+				case FIRST_NAME:
+					input.setFirstName(value);
+					break;
+				case LAST_NAME:
+					input.setLastName(value);
+					break;
+				case USER_ID:
+					input.setUserId(value);
+					break;
+				case PASSWORD:
+					input.setPassword(value);
+					break;
+				case ADMIN:
+					input.setAdmin(Boolean.valueOf(value));
+					break;
+				default:
+					break;
 				}
 
 				try {
@@ -632,14 +655,14 @@ public class AjaxServlet extends HttpServlet {
 				input.setType(type);
 
 				switch (type) {
-					case QUESTION:
-						input.setQuestion(value);
-						break;
-					case ANSWER:
-						input.setAnswer(value);
-						break;
-					default:
-						break;
+				case QUESTION:
+					input.setQuestion(value);
+					break;
+				case ANSWER:
+					input.setAnswer(value);
+					break;
+				default:
+					break;
 				}
 
 				try {
@@ -857,8 +880,8 @@ public class AjaxServlet extends HttpServlet {
 		long userDbId = 0;
 		long startWeekNum = 0;
 		long endWeekNum = 0;
-		long weekStartYear = 0;
-		long weekEndYear = 0;
+		long startYear = 0;
+		long endYear = 0;
 		long projectId = 0;
 		long activityId = 0;
 
@@ -877,7 +900,17 @@ public class AjaxServlet extends HttpServlet {
 					.getParamText()));
 			userDbId = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.userDbId
 					.getParamText()));
-
+			
+			startWeekNum = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.startWeekNum
+					.getParamText()));
+			startYear = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.startYear
+					.getParamText()));
+			
+			endWeekNum = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.endWeekNum
+					.getParamText()));
+			endYear = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.endYear
+					.getParamText()));
+			
 			User user = getSessionUser(request);
 
 			// non-admin user can search only his/her entries
@@ -888,19 +921,13 @@ public class AjaxServlet extends HttpServlet {
 			// set default values
 			if (weekStartDate == null) {
 				weekStartDate = new Date();
-				weekStartYear = TextHelper.getYear(weekStartDate);
+				startYear = TextHelper.getYear(weekStartDate);
 				startWeekNum = TextHelper.getWeekNumber(weekStartDate);
-			} else {
-				weekStartYear = TextHelper.getYear(weekStartDate);
-				startWeekNum = TextHelper.getWeekNumber(weekStartDate);
-			}
+			} 
 
 			if (weekEndDate == null) {
 				weekEndDate = new Date();
-				weekEndYear = TextHelper.getYear(weekEndDate);
-				endWeekNum = TextHelper.getWeekNumber(weekEndDate);
-			} else {
-				weekEndYear = TextHelper.getYear(weekEndDate);
+				endYear = TextHelper.getYear(weekEndDate);
 				endWeekNum = TextHelper.getWeekNumber(weekEndDate);
 			}
 
@@ -916,10 +943,12 @@ public class AjaxServlet extends HttpServlet {
 				searchParameters.setActivityid(activityId);
 				searchParameters.setProjectId(projectId);
 				searchParameters.setUserId(userDbId);
+				searchParameters.setStartDate(weekStartDate);
 				searchParameters.setStartWeekNum(startWeekNum);
-				searchParameters.setStartYear(weekStartYear);
+				searchParameters.setStartYear(startYear);
+				searchParameters.setEndDate(weekEndDate);
 				searchParameters.setEndWeekNum(endWeekNum);
-				searchParameters.setEndYear(weekEndYear);
+				searchParameters.setEndYear(endYear);
 
 				// call service
 				TimeDataReply reply = SERVICE.searchTimeData(searchParameters);
@@ -938,13 +967,54 @@ public class AjaxServlet extends HttpServlet {
 					out.close();
 				}
 			}
+		}
+	}
 
+	/**
+	 * Fetches report details.
+	 * 
+	 * @param request
+	 * @param response
+	 */
+	private void getReportDetails(HttpServletRequest request, HttpServletResponse response) {
+
+		long projectId = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.projectId
+				.getParamText()));
+
+		if (projectId > 0) {
+
+			// start search
+			{
+				PrintWriter out = null;
+
+				try {
+					// populate search parameter
+					ReportSearchParameters searchParameters = new ReportSearchParameters();
+					searchParameters.setProjectDbId(projectId);
+
+					// call service
+					DetailedReportReply reply = SERVICE.getDetailedReport(searchParameters);
+
+					// prepare JSON
+					String json = getJSON(reply);
+					out = response.getWriter();
+					out.println(json);
+
+				} catch (TimelineException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} finally {
+					if (out != null) {
+						out.close();
+					}
+				}
+			}
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest
 	 * , javax.servlet.http.HttpServletResponse)
@@ -956,7 +1026,6 @@ public class AjaxServlet extends HttpServlet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest
 	 * , javax.servlet.http.HttpServletResponse)
@@ -967,8 +1036,8 @@ public class AjaxServlet extends HttpServlet {
 
 		boolean validUser = false;
 
-		final String typeStr = TextHelper.trimToNull(request
-				.getParameter(TimelineConstants.AjaxRequestParam.operation.getParamText()));
+		final String typeStr = TextHelper.trimToNull(request.getParameter(TimelineConstants.AjaxRequestParam.operation
+				.getParamText()));
 		final TimelineConstants.OperationType type = TimelineConstants.OperationType.getOperationType(typeStr);
 
 		{
@@ -1015,6 +1084,8 @@ public class AjaxServlet extends HttpServlet {
 				modifyUserPreferences(request, response);
 			} else if (TimelineConstants.OperationType.SEARCH_ENTRIES.toString().equalsIgnoreCase(typeStr)) {
 				searchEntries(request, response);
+			} else if (TimelineConstants.OperationType.REPORT_DETAIL.toString().equalsIgnoreCase(typeStr)) {
+				getReportDetails(request, response);
 			}
 		} else {
 			handleInvalidRequest(request, response);
