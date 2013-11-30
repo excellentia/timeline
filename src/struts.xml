@@ -29,6 +29,12 @@
 			<result name="error">pages/login.jsp</result>
 		</action>
 
+		<action name="ReportDetail"
+			class="org.ag.timeline.presentation.action.ReportDetailAction">
+			<result name="success">pages/report-details.jsp</result>
+			<result name="error">pages/login.jsp</result>
+		</action>
+
 		<action name="Account"
 			class="org.ag.timeline.presentation.action.AccountSettingsAction">
 			<result name="success">pages/account-settings.jsp</result>
