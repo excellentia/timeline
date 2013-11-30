@@ -1,6 +1,6 @@
 package org.ag.timeline.presentation.action;
 
-import org.ag.timeline.presentation.transferobject.reply.ReportDataReply;
+import org.ag.timeline.presentation.transferobject.reply.SummaryReportReply;
 import org.ag.timeline.presentation.transferobject.search.ReportSearchParameters;
 
 /**
@@ -14,7 +14,7 @@ public class ReportAction extends SecureBaseAction {
 	private long activityId = 0;
 	private long userId = 0;
 	private boolean exportToFile = false;
-	private ReportDataReply reply = null;
+	private SummaryReportReply reply = null;
 
 	/*
 	 * (non-Javadoc)
@@ -41,7 +41,7 @@ public class ReportAction extends SecureBaseAction {
 			forward = null;
 		}
 
-		this.reply = service.getReport(searchParameters);
+		this.reply = service.getSummaryReport(searchParameters);
 		return forward;
 	}
 
@@ -104,7 +104,7 @@ public class ReportAction extends SecureBaseAction {
 	 * 
 	 * @return the reply
 	 */
-	public ReportDataReply getReply() {
+	public SummaryReportReply getReply() {
 		return reply;
 	}
 
@@ -113,7 +113,7 @@ public class ReportAction extends SecureBaseAction {
 	 * 
 	 * @param reply the reply to set
 	 */
-	public void setReply(ReportDataReply reply) {
+	public void setReply(SummaryReportReply reply) {
 		this.reply = reply;
 	}
 
