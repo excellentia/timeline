@@ -21,9 +21,9 @@
 			<%-- Week Select Area --%>
 			<p class="message">Select Week</p>
 			<div id="searchBar">
-				<input id="weekArea" type="text" class="dateSearch" readonly="readonly" title="Selected Week" disabled="disabled" />
-				<input id="weekpicker" type="hidden" /> <img id="weekImg" title="Click To Select Week" alt="Click To Select Week"
-					src="./pages/inc/images/calendar.gif" />
+				<input id="weekArea" type="text" class="dateSearch" readonly="readonly" title="Selected Week" disabled="disabled" /> 
+				<input id="weekpicker" type="hidden" /> 
+				<img id="weekImg" title="Click To Select Week" alt="Click To Select Week" src="./pages/inc/images/calendar.gif" />
 			</div>
 			<div>
 				<table style="width: 100%;" id="timeTable">
@@ -75,21 +75,19 @@
 			<div id="searchBar">
 				<%-- Start Week --%>
 				<div style="display: inline; padding: 0; margin: 0">
-					<input id="startWeekSearch" type="text" class="dateSearch" readonly="readonly" title="Start Week"
-						disabled="disabled" value="${startWeekLabel}" /> <input id="startWeekPicker" type="hidden" /> <img
-						id="startWeekImg" title="Click To Select Start Week" alt="Click To Select Start Week"
-						src="./pages/inc/images/calendar.gif" /> &nbsp;to&nbsp;
+					<input id="startWeekSearch" type="text" class="dateSearch" readonly="readonly" title="Start Week" disabled="disabled" value="${startWeekLabel}" /> 
+					<input id="startWeekPicker" type="hidden" /> 
+					<img id="startWeekImg" title="Click To Select Start Week" alt="Click To Select Start Week" src="./pages/inc/images/calendar.gif" /> &nbsp;to&nbsp;
 				</div>
 				<%-- End Week --%>
 				<div style="display: inline; padding: 0; margin: 0">
-					<input id="endWeekSearch" type="text" class="dateSearch" readonly="readonly" title="End Week" disabled="disabled"
-						value="${endWeekLabel}" /> <input id="endWeekPicker" type="hidden" /> <img id="endWeekImg"
-						title="Click To Select End Week" alt="Click To Select End Week" src="./pages/inc/images/calendar.gif" />
+					<input id="endWeekSearch" type="text" class="dateSearch" readonly="readonly" title="End Week" disabled="disabled" value="${endWeekLabel}" /> 
+					<input id="endWeekPicker" type="hidden" /> 
+					<img id="endWeekImg" title="Click To Select End Week" alt="Click To Select End Week" src="./pages/inc/images/calendar.gif" />
 				</div>
 				<%-- Project --%>
 				<div style="display: inline; padding: 0; margin: 0; margin-left: 2em;">
-					<select id="searchProjectId" name="" searchProjectId"" size="1" class="dateSearch" title="Select Project"
-						onchange="populateActivities('searchProjectId','searchActivityId')">
+					<select id="searchProjectId" name="" searchProjectId"" size="1" class="dateSearch" title="Select Project" onchange="populateActivities('searchProjectId','searchActivityId')">
 						<option value="0" <c:if test="${selectedProjId == 0}">selected="selected"</c:if>>All Projects</option>
 						<c:forEach var="project" items="${PROJECT_LIST.projects}">
 							<option value="${project.code}" <c:if test="${selectedProjId == project.code}">selected="selected"</c:if>>${project.value}</option>
@@ -119,8 +117,7 @@
 					</div>
 				</c:if>
 				<div style="display: inline; padding: 0; margin: 0; margin-left: 1em;">
-					<input type="button" value="Search" class="button" style="height: 1.5em;"
-						onclick="searchEntries('mySearchResults','myEntrySearchResults_body','my_entry_accordion',${SESSION_USER.admin})" />
+					<input type="button" value="Search" class="button" style="height: 1.5em;" onclick="searchEntries('mySearchResults','myEntrySearchResults_body','my_entry_accordion',${SESSION_USER.admin})" />
 				</div>
 			</div>
 			<%-- Results Area --%>
@@ -170,8 +167,7 @@
 												<c:forEach var="weeklyEntry" items="${entries}">
 													<c:set var="entryId">entry_${weeklyEntry.id}</c:set>
 													<tr id='${entryId}' class="leadColumn">
-														<td>${weeklyEntry.projectName} <input type="hidden" id="startDate_${weeklyEntry.id}"
-															value="${weeklyEntry.formattedStartDate}" />
+														<td>${weeklyEntry.projectName} <input type="hidden" id="startDate_${weeklyEntry.id}" value="${weeklyEntry.formattedStartDate}" />
 														</td>
 														<td>${weeklyEntry.activityName}</td>
 														<td>${weeklyEntry.leadName}</td>
@@ -183,11 +179,14 @@
 														<td class="weekEnd">${weeklyEntry.day_6_time}</td>
 														<td class="weekEnd">${weeklyEntry.day_7_time}</td>
 														<td class="rowTotal">${weeklyEntry.weeklySum}</td>
-														<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}"
-															src="${editIconPath}"
-															onclick="editTimeEntry('${entryId}',${weeklyEntry.projectId},${weeklyEntry.activityId}, ${weeklyEntry.id})" /></td>
-														<td align="center"><img alt="Delete" align="middle" class="icon" title="${activityDeleteTitle}"
-															src="${deleteIconPath}" onclick="deleteTimeEntry('${entryId}',${weeklyEntry.id})" /></td>
+														<td align="center">
+															<img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" 
+																onclick="editTimeEntry('${entryId}',${weeklyEntry.projectId},${weeklyEntry.activityId}, ${weeklyEntry.id})" />
+														</td>
+														<td align="center">
+															<img alt="Delete" align="middle" class="icon" title="${activityDeleteTitle}" src="${deleteIconPath}" 
+																onclick="deleteTimeEntry('${entryId}',${weeklyEntry.id})" />
+														</td>
 													</tr>
 												</c:forEach>
 											</c:if>

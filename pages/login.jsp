@@ -25,8 +25,9 @@
 						<td><input type="password" class="dataEntry" id="password" name="password" tabindex="2" maxlength="20" /></td>
 					</tr>
 					<tr>
-						<td style="font-size: 0.8em; border-right: 1px solid white"><a style="text-decoration: none;"
-							title="Forgot Password ?" href="./Reset">Troubleshoot !</a></td>
+						<td style="font-size: 0.8em; border-right: 1px solid white">
+							<a style="text-decoration: none;" title="Forgot Password ?" href="./Reset">Troubleshoot !</a>
+						</td>
 						<td style="text-align: right"><input type="submit" value="Login" id="loginButton" class="button" tabindex="3" /></td>
 					</tr>
 				</tbody>
