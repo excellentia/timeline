@@ -3,6 +3,8 @@
  */
 package org.ag.timeline.presentation.transferobject.search;
 
+import java.util.Date;
+
 
 /**
  * Wraps the search parameters.
@@ -67,6 +69,22 @@ public class TimeDataSearchParameters extends BasicSearchParameter {
 
 	public void setActivityid(long activityId) {
 		this.activity.setActivityId(activityId);
+	}
+	
+	public Date getStartDate() {
+		return this.startWeek.getStartDate();
+	}
+
+	public void setStartDate(Date startDate) {
+		this.startWeek.setStartDate(startDate);
+	}
+	
+	public Date getEndDate() {
+		return this.endWeek.getEndDate();
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endWeek.setEndDate(endDate);
 	}
 
 	public long getStartWeekNum() {
