@@ -17,8 +17,8 @@ import org.hsqldb.Server;
 import org.ag.timeline.application.context.RequestContext;
 import org.ag.timeline.application.context.TimelineContext;
 import org.ag.timeline.application.exception.TimelineException;
-import org.ag.timeline.business.service.iface.TimelineIface;
-import org.ag.timeline.business.service.impl.TimelineImpl;
+import org.ag.timeline.business.service.iface.TimelineService;
+import org.ag.timeline.business.service.impl.TimelineServiceImpl;
 import org.ag.timeline.business.util.HibernateUtil;
 import org.ag.timeline.common.TimelineConstants;
 
@@ -104,7 +104,7 @@ public class TimelineApplicationListener implements ServletContextListener {
 
 			TimelineContext context = new TimelineContext(-1);
 			RequestContext.setTimelineContext(context);
-			TimelineIface impl = new TimelineImpl();
+			TimelineService impl = new TimelineServiceImpl();
 			impl.systemManagement();
 
 		} catch (TimelineException e) {
