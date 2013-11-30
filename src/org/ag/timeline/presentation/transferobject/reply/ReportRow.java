@@ -6,11 +6,6 @@ package org.ag.timeline.presentation.transferobject.reply;
  * 
  * @author Abhishek Gaurav
  */
-/**
- * 
- * 
- * @author Abhishek Gaurav
- */
 public class ReportRow {
 
 	private long projectId = 0;
