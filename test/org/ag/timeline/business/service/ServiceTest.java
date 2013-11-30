@@ -18,8 +18,8 @@ import org.ag.timeline.business.model.Project;
 import org.ag.timeline.business.model.TimeData;
 import org.ag.timeline.business.model.User;
 import org.ag.timeline.business.model.UserPreferences;
-import org.ag.timeline.business.service.iface.TimelineIface;
-import org.ag.timeline.business.service.impl.TimelineImpl;
+import org.ag.timeline.business.service.iface.TimelineService;
+import org.ag.timeline.business.service.impl.TimelineServiceImpl;
 import org.ag.timeline.business.util.HibernateUtil;
 import org.ag.timeline.common.TextHelper;
 import org.ag.timeline.common.TimelineConstants.AuditDataType;
@@ -64,7 +64,7 @@ public class ServiceTest {
 	/**
 	 * Service implementation.
 	 */
-	private static TimelineIface impl = null;
+	private static TimelineService impl = null;
 
 	/**
 	 * Helper for test data management.
@@ -83,7 +83,7 @@ public class ServiceTest {
 			dataHelper = TestDataHelper.getInstance(session);
 			RequestContext.setTimelineContext(new TimelineContext(dataHelper.getTestUserDbId()));
 
-			impl = new TimelineImpl();
+			impl = new TimelineServiceImpl();
 			impl.systemManagement();
 
 		} catch (Exception e) {
@@ -726,9 +726,9 @@ public class ServiceTest {
 				for (long projectId : reply.getProjectIds()) {
 					Assert.assertTrue("Incorrect Project Id.", projMap.containsKey(projectId));
 					Assert.assertEquals("Incorrect Activity Count.", mapping.get(projectId).size(), reply
-							.getProjectActivities(projectId).size());
+							.getProjectActivitiesById(projectId).size());
 
-					for (CodeValue activity : reply.getProjectActivities(projectId)) {
+					for (CodeValue activity : reply.getProjectActivitiesById(projectId)) {
 						Assert.assertTrue("Incorrect Activity results.", actMap.containsKey(activity.getCode()));
 						Assert.assertEquals("Incorrect Activity results.", actMap.get(activity.getCode()),
 								activity.getValue());
@@ -755,7 +755,7 @@ public class ServiceTest {
 				for (long projectId : reply.getProjectIds()) {
 					Assert.assertTrue("Incorrect Project Id.", projMap.containsKey(projectId));
 
-					for (CodeValue activity : reply.getProjectActivities(projectId)) {
+					for (CodeValue activity : reply.getProjectActivitiesById(projectId)) {
 						Assert.assertTrue("Incorrect Activity results.", actMap.containsKey(activity.getCode()));
 						Assert.assertEquals("Incorrect Activity results.", actMap.get(activity.getCode()),
 								activity.getValue());
@@ -781,7 +781,7 @@ public class ServiceTest {
 				long projectId = reply.getProjectIds().iterator().next();
 				Assert.assertTrue("Incorrect Project Id.", projMap.containsKey(projectId));
 
-				CodeValue activity = reply.getProjectActivities(projectId).iterator().next();
+				CodeValue activity = reply.getProjectActivitiesById(projectId).iterator().next();
 				Assert.assertTrue("Incorrect Activity results.", (activityId == activity.getCode()));
 				Assert.assertEquals("Incorrect Activity results.", actMap.get(activity.getCode()), activity.getValue());
 
