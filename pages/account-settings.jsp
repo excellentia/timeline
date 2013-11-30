@@ -26,38 +26,32 @@
 				<tr id="USER_ID">
 					<td class="label">User Id</td>
 					<td class="data">${SESSION_USER.userId}</td>
-					<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}"
-						onclick="editAccountSettings('USER_ID',${userId})" /></td>
+					<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" onclick="editAccountSettings('USER_ID',${userId})" /></td>
 				</tr>
 				<tr id="FIRST_NAME">
 					<td class="label">First Name</td>
 					<td class="data">${SESSION_USER.firstName}</td>
-					<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}"
-						onclick="editAccountSettings('FIRST_NAME',${userId})" /></td>
+					<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" onclick="editAccountSettings('FIRST_NAME',${userId})" /></td>
 				</tr>
 				<tr id="LAST_NAME">
 					<td class="label">Last Name</td>
 					<td class="data">${SESSION_USER.lastName}</td>
-					<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}"
-						onclick="editAccountSettings('LAST_NAME',${userId})" /></td>
+					<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" onclick="editAccountSettings('LAST_NAME',${userId})" /></td>
 				</tr>
 				<tr id="PASSWORD">
 					<td class="label">Password</td>
 					<td class="data">${SESSION_USER.password}</td>
-					<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}"
-						onclick="editAccountSettings('PASSWORD',${userId})" /></td>
+					<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" onclick="editAccountSettings('PASSWORD',${userId})" /></td>
 				</tr>
 				<tr id="QUESTION">
 					<td class="label">Question</td>
 					<td class="data">${preferences.question}</td>
-					<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}"
-						onclick="editAccountSettings('QUESTION',${userId})" /></td>
+					<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" onclick="editAccountSettings('QUESTION',${userId})" /></td>
 				</tr>
 				<tr id="ANSWER">
-					<td class="label">Password</td>
+					<td class="label">Answer</td>
 					<td class="data">${preferences.answer}</td>
-					<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}"
-						onclick="editAccountSettings('ANSWER',${userId})" /></td>
+					<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" onclick="editAccountSettings('ANSWER',${userId})" /></td>
 				</tr>
 			</tbody>
 		</table>
