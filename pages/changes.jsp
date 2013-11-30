@@ -15,7 +15,7 @@
 	<%-- Search Area --%>
 	<p style="height: 2em;">Select Search Criteria</p>
 	<div id="searchBar">
-		<form action="./Changes" id="searchForm" name="searchForm" method="POST">
+		<form action="Changes" id="searchForm" name="searchForm" method="POST">
 
 			<c:set var="selectedUserId" value="${userId}" />
 			<c:set var="selectedDataTypeId" value="${entityType}" />
@@ -23,17 +23,17 @@
 			<input type="hidden" name="search" value="true" />
 
 			<div class="thin">From</div>
-			<div class="thin" style="padding-right: 1em;">
-				<input type="text" id="fromDate" name="fromDate" class="dateSearch" style="width: 7.5em;" value="${fromDate}"
-					readonly="readonly"><img id="fromDateImg" src="./pages/inc/images/calendar.gif" />
+			<div class="thin" style="padding-left: 0.5em; padding-right: 1.5em;">
+				<input type="text" id="fromDate" name="fromDate" class="dateSearch" style="width: 7.5em;" value="${fromDate}" readonly="readonly">
+				<img id="fromDateImg" src="./pages/inc/images/calendar.gif" />
 			</div>
 			<div class="thin">To</div>
-			<div class="thin">
-				<input type="text" id="toDate" name="toDate" class="dateSearch" style="width: 7.5em;" value="${toDate}"
-					readonly="readonly"><img id="toDateImg" src="./pages/inc/images/calendar.gif" />
+			<div class="thin" style="padding-left: 0.5em; padding-right: 1.5em;">
+				<input type="text" id="toDate" name="toDate" class="dateSearch" style="width: 7.5em;" value="${toDate}" readonly="readonly">
+				<img id="toDateImg" src="./pages/inc/images/calendar.gif" />
 			</div>
-			<div class="thin" style="padding-left: 1em;">Type</div>
-			<div class="thin">
+			<div class="thin">Type</div>
+			<div class="thin" style="padding-left: 0.5em; padding-right: 1.5em;">
 				<select id="entityType" size="1" name="entityType" class="dateSearch" title="Select Data Type">
 					<option value="0" <c:if test="${selectedDataTypeId == 0}">selected="selected"</c:if>>All Types</option>
 					<c:forEach var="type" items="${DATA_TYPE_LIST}">
@@ -41,19 +41,18 @@
 					</c:forEach>
 				</select>
 			</div>
-			<div class="thin" style="padding-left: 1em;">Operation</div>
-			<div class="thin">
+			<div class="thin">Operation</div>
+			<div class="thin" style="padding-left: 0.5em; padding-right: 1em;">
 				<select id="operationType" size="1" name="operationType" class="dateSearch" title="Select Operation Type">
 					<option value="0" <c:if test="${selectedOperationId == 0}">selected="selected"</c:if>>All Operations</option>
 					<c:forEach var="operationType" items="${OPERATION_TYPE_LIST}">
-						<option value="${operationType.code}"
-							<c:if test="${selectedOperationId == operationType.code}">selected="selected"</c:if>>${operationType.value}</option>
+						<option value="${operationType.code}" <c:if test="${selectedOperationId == operationType.code}">selected="selected"</c:if>>${operationType.value}</option>
 					</c:forEach>
 				</select>
 			</div>
 			<c:if test="${SESSION_USER.admin}">
-				<div class="thin" style="padding-left: 1em;">User</div>
-				<div class="thin">
+				<div class="thin">User</div>
+				<div class="thin" style="padding-left: 0.5em; padding-right: 1em;">
 					<select id="userId" size="1" name="userId" class="dateSearch" title="Select User">
 						<option value="0" <c:if test="${selectedUserId == 0}">selected="selected"</c:if>>All Users</option>
 						<c:forEach var="user" items="${USER_LIST.users}">
@@ -63,7 +62,7 @@
 				</div>
 			</c:if>
 			<div class="thin" style="padding-left: 1em;">
-				<input type="submit" value="Display Changes" class="button" />
+				<input type="submit" value="Display Changes" class="button" style="font-size: 0.8em;" />
 			</div>
 		</form>
 	</div>
