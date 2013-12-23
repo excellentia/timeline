@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.ag.timeline.presentation.transferobject.reply;
 
 import java.util.Date;
@@ -17,33 +14,52 @@ public class TimeDataRow {
 	private long id = 0;
 
 	private long projectId = 0;
+
 	private String projectName = null;
+
 	private String leadName = null;
 
 	private long activityId = 0;
+
 	private String activityName = null;
 
 	private long userId = 0;
+
 	private String userFirstName = null;
+
 	private String userLastName = null;
+
 	private String userFullName = null;
 
+	private String userAbbrvName = null;
+
 	private long weekId = 0;
+
 	private long year = 0;
+
 	private long weekNum = 0;
 
 	private Date startDate = null;
+
 	private Date endDate = null;
 
 	private double day_1_time = 0;
+
 	private double day_2_time = 0;
+
 	private double day_3_time = 0;
+
 	private double day_4_time = 0;
+
 	private double day_5_time = 0;
+
 	private double day_6_time = 0;
+
 	private double day_7_time = 0;
 
 	private double weeklySum = 0;
+
+	private boolean proxyRow = false;
 
 	/**
 	 * Getter for id.
@@ -442,12 +458,48 @@ public class TimeDataRow {
 	}
 
 	/**
+	 * Getter for userAbbrvName.
+	 * 
+	 * @return The userAbbrvName.
+	 */
+	public String getUserAbbrvName() {
+		return userAbbrvName;
+	}
+
+	/**
+	 * Setter for userAbbrvName.
+	 * 
+	 * @param userAbbrvName The userAbbrvName to set.
+	 */
+	public void setUserAbbrvName(String userAbbrvName) {
+		this.userAbbrvName = userAbbrvName;
+	}
+
+	/**
 	 * Getter for weeklySum.
 	 * 
 	 * @return the weeklySum
 	 */
 	public double getWeeklySum() {
 		return weeklySum;
+	}
+
+	/**
+	 * Getter for proxyRow.
+	 * 
+	 * @return The proxyRow.
+	 */
+	public boolean isProxyRow() {
+		return proxyRow;
+	}
+
+	/**
+	 * Setter for proxyRow.
+	 * 
+	 * @param proxyRow The proxyRow to set.
+	 */
+	public void setProxyRow(boolean proxyRow) {
+		this.proxyRow = proxyRow;
 	}
 
 	/**

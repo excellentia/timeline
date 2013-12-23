@@ -20,7 +20,7 @@ public class UserSearchParameter extends BasicSearchParameter {
 	public void setId(long id) {
 		this.user.setId(id);
 	}
-	
+
 	public String getUserId() {
 		return this.user.getUserId();
 	}
@@ -51,6 +51,14 @@ public class UserSearchParameter extends BasicSearchParameter {
 
 	public void setOnlyAdmin(boolean admin) {
 		this.user.setAdmin(admin);
+	}
+
+	public boolean getOnlyActive() {
+		return this.user.isActive();
+	}
+
+	public void setOnlyActive(boolean active) {
+		this.user.setActive(active);
 	}
 
 }

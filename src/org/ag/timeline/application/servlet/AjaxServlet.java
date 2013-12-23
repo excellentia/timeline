@@ -21,6 +21,7 @@ import org.ag.timeline.common.TimelineConstants;
 import org.ag.timeline.presentation.transferobject.common.CodeValue;
 import org.ag.timeline.presentation.transferobject.input.CodeValueInput;
 import org.ag.timeline.presentation.transferobject.input.ProjectInput;
+import org.ag.timeline.presentation.transferobject.input.StatusInput;
 import org.ag.timeline.presentation.transferobject.input.TimeDataInput;
 import org.ag.timeline.presentation.transferobject.input.UserInput;
 import org.ag.timeline.presentation.transferobject.input.UserPreferencesInput;
@@ -36,11 +37,13 @@ import org.ag.timeline.presentation.transferobject.reply.TimeDataRow;
 import org.ag.timeline.presentation.transferobject.reply.UserPreferenceReply;
 import org.ag.timeline.presentation.transferobject.reply.UserReply;
 import org.ag.timeline.presentation.transferobject.reply.UserSearchReply;
+import org.ag.timeline.presentation.transferobject.reply.WeeklyUserReply;
 import org.ag.timeline.presentation.transferobject.search.ActivitySearchParameter;
 import org.ag.timeline.presentation.transferobject.search.ProjectSearchParameter;
 import org.ag.timeline.presentation.transferobject.search.ReportSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.TimeDataSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.UserSearchParameter;
+import org.ag.timeline.presentation.transferobject.search.WeekSearchParameter;
 
 /**
  * Ajax Application controller servlet.
@@ -184,8 +187,10 @@ public class AjaxServlet extends HttpServlet {
 					builder.append("\"details\" : [");
 
 					for (DetailedReportRow row : detailedReportReply.getRowList()) {
-						builder.append("{\"weekStartDate\" : \"").append(TextHelper.getDisplayWeekDay(row.getWeekStartDate())).append("\",");
-						builder.append("\"weekEndDate\" : \"").append(TextHelper.getDisplayWeekDay(row.getWeekEndDate())).append("\",");
+						builder.append("{\"weekStartDate\" : \"")
+								.append(TextHelper.getDisplayWeekDay(row.getWeekStartDate())).append("\",");
+						builder.append("\"weekEndDate\" : \"")
+								.append(TextHelper.getDisplayWeekDay(row.getWeekEndDate())).append("\",");
 						builder.append("\"activityName\" : \"").append(row.getActivityName()).append("\",");
 						builder.append("\"weeklySum\" : \"").append(row.getWeeklySum()).append("\"},");
 					}
@@ -267,6 +272,42 @@ public class AjaxServlet extends HttpServlet {
 
 				} else {
 					builder.append("\"error\" : \"No Entries Found.\"");
+				}
+			} else if (reply instanceof WeeklyUserReply) {
+				WeeklyUserReply userReply = (WeeklyUserReply) reply;
+
+				if ((userReply != null) && (userReply.getUserCount() > 0)) {
+
+					List<Long> weekIdList = userReply.getWeekIdList();
+					builder.append("\"weeklyUserData\" : [");
+
+					for (long weekId : weekIdList) {
+						builder.append("{");
+						builder.append("\"weekName\" : \"").append(userReply.getWeekLabel(weekId)).append("\",");
+
+						// populate entry data info
+						{
+							builder.append("\"users\" : [");
+
+							for (User user : userReply.getWeeklyUsers(weekId)) {
+								builder.append("{");
+								builder.append("\"userName\" : \"").append(user.getUserName()).append("\"");
+								builder.append("},");
+							}
+
+							// remove trailing comma
+							builder = new StringBuilder(builder.substring(0, builder.length() - 1));
+							builder.append("]");
+						}
+
+						builder.append("},");
+					}
+
+					// remove trailing comma
+					builder = new StringBuilder(builder.substring(0, builder.length() - 1)).append("]");
+
+				} else {
+					builder.append("\"error\" : \"No Results Found.\"");
 				}
 			}
 
@@ -357,12 +398,50 @@ public class AjaxServlet extends HttpServlet {
 			input.setNewLabelText(projectText);
 			input.setProjectId(id);
 
+			// set the status as Active by default
+			input.setActive(Boolean.TRUE);
+
 			try {
 				if (id == 0) {
 					reply = SERVICE.createProject(input);
 				} else {
 					reply = SERVICE.modifyProject(input);
 				}
+
+				String json = getJSON(reply);
+				out = response.getWriter();
+				out.println(json);
+
+			} catch (TimelineException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if (out != null) {
+					out.close();
+				}
+			}
+		}
+	}
+
+	private void saveEntityStatus(HttpServletRequest request, HttpServletResponse response,
+			final TimelineConstants.StatusEntity entity) {
+
+		long id = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.id.getParamText()));
+		final String statusText = TextHelper.trimToNull(request.getParameter(TimelineConstants.AjaxRequestParam.status
+				.getParamText()));
+
+		PrintWriter out = null;
+
+		if (statusText != null) {
+
+			final boolean status = TextHelper.getBooleanValue(statusText);
+
+			CodeValueReply reply = null;
+			StatusInput input = new StatusInput(id, entity, status);
+
+			try {
+				reply = SERVICE.modifyStatus(input);
 
 				String json = getJSON(reply);
 				out = response.getWriter();
@@ -446,6 +525,7 @@ public class AjaxServlet extends HttpServlet {
 		try {
 			UserSearchParameter searchParameters = new UserSearchParameter();
 			searchParameters.setOnlyAdmin(Boolean.TRUE);
+			searchParameters.setOnlyActive(Boolean.TRUE);
 			reply = SERVICE.searchUsers(searchParameters);
 
 			String json = getJSON(reply);
@@ -593,23 +673,23 @@ public class AjaxServlet extends HttpServlet {
 				input.setType(type);
 
 				switch (type) {
-				case FIRST_NAME:
-					input.setFirstName(value);
-					break;
-				case LAST_NAME:
-					input.setLastName(value);
-					break;
-				case USER_ID:
-					input.setUserId(value);
-					break;
-				case PASSWORD:
-					input.setPassword(value);
-					break;
-				case ADMIN:
-					input.setAdmin(Boolean.valueOf(value));
-					break;
-				default:
-					break;
+					case FIRST_NAME:
+						input.setFirstName(value);
+						break;
+					case LAST_NAME:
+						input.setLastName(value);
+						break;
+					case USER_ID:
+						input.setUserId(value);
+						break;
+					case PASSWORD:
+						input.setPassword(value);
+						break;
+					case ADMIN:
+						input.setAdmin(Boolean.valueOf(value));
+						break;
+					default:
+						break;
 				}
 
 				try {
@@ -655,14 +735,14 @@ public class AjaxServlet extends HttpServlet {
 				input.setType(type);
 
 				switch (type) {
-				case QUESTION:
-					input.setQuestion(value);
-					break;
-				case ANSWER:
-					input.setAnswer(value);
-					break;
-				default:
-					break;
+					case QUESTION:
+						input.setQuestion(value);
+						break;
+					case ANSWER:
+						input.setAnswer(value);
+						break;
+					default:
+						break;
 				}
 
 				try {
@@ -815,6 +895,9 @@ public class AjaxServlet extends HttpServlet {
 				userId = user.getId();
 			}
 
+			long proxiedUserDbId = TextHelper.getLongValue(request
+					.getParameter(TimelineConstants.AjaxRequestParam.proxiedUserDbId.getParamText()));
+
 			Date weekStartDate = TextHelper.getValidDate(request
 					.getParameter(TimelineConstants.AjaxRequestParam.weekStartDate.getParamText()));
 
@@ -838,6 +921,7 @@ public class AjaxServlet extends HttpServlet {
 			myTimeData.setActivityId(activityId);
 			myTimeData.setDate(weekStartDate);
 			myTimeData.setUserId(userId);
+			myTimeData.setProxiedUserDbId(proxiedUserDbId);
 
 			myTimeData.setDay_1_time(day1);
 			myTimeData.setDay_2_time(day2);
@@ -900,17 +984,17 @@ public class AjaxServlet extends HttpServlet {
 					.getParamText()));
 			userDbId = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.userDbId
 					.getParamText()));
-			
+
 			startWeekNum = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.startWeekNum
 					.getParamText()));
 			startYear = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.startYear
 					.getParamText()));
-			
+
 			endWeekNum = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.endWeekNum
 					.getParamText()));
 			endYear = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.endYear
 					.getParamText()));
-			
+
 			User user = getSessionUser(request);
 
 			// non-admin user can search only his/her entries
@@ -921,13 +1005,13 @@ public class AjaxServlet extends HttpServlet {
 			// set default values
 			if (weekStartDate == null) {
 				weekStartDate = new Date();
-				startYear = TextHelper.getYear(weekStartDate);
+				startYear = TextHelper.getYearForWeekDay(weekStartDate);
 				startWeekNum = TextHelper.getWeekNumber(weekStartDate);
-			} 
+			}
 
 			if (weekEndDate == null) {
 				weekEndDate = new Date();
-				endYear = TextHelper.getYear(weekEndDate);
+				endYear = TextHelper.getYearForWeekDay(weekEndDate);
 				endWeekNum = TextHelper.getWeekNumber(weekEndDate);
 			}
 
@@ -968,6 +1052,50 @@ public class AjaxServlet extends HttpServlet {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Search Users without entries.
+	 * 
+	 * @param request
+	 * @param response
+	 */
+	private void searchUsersWithoutEntries(HttpServletRequest request, HttpServletResponse response) {
+
+		// populate search parameters
+		Date startDate = TextHelper.getValidDate(request
+				.getParameter(TimelineConstants.AjaxRequestParam.weekStartDate.getParamText()));
+		Date endDate = TextHelper.getValidDate(request.getParameter(TimelineConstants.AjaxRequestParam.weekEndDate
+				.getParamText()));
+
+		// start search
+
+		PrintWriter out = null;
+
+		try {
+			// populate search parameter
+			WeekSearchParameter searchParameters = new WeekSearchParameter();
+			searchParameters.setEndDate(endDate);
+			searchParameters.setStartDate(startDate);
+
+			// call service
+			WeeklyUserReply reply = SERVICE.searchUsersWithoutEntries(searchParameters);
+
+			// prepare JSON
+			String json = getJSON(reply);
+			out = response.getWriter();
+			out.println(json);
+
+		} catch (TimelineException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (out != null) {
+				out.close();
+			}
+		}
+	
 	}
 
 	/**
@@ -1060,6 +1188,8 @@ public class AjaxServlet extends HttpServlet {
 				getLeads(request, response);
 			} else if (TimelineConstants.OperationType.SAVE_PROJECT.toString().equalsIgnoreCase(typeStr)) {
 				saveProject(request, response);
+			} else if (TimelineConstants.OperationType.SAVE_PROJECT_STATUS.toString().equalsIgnoreCase(typeStr)) {
+				saveEntityStatus(request, response, TimelineConstants.StatusEntity.PROJECT);
 			} else if (TimelineConstants.OperationType.DELETE_PROJECT.toString().equalsIgnoreCase(typeStr)) {
 				deleteProject(request, response);
 			} else if (TimelineConstants.OperationType.SAVE_LEAD.toString().equalsIgnoreCase(typeStr)) {
@@ -1070,6 +1200,8 @@ public class AjaxServlet extends HttpServlet {
 				deleteActivity(request, response);
 			} else if (TimelineConstants.OperationType.SAVE_USER.toString().equalsIgnoreCase(typeStr)) {
 				saveUser(request, response);
+			} else if (TimelineConstants.OperationType.SAVE_USER_STATUS.toString().equalsIgnoreCase(typeStr)) {
+				saveEntityStatus(request, response, TimelineConstants.StatusEntity.USER);
 			} else if (TimelineConstants.OperationType.DELETE_USER.toString().equalsIgnoreCase(typeStr)) {
 				deleteUser(request, response);
 			} else if (TimelineConstants.OperationType.RESET_USER.toString().equalsIgnoreCase(typeStr)) {
@@ -1084,6 +1216,9 @@ public class AjaxServlet extends HttpServlet {
 				modifyUserPreferences(request, response);
 			} else if (TimelineConstants.OperationType.SEARCH_ENTRIES.toString().equalsIgnoreCase(typeStr)) {
 				searchEntries(request, response);
+			} else if (TimelineConstants.OperationType.SEARCH_USERS_WITHOUT_ENTRIES.toString()
+					.equalsIgnoreCase(typeStr)) {
+				searchUsersWithoutEntries(request, response);
 			} else if (TimelineConstants.OperationType.REPORT_DETAIL.toString().equalsIgnoreCase(typeStr)) {
 				getReportDetails(request, response);
 			}

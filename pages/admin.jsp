@@ -11,7 +11,7 @@
 
 <%-- Main content --%>
 <div id="content">
-	<div id="accordion">
+	<div id="adminAccordion">
 		<%-- User Related Section--%>
 		<h3>
 			<a href="#section2">User Account Management</a>
@@ -19,10 +19,11 @@
 		<div>
 			<table style="width: 50%;" id="userTable">
 				<colgroup>
-					<col style="width: 18%" />
-					<col style="width: 28%" />
-					<col style="width: 28%" />
+					<col style="width: 16%" />
+					<col style="width: 26%" />
+					<col style="width: 26%" />
 					<col style="width: 8%" />
+					<col style="width: 6%" />
 					<col style="width: 6%" />
 					<col style="width: 6%" />
 					<col style="width: 6%" />
@@ -33,7 +34,7 @@
 						<th>First Name</th>
 						<th>Last Name</th>
 						<th>Admin</th>
-						<th colspan="3">&nbsp;</th>
+						<th colspan="4">&nbsp;</th>
 					</tr>
 				</thead>
 				<c:if test="${(userReply!= null) && (userReply.users != null) && (userReply.users.size() > 0)}">
@@ -47,7 +48,10 @@
 								<td>
 									<c:if test="${user.admin}">
 										<img alt="Admin" align="middle" class="icon" title="${adminTitle}" src="${adminIconPath}" />
-									</c:if></td>
+									</c:if>
+								</td>
+								<c:set var="userStatusId" value= "user_status_${user.id}" />
+								<td align="center"><input id="${userStatusId}" type='checkbox' value='${user.active}' <c:if test="${user.active}">checked="checked"</c:if> onchange="toggleUserStatus(${user.id},'${userStatusId}','${userId}')" /></td>
 								<td><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" onclick="editUser('${userId}',${user.id})" /></td>
 								<td><img alt="Reset" align="middle" class="icon" title="${resetTitle}" src="${resetIconPath}" onclick="resetUser('${userId}',${user.id})" /></td>
 								<td><img alt="Delete" align="middle" class="icon" title="${userDeleteTitle}" src="${deleteIconPath}" onclick="deleteUser('${userId}',${user.id})" /></td>
@@ -57,7 +61,7 @@
 				</c:if>
 				<tfoot>
 					<tr>
-						<td colspan="7" style="text-align: right">
+						<td colspan="8" style="text-align: right">
 							<input type="button" value="Add User" class="button" onclick="addNewUser('userTable')" />
 						</td>
 					</tr>
@@ -84,20 +88,24 @@
 								<col style="width: 6%" />
 							</colgroup>
 							<tbody>
+								<c:set var="statusClass" value="activeEntity"/>
+								<c:if test="${project.active == false}">
+									<c:set var="statusClass" value="inActiveEntity"/>
+								</c:if>
 								<c:set var="projTitleId">${projId}_title</c:set>
-								<tr id="${projTitleId}">
+								<tr id="${projTitleId}" class="${statusClass}">
 									<td class="projectArea">${project.value}</td>
 									<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" onclick="editProject('${projTitleId}',${project.code})" /></td>
 									<td align="center"><img alt="Delete" align="middle" class="icon" title="${projectDeleteTitle}" src="${deleteIconPath}" onclick="deleteProject('${projId}',${project.code})" /></td>
 								</tr>
-								<c:set var="projLeadId">${projId}_lead</c:set>
+								<c:set var="projLeadRowId">${projId}_lead</c:set>
 								<c:set var="leadName" value="${project.leadName}" />
-								<c:if test="${project.leadName == null}">
+								<c:if test="${leadName == null}">
 									<c:set var="leadName" value="Please select..." />
 								</c:if>
-								<tr id="${projLeadId}">
+								<tr id="${projLeadRowId}">
 									<td class="leadArea">${leadName}</td>
-									<td align="center" colspan="2"><img alt="Edit Lead" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" onclick="editLead('${projLeadId}',${project.code})" /></td>
+									<td align="center" colspan="2"><img alt="Edit Lead" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" onclick="editLead('${projLeadRowId}',${project.code}, ${project.leadDbId})" /></td>
 								</tr>
 								<c:if test="${activityReply != null}">
 									<c:forEach var="activity" items="${activityReply.getProjectActivitiesById(project.code)}">
@@ -112,9 +120,15 @@
 							</tbody>
 							<tfoot>
 								<tr>
-									<td colspan="3" align="right">
+									<c:set var="statusId" value= "project_status_${project.code}" />
+									<td align="left">
+										&nbsp;Active&nbsp;<input id="${statusId}" type='checkbox' value='${project.active}' <c:if test="${project.active}">checked="checked"</c:if> onchange="toggleProjectStatus(${project.code},'${statusId}','${projTitleId}')" />
+									</td>
+									<c:remove var="statusId"/>
+									<td colspan="2" align="right">
 										<input type="button" value="Add Activity" class="button" onclick="addNewActivity('${projId}',${project.code})" />
 									</td>
+								</tr>
 							</tfoot>
 						</table>
 					</c:forEach>

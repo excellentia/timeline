@@ -15,4 +15,6 @@
 	<body>
 		<div id="container">
 			<%-- Header Text --%>
-			<div id="header">Timeline</div>
+			<c:set var="applicationHeader" value="Timeline" />
+			<div id="header">${applicationHeader}</div>
+			<c:remove var="applicationHeader"/>

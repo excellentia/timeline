@@ -40,16 +40,16 @@ import org.ag.timeline.presentation.transferobject.reply.UserPreferenceReply;
 import org.ag.timeline.presentation.transferobject.reply.UserPreferenceSearchReply;
 import org.ag.timeline.presentation.transferobject.reply.UserReply;
 import org.ag.timeline.presentation.transferobject.reply.UserSearchReply;
+import org.ag.timeline.presentation.transferobject.reply.WeeklyUserReply;
 import org.ag.timeline.presentation.transferobject.search.ActivitySearchParameter;
 import org.ag.timeline.presentation.transferobject.search.AuditDataSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.ProjectSearchParameter;
 import org.ag.timeline.presentation.transferobject.search.TimeDataSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.UserPreferenceSearchParameter;
 import org.ag.timeline.presentation.transferobject.search.UserSearchParameter;
-
+import org.ag.timeline.presentation.transferobject.search.WeekSearchParameter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -1103,6 +1103,26 @@ public class ServiceTest {
 					System.out.println(row);
 				}
 			}
+
+		} catch (TimelineException e) {
+			Assert.fail("TimelineException occurred.");
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void testNaughtyList() {
+
+		User naughty = dataHelper.createUser("Dev", "Naughty", "naughty", "naughty", false);
+		TimeData timeData = dataHelper.createBasicTimeData();
+
+		try {
+
+			WeekSearchParameter searchParameters = new WeekSearchParameter();
+			WeeklyUserReply reply = impl.searchUsersWithoutEntries(searchParameters);
+
+			Assert.assertNotNull(reply);
+			Assert.assertTrue("Reply has error : " + reply.getMessage(), !reply.isMsgError());
 
 		} catch (TimelineException e) {
 			Assert.fail("TimelineException occurred.");

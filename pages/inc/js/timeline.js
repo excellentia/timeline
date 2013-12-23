@@ -36,14 +36,13 @@ var searchStartYear = null;
 var searchEndYear = null;
 
 var accOptions = {
-	autoHeight : false,
-	navigation : true,
-	collapsible : true,
-	active : 0
+    autoHeight : false,
+    navigation : true,
+    collapsible : true,
+    active : 0
 };
 
 function populateActivities(projElmId, activityElmId) {
-
 	var selectElm = document.getElementById(projElmId);
 
 	if (selectElm != null) {
@@ -55,59 +54,52 @@ function populateActivities(projElmId, activityElmId) {
 
 				if (selectedProjectId > 0) {
 
-					$
-							.getJSON(
-									jsonUrl,
-									{
-										operation : "ACTIVTIES",
-										id : selectedProjectId
-									},
-									function(data) {
+					$.getJSON(
+						jsonUrl,
+						{
+							operation : "ACTIVTIES",
+							id : selectedProjectId
+						},
+						function(data) {
+							var jsonData = data;
 
-										var jsonData = data;
+							if (jsonData.error) {
+								alert(jsonData.error);
+							} else {
+							if (activityElmId == null) {
 
-										if (jsonData.error) {
-											alert(jsonData.error);
-										} else {
-											if (activityElmId == null) {
+								var activitySelectHTML = "<select size='1' class='timeEntrySelectEdit' name='activity' id='activity_" + selectedProjectId + "'>";
+								var optionHTML = "";
 
-												var activitySelectHTML = "<select size='1' class='timeEntrySelectEdit' name='activity' id='activity_"
-														+ selectedProjectId + "'>";
-												var optionHTML = "";
+								for ( var j = 0; j < jsonData.activities.length; j++) {
+									optionHTML = optionHTML + '<option value="' + jsonData.activities[j].code + '">' + jsonData.activities[j].value + '</option>';
+									activityArr[jsonData.activities[j].code] = jsonData.activities[j].value;
+								}
 
-												for ( var j = 0; j < jsonData.activities.length; j++) {
-													optionHTML = optionHTML + '<option value="'
-															+ jsonData.activities[j].code + '">'
-															+ jsonData.activities[j].value + '</option>';
-													activityArr[jsonData.activities[j].code] = jsonData.activities[j].value;
-												}
+								activitySelectHTML = activitySelectHTML + optionHTML + "</select>";
 
-												activitySelectHTML = activitySelectHTML + optionHTML + "</select>";
+								var selectElm = document.getElementById(projElmId);
+								var newRow = selectElm.parentNode.parentNode;
+								newRow.cells[2].innerHTML = activitySelectHTML;
+								newRow.cells[3].innerHTML = leads[selectedProjectId];
 
-												var selectElm = document.getElementById(projElmId);
-												var newRow = selectElm.parentNode.parentNode;
-												newRow.cells[1].innerHTML = activitySelectHTML;
-												newRow.cells[2].innerHTML = leads[selectedProjectId];
+							} else {
+								var selectElm = document.getElementById(activityElmId);
+								var optionHTML = "<option value='0' selected='selected'>All Activities</option>";
 
-											} else {
-												var selectElm = document.getElementById(activityElmId);
-												var optionHTML = "<option value='0' selected='selected'>All Activities</option>";
+								for ( var j = 0; j < jsonData.activities.length; j++) {
+									optionHTML = optionHTML + '<option value="' + jsonData.activities[j].code + '">' + jsonData.activities[j].value + '</option>';
+								}
 
-												for ( var j = 0; j < jsonData.activities.length; j++) {
-													optionHTML = optionHTML + '<option value="'
-															+ jsonData.activities[j].code + '">'
-															+ jsonData.activities[j].value + '</option>';
-												}
-
-												selectElm.innerHTML = optionHTML;
-											}
-										}
-									});
+								selectElm.innerHTML = optionHTML;
+							}
+						}
+					});
 				} else {
 					if (activityElmId == null) {
 						var newRow = selectElm.parentNode.parentNode;
-						newRow.cells[1].innerHTML = "";
 						newRow.cells[2].innerHTML = "";
+						newRow.cells[3].innerHTML = "";
 					} else {
 						var selectElm = document.getElementById(activityElmId);
 						var optionHTML = "<option value='0' selected='selected'>All Activities</option>";
@@ -126,17 +118,21 @@ function updateWeeklySum(rowElmId) {
 		var currSum = 0.0;
 		var val;
 
-		for ( var i = 3; i < 10; i++) {
+		for ( var i = 4; i < 11; i++) {
 			val = activeRow.cells[i].children[0].value;
 
-			if ((val != null) && (!isNaN(val))) {
+			if ((val != null) && (val != "") && (!isNaN(val)) ) {
 				currSum = currSum + parseFloat(val, 10);
+
+				if(val.charAt(0) == '.') {
+					activeRow.cells[i].children[0].value = "0"+val;
+				}
 			} else {
 				activeRow.cells[i].children[0].value = 0;
 			}
 		}
 
-		activeRow.cells[10].innerHTML = currSum;
+		activeRow.cells[11].innerHTML = currSum;
 	}
 }
 
@@ -149,7 +145,6 @@ function deleteTimeEntry(rowElmId, entryDbId) {
 				operation : "DELETE_TIME_ENTRY",
 				entryId : entryDbId
 			}, function(data) {
-
 				jsonData = data;
 
 				if (jsonData.error) {
@@ -175,11 +170,9 @@ function editTimeEntry(rowElmId, projDbId, actDbId, entryDbId) {
 		{
 			var selectId = "project_" + entryDbId;
 
-			var projectHTML = "<select size='1' class='timeEntrySelectEdit' name='project' id='" + selectId
-					+ "' onchange=\"populateActivities('" + selectId
-					+ "', null)\"><option value='0'>Select Project...</option>";
+			var projectHTML = "<select size='1' class='timeEntrySelectEdit' name='project' id='" + selectId + "' onchange=\"populateActivities('" + selectId + "', null)\"><option value='0'>Select Project...</option>";
 			var optionHTML = "";
-
+			
 			if ((projectsAvailableJSON != null) && (projectsAvailableJSON.projects != null)) {
 				for ( var i = 0; i < projectsAvailableJSON.projects.length; i++) {
 					optionHTML = optionHTML + "<option value = '" + projectsAvailableJSON.projects[i].code + "'";
@@ -195,65 +188,59 @@ function editTimeEntry(rowElmId, projDbId, actDbId, entryDbId) {
 			}
 
 			projectHTML = projectHTML + optionHTML + "</select>";
-			activityRow.cells[0].innerHTML = projectHTML;
+			activityRow.cells[1].innerHTML = projectHTML;
 		}
 
 		// activities
 		{
 			var activitySelectHTML = "<select size='1' name='activity' class='timeEntrySelectEdit' id='activity_"
-					+ actDbId + "'>";
+			        + actDbId + "'>";
 			var optionHTML = "";
 
-			$
-					.getJSON(
-							jsonUrl,
-							{
-								operation : "ACTIVTIES",
-								id : projDbId
-							},
-							function(data) {
+			$.getJSON(
+				jsonUrl,
+				{
+					operation : "ACTIVTIES",
+					id : projDbId
+				},
+				function(data) {
+					var activtiesAvailableJSON = data;
 
-								var activtiesAvailableJSON = data;
+					for ( var i = 0; i < activtiesAvailableJSON.activities.length; i++) {
+						optionHTML = optionHTML + "<option value='" + activtiesAvailableJSON.activities[i].code + "'";
 
-								for ( var i = 0; i < activtiesAvailableJSON.activities.length; i++) {
-									optionHTML = optionHTML + "<option value='"
-											+ activtiesAvailableJSON.activities[i].code + "'";
+						if (actDbId == activtiesAvailableJSON.activities[i].code) {
+							optionHTML = optionHTML + " selected='selected' ";
+						}
+						
+						optionHTML = optionHTML + ">" + activtiesAvailableJSON.activities[i].value + "</option>";
+						activityArr[activtiesAvailableJSON.activities[i].code] = activtiesAvailableJSON.activities[i].value;
+					}
 
-									if (actDbId == activtiesAvailableJSON.activities[i].code) {
-										optionHTML = optionHTML + " selected='selected' ";
-									}
-
-									optionHTML = optionHTML + ">" + activtiesAvailableJSON.activities[i].value
-											+ "</option>";
-									activityArr[activtiesAvailableJSON.activities[i].code] = activtiesAvailableJSON.activities[i].value;
-								}
-
-								activitySelectHTML = activitySelectHTML + optionHTML + "</select>";
-								activityRow.cells[1].innerHTML = activitySelectHTML;
-							});
+					activitySelectHTML = activitySelectHTML + optionHTML + "</select>";
+					activityRow.cells[2].innerHTML = activitySelectHTML;
+			});
 		}
 
 		// days
 		{
 			var selectPrefix = "<input type='text' class='timeEntryEdit' value='";
-			var selectSufix = "' id='" + entryDbId + "_day1' class='timeEntry'onchange=\"updateWeeklySum('" + rowElmId
-					+ "')\">";
+			var selectSufix = "' id='" + entryDbId + "_day1' class='timeEntry'onchange=\"updateWeeklySum('" + rowElmId + "')\">";
 
-			for ( var i = 3; i < 10; i++) {
+			for ( var i = 4; i < 11; i++) {
 				activityRow.cells[i].innerHTML = selectPrefix + activityRow.cells[i].innerHTML + selectSufix;
 			}
 		}
 
 		// save button
 		{
-			var saveHTML = "<img alt='Save' class='icon' title='" + saveTitle + "' src='" + saveIcon
-					+ "' onclick=\"saveTimeEntry('" + rowElmId + "'," + entryDbId + ")\" align='middle'>";
-			activityRow.cells[11].innerHTML = saveHTML;
+			var saveHTML = "<img alt='Save' class='icon' title='" + saveTitle + "' src='" + saveIcon + "' onclick=\"saveTimeEntry('" + rowElmId + "'," + entryDbId + ",0)\" align='middle'>";
+			activityRow.cells[12].innerHTML = saveHTML;
 		}
 	}
 }
 
-function saveTimeEntry(rowElmId, entryDbId) {
+function saveTimeEntry(rowElmId, entryDbId, proxiedUserDbId) {
 
 	if (rowElmId != "") {
 
@@ -261,7 +248,7 @@ function saveTimeEntry(rowElmId, entryDbId) {
 
 		// get the selected project
 		var projDbId = 0;
-		var projects = entryRow.cells[0].children[0].options;
+		var projects = entryRow.cells[1].children[0].options;
 
 		for ( var i = 0; i < projects.length; i++) {
 			if (projects[i].selected) {
@@ -271,7 +258,7 @@ function saveTimeEntry(rowElmId, entryDbId) {
 
 		// get the selected activity
 		var actDbId = 0;
-		var activities = entryRow.cells[1].children[0].options;
+		var activities = entryRow.cells[2].children[0].options;
 
 		for ( var i = 0; i < activities.length; i++) {
 			if (activities[i].selected) {
@@ -283,9 +270,13 @@ function saveTimeEntry(rowElmId, entryDbId) {
 		var timeData = {};
 		var sum = 0;
 
-		for ( var i = 3; i < 10; i++) {
-			timeData[i - 3] = entryRow.cells[i].children[0].value;
-			sum = sum + parseInt(timeData[i - 3], 10);
+		for ( var i = 0; i < 7; i++) {
+			timeData[i] = entryRow.cells[i+4].children[0].value;
+			
+			if ((timeData[i] != null) && (timeData[i] != "") && (!isNaN(timeData[i])) ) {
+				sum = sum + parseFloat(timeData[i], 10);
+			}
+			
 		}
 
 		var weekStart = weekStartDate;
@@ -301,20 +292,20 @@ function saveTimeEntry(rowElmId, entryDbId) {
 		if ((projDbId > 0) && (actDbId > 0) && (sum > 0) && ((weekStart != null) || (entryDbId > 0))) {
 
 			$.post(jsonUrl, {
-				operation : "SAVE_TIME_ENTRY",
-				entryId : entryDbId,
-				projectId : projDbId,
-				activityId : actDbId,
-				weekStartDate : weekStart,
-				day1 : timeData[0],
-				day2 : timeData[1],
-				day3 : timeData[2],
-				day4 : timeData[3],
-				day5 : timeData[4],
-				day6 : timeData[5],
-				day7 : timeData[6]
+			    operation : "SAVE_TIME_ENTRY",
+			    entryId : entryDbId,
+			    projectId : projDbId,
+			    activityId : actDbId,
+			    weekStartDate : weekStart,
+			    proxiedUserDbId : proxiedUserDbId,
+			    day1 : timeData[0],
+			    day2 : timeData[1],
+			    day3 : timeData[2],
+			    day4 : timeData[3],
+			    day5 : timeData[4],
+			    day6 : timeData[5],
+			    day7 : timeData[6]
 			}, function(data) {
-
 				var jsonData = data;
 
 				if (jsonData.error) {
@@ -323,21 +314,19 @@ function saveTimeEntry(rowElmId, entryDbId) {
 
 					var activityRow = document.getElementById(rowElmId);
 
-					activityRow.cells[0].innerHTML = projectArr[projDbId];
-					activityRow.cells[1].innerHTML = activityArr[actDbId];
-					activityRow.cells[3].innerHTML = timeData[0];
-					activityRow.cells[4].innerHTML = timeData[1];
-					activityRow.cells[5].innerHTML = timeData[2];
-					activityRow.cells[6].innerHTML = timeData[3];
-					activityRow.cells[7].innerHTML = timeData[4];
-					activityRow.cells[8].innerHTML = timeData[5];
-					activityRow.cells[9].innerHTML = timeData[6];
+					activityRow.cells[1].innerHTML = projectArr[projDbId];
+					activityRow.cells[2].innerHTML = activityArr[actDbId];
+					activityRow.cells[4].innerHTML = timeData[0];
+					activityRow.cells[5].innerHTML = timeData[1];
+					activityRow.cells[6].innerHTML = timeData[2];
+					activityRow.cells[7].innerHTML = timeData[3];
+					activityRow.cells[8].innerHTML = timeData[4];
+					activityRow.cells[9].innerHTML = timeData[5];
+					activityRow.cells[10].innerHTML = timeData[6];
 					activityRow.className = "leadColumn";
 
-					var editHTML = "<img alt='Edit' class='icon' title='" + editTitle + "' src='" + editIcon
-							+ "' onclick=\"editTimeEntry('" + rowElmId + "'," + projDbId + "," + actDbId + ","
-							+ jsonData.code + ")\" align='middle'>";
-					activityRow.cells[11].innerHTML = editHTML;
+					var editHTML = "<img alt='Edit' class='icon' title='" + editTitle + "' src='" + editIcon + "' onclick=\"editTimeEntry('" + rowElmId + "'," + projDbId + "," + actDbId + "," + jsonData.code + ")\" align='middle'>";
+					activityRow.cells[12].innerHTML = editHTML;
 
 				}
 			}, "json");
@@ -346,11 +335,11 @@ function saveTimeEntry(rowElmId, entryDbId) {
 }
 
 /**
- * Create a new table row.
+ * Create a new Time Entry table row.
  * 
  * @param tableID Id of the target table .
  */
-function addActivityRow(tableID) {
+function addEntryRow(tableID) {
 
 	var selectedWeek = document.getElementById('weekArea');
 
@@ -358,110 +347,123 @@ function addActivityRow(tableID) {
 		alert("Select Week First");
 	} else {
 
-		$
-				.getJSON(
-						jsonUrl,
-						{
-							operation : "project"
-						},
-						function(data) {
+		$.getJSON(
+			jsonUrl,
+			{operation : "project"},
+			function(data) {
+				var jsonData = data;
 
-							var jsonData = data;
+				if (jsonData.error) {
+					alert(jsonData.error);
+				} else {
+					var table = document.getElementById(tableID);
+					var tbody = table.tBodies[0];
+					var rowCount = tbody.rows.length;
+					var newId = rowCount;
 
-							if (jsonData.error) {
-								alert(jsonData.error);
-							} else {
-								var table = document.getElementById(tableID);
-								var tbody = table.tBodies[0];
-								var rowCount = tbody.rows.length;
-								var newId = rowCount;
+					var row = tbody.insertRow(rowCount);
+					var rowId = "entry_" + newId;
+					row.id = rowId;
 
-								var row = tbody.insertRow(rowCount);
-								var rowId = "entry_" + newId;
-								row.id = rowId;
+					var userName = 'Me';
 
-								var selectId = "project_" + newId;
+					var proxyUserElm = document.getElementById('proxyUserArea');
+					var proxiedUserDbId = 0;
 
-								var projectHTML = "<select class='timeEntrySelectEdit' size='1' id='" + selectId
-										+ "' onchange=\"populateActivities('" + selectId
-										+ "',null)\"><option value='0'>Select Project...</option>";
-								var optionHTML = '';
-
-								for ( var i = 0; i < jsonData.projects.length; i++) {
-									optionHTML = optionHTML + '<option value="' + jsonData.projects[i].code + '">'
-											+ jsonData.projects[i].value + '</option>';
-									leads[jsonData.projects[i].code] = jsonData.projects[i].leadname;
-									projectArr[jsonData.projects[i].code] = jsonData.projects[i].value;
-								}
-
-								projectHTML = projectHTML + optionHTML + "</select>";
-
-								var timeWeekDayHTML = "<input value='0' class='timeEntryEdit' type='text' onchange=\"updateWeeklySum('"
-										+ rowId + "')\">";
-								var timeWeekEndHTML = "<input value='0' class='timeEntryEdit weekEnd' type='text' onchange=\"updateWeeklySum('"
-										+ rowId + "')\">";
-								var deleteHTML = "<img alt='Delete' class='icon' title='Delete this row' src='"
-										+ deleteIcon + "' onclick=\"deleteTimeEntry('" + rowId + "'," + 0
-										+ ")\" align='middle'>";
-								var saveHTML = "<img alt='Save' class='icon' title='" + saveTitle + "' src='"
-										+ saveIcon + "' onclick=\"saveTimeEntry('" + rowId + "',0)\" align='middle'>";
-								var cellNum = 0;
-
-								/**
-								 * Create Project Column
-								 */
-								var newcell = row.insertCell(cellNum++);
-								newcell.innerHTML = projectHTML;
-
-								/**
-								 * Create Activity Column
-								 */
-								newcell = row.insertCell(cellNum++);
-
-								/**
-								 * Create Lead Column
-								 */
-								newcell = row.insertCell(cellNum++);
-								newcell.className = "leadColumn";
-
-								/**
-								 * Week Day
-								 */
-								for ( var i = 1; i <= 5; i++) {
-									newcell = row.insertCell(cellNum++);
-									newcell.innerHTML = timeWeekDayHTML;
-								}
-
-								/**
-								 * Week End
-								 */
-								for ( var i = 1; i <= 2; i++) {
-									newcell = row.insertCell(cellNum++);
-									newcell.innerHTML = timeWeekEndHTML;
-								}
-
-								/**
-								 * Create Total Column
-								 */
-								newcell = row.insertCell(cellNum++);
-								newcell.className = "rowTotal";
-								newcell.innerHTML = 0;
-
-								/**
-								 * Create Edit Column
-								 */
-								newcell = row.insertCell(cellNum++);
-								newcell.align = "center";
-								newcell.innerHTML = saveHTML;
-
-								/**
-								 * Create Delete Column
-								 */
-								newcell = row.insertCell(cellNum++);
-								newcell.align = "center";
-								newcell.innerHTML = deleteHTML;
+					if (proxyUserElm != null) {
+						for ( var i = 0; i < proxyUserElm.options.length; i++) {
+							if ((proxyUserElm.options[i].selected) && (proxyUserElm.options[i].value > 0)) {
+								proxiedUserDbId = proxyUserElm.options[i].value;
+								userName = proxyUserElm.options[i].innerHTML;
+								break;
 							}
-						});
+						}
+					}
+					
+					var selectId = "project_" + newId;
+
+					var projectHTML = "<select class='timeEntrySelectEdit' size='1' id='" + selectId + "' onchange=\"populateActivities('" + selectId + "',null)\"><option value='0'>Select Project...</option>";
+					var optionHTML = '';
+
+					for ( var i = 0; i < jsonData.projects.length; i++) {
+						optionHTML = optionHTML + '<option value="' + jsonData.projects[i].code + '">' + jsonData.projects[i].value + '</option>';
+						leads[jsonData.projects[i].code] = jsonData.projects[i].leadname;
+						projectArr[jsonData.projects[i].code] = jsonData.projects[i].value;
+					}
+
+					projectHTML = projectHTML + optionHTML + "</select>";
+
+					var timeWeekDayHTML = "<input value='0' class='timeEntryEdit' type='text' onchange=\"updateWeeklySum('" + rowId + "')\">";
+					var timeWeekEndHTML = "<input value='0' class='timeEntryEdit weekEnd' type='text' onchange=\"updateWeeklySum('" + rowId + "')\">";
+					var deleteHTML = "<img alt='Delete' class='icon' title='Delete this row' src='" 
+						+ deleteIcon + "' onclick=\"deleteTimeEntry('" + rowId + "'," + 0 + ")\" align='middle'>";
+					var saveHTML = "<img alt='Save' class='icon' title='" + saveTitle + "' src='" 
+						+ saveIcon + "' onclick=\"saveTimeEntry('" + rowId + "',0,"+proxiedUserDbId+")\" align='middle'>";
+
+					var cellNum = 0;
+
+					/**
+					* Create User Column
+					*/
+					var newcell = row.insertCell(cellNum++);
+					newcell.innerHTML = userName;
+					
+					/**
+					* Create Project Column
+					*/
+					var newcell = row.insertCell(cellNum++);
+					newcell.innerHTML = projectHTML;
+
+					/**
+					* Create Activity Column
+					*/
+					newcell = row.insertCell(cellNum++);
+
+					/**
+					* Create Lead Column
+					*/
+					newcell = row.insertCell(cellNum++);
+					newcell.className = "leadColumn";
+
+					/**
+					* Week Day
+					*/
+					for ( var i = 1; i <= 5; i++) {
+						newcell = row.insertCell(cellNum++);
+						newcell.innerHTML = timeWeekDayHTML;
+					}
+
+					/**
+					* Week End
+					*/
+					for ( var i = 1; i <= 2; i++) {
+						newcell = row.insertCell(cellNum++);
+						newcell.innerHTML = timeWeekEndHTML;
+					}
+
+					/**
+					* Create Total Column
+					*/
+					newcell = row.insertCell(cellNum++);
+					newcell.className = "rowTotal";
+					newcell.innerHTML = 0;
+
+					/**
+					* Create Edit Column
+					*/
+					newcell = row.insertCell(cellNum++);
+					newcell.align = "center";
+					newcell.innerHTML = saveHTML;
+
+					/**
+					* Create Delete Column
+					*/
+					newcell = row.insertCell(cellNum++);
+					newcell.align = "center";
+					newcell.innerHTML = deleteHTML;
+				}
+			}
+		);
 	}
 }
 
@@ -472,10 +474,9 @@ function deleteProject(projElementId, projDbId) {
 		var jsonData = null;
 
 		$.post(jsonUrl, {
-			operation : "DELETE_PROJECT",
-			id : projDbId
+		    operation : "DELETE_PROJECT",
+		    id : projDbId
 		}, function(data) {
-
 			jsonData = data;
 
 			if (jsonData.error) {
@@ -488,7 +489,7 @@ function deleteProject(projElementId, projDbId) {
 	}
 }
 
-function editLead(leadElmId, projDbId) {
+function editLead(leadElmId, projDbId, leadDbId) {
 
 	if (projDbId > 0) {
 
@@ -509,8 +510,12 @@ function editLead(leadElmId, projDbId) {
 				var optionHTML = '';
 
 				for ( var i = 0; i < jsonData.admins.length; i++) {
-					optionHTML = optionHTML + '<option value="' + jsonData.admins[i].code + '">'
-							+ jsonData.admins[i].value + '</option>';
+					optionHTML = optionHTML + '<option value="' + jsonData.admins[i].code + '"';
+
+					if ((leadDbId > 0) && (leadDbId == jsonData.admins[i].code)) {
+						optionHTML = optionHTML + ' selected = "selected" ';
+					}
+					optionHTML = optionHTML + '>' + jsonData.admins[i].value + '</option>';
 				}
 
 				leadHTML = leadHTML + optionHTML + "</select>";
@@ -519,7 +524,7 @@ function editLead(leadElmId, projDbId) {
 
 				var saveHTML = "<img alt='Save' align='middle' class='icon' title='Save This Text'";
 				saveHTML = saveHTML + "src='" + saveIcon + "' onclick=\"saveLead(" + projDbId + ",'" + leadId
-						+ "')\" />";
+				        + "')\" />";
 
 				row.cells[1].innerHTML = saveHTML;
 			}
@@ -544,9 +549,9 @@ function saveLead(projDbId, leadElmId) {
 
 		if (leadId > 0) {
 			$.post(jsonUrl, {
-				operation : "SAVE_LEAD",
-				id : projDbId,
-				refId : leadId
+			    operation : "SAVE_LEAD",
+			    id : projDbId,
+			    refId : leadId
 			}, function(data) {
 
 				jsonData = data;
@@ -560,8 +565,8 @@ function saveLead(projDbId, leadElmId) {
 					row.cells[0].innerHTML = leadName;
 					row.cells[0].className = "leadArea";
 					row.cells[1].innerHTML = "<img alt=\"Edit Lead\" align=\"middle\" class=\"icon\" title=\""
-							+ editTitle + "\" src=\"" + editIcon + "\" onclick=\"editLead('" + projLeadId + "',"
-							+ projDbId + ")\"/>";
+					        + editTitle + "\" src=\"" + editIcon + "\" onclick=\"editLead('" + projLeadId + "',"
+					        + projDbId +","+leadId+ ")\"/>";
 
 				}
 			}, "json");
@@ -575,10 +580,9 @@ function deleteActivity(actElementId, actDbId) {
 
 	if (actDbId > 0) {
 		$.post(jsonUrl, {
-			operation : "DELETE_ACTIVITY",
-			id : actDbId
+		    operation : "DELETE_ACTIVITY",
+		    id : actDbId
 		}, function(data) {
-
 			jsonData = data;
 
 			if (jsonData.error) {
@@ -609,7 +613,6 @@ function saveActivity(actElmId, actDbId, projDbId) {
 				refId : actDbId,
 				text : text
 			}, function(data) {
-
 				jsonData = data;
 
 				if (jsonData.error) {
@@ -620,12 +623,8 @@ function saveActivity(actElmId, actDbId, projDbId) {
 					actRow.cells[0].innerHTML = jsonData.value;
 					actRow.cells[0].className = "activityArea";
 
-					actRow.children[1].innerHTML = "<img alt='Edit' align='middle' class='icon' title='" + editTitle
-							+ "' src='" + editIcon + "' onclick=\"editActivity('" + actId + "'," + jsonData.code + ","
-							+ projDbId + ")\" />";
-					actRow.children[2].innerHTML = "<img alt='Delete' align='middle' class='icon' title='"
-							+ activityDeleteTitle + "' src='" + deleteIcon + "' onclick=\"deleteActivity('" + actId
-							+ "'," + jsonData.code + ")\"/>";
+					actRow.children[1].innerHTML = "<img alt='Edit' align='middle' class='icon' title='" + editTitle + "' src='" + editIcon + "' onclick=\"editActivity('" + actId + "'," + jsonData.code + "," + projDbId + ")\" />";
+					actRow.children[2].innerHTML = "<img alt='Delete' align='middle' class='icon' title='" + activityDeleteTitle + "' src='" + deleteIcon + "' onclick=\"deleteActivity('" + actId + "'," + jsonData.code + ")\"/>";
 				}
 			}, "json");
 		}
@@ -641,10 +640,8 @@ function editActivity(actElmId, actDbId, projDbId) {
 	actRow.cells[0].innerHTML = actInput;
 	actRow.cells[0].children[0].focus();
 
-	actRow.children[1].innerHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='"
-			+ saveIcon + "' onclick=\"saveActivity('" + actElmId + "'," + actDbId + "," + projDbId + ")\"/>";
-	actRow.children[2].innerHTML = "<img alt='Delete' align='middle' class='icon' title='" + activityDeleteTitle
-			+ "' src='" + deleteIcon + "' onclick=\"deleteActivity('" + actId + "'," + actDbId + ")\"/>";
+	actRow.children[1].innerHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='" + saveIcon + "' onclick=\"saveActivity('" + actElmId + "'," + actDbId + "," + projDbId + ")\"/>";
+	actRow.children[2].innerHTML = "<img alt='Delete' align='middle' class='icon' title='" + activityDeleteTitle + "' src='" + deleteIcon + "' onclick=\"deleteActivity('" + actId + "'," + actDbId + ")\"/>";
 }
 
 function addNewActivity(tableID, projDbId) {
@@ -658,10 +655,8 @@ function addNewActivity(tableID, projDbId) {
 	row.id = newId;
 
 	var activityHTML = "<input type='text' value='' class='activityAreaEdit' />";
-	var saveHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='" + saveIcon
-			+ "' onclick=\"saveActivity('" + newId + "',0," + projDbId + ")\"/>";
-	var deleteHTML = "<img alt='Delete' align='middle' class='icon' title='" + activityDeleteTitle + "' src='"
-			+ deleteIcon + "' onclick=\"deleteActivity('" + newId + "',0)\"/>";
+	var saveHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='" + saveIcon + "' onclick=\"saveActivity('" + newId + "',0," + projDbId + ")\"/>";
+	var deleteHTML = "<img alt='Delete' align='middle' class='icon' title='" + activityDeleteTitle + "' src='" + deleteIcon + "' onclick=\"deleteActivity('" + newId + "',0)\"/>";
 
 	var cellNum = 0;
 
@@ -689,6 +684,70 @@ function addNewActivity(tableID, projDbId) {
 
 }
 
+function toggleProjectStatus(projDbId, inputId, projTitleId) {
+
+	var checkInput = document.getElementById(inputId);
+
+	if (checkInput != null) {
+
+		var projectStatus = checkInput.checked;
+
+		$.post(jsonUrl, {
+			operation : "SAVE_PROJECT_STATUS",
+			id : projDbId,
+			status : projectStatus
+		}, function(data) {
+
+			jsonData = data;
+
+			if (jsonData.error) {
+				alert(jsonData.error);
+			} else {
+				// var projectId = jsonData.code;
+				var projectName = jsonData.value;
+				var projTitleArea = document.getElementById(projTitleId);
+				if (projectStatus) {
+					projTitleArea.className = "activeEntity";
+				} else {
+					projTitleArea.className = "inActiveEntity";
+				}
+			}
+		}, "json");
+	}
+}
+
+function toggleUserStatus(userDbId, inputId, userRowId) {
+
+	var checkInput = document.getElementById(inputId);
+
+	if (checkInput != null) {
+
+		var userStatus = checkInput.checked;
+
+		$.post(jsonUrl, {
+			operation : "SAVE_USER_STATUS",
+			id : userDbId,
+			status : userStatus
+		}, function(data) {
+
+			jsonData = data;
+
+			if (jsonData.error) {
+				alert(jsonData.error);
+			} else {
+				var userName = jsonData.value;
+
+				var rowId = document.getElementById(userRowId);
+				if (userStatus) {
+					rowId.className = "activeEntity";
+				} else {
+					rowId.className = "inActiveEntity";
+				}
+			}
+		}, "json");
+	}
+}
+
 function saveProject(divID, projDbId, projNameId) {
 
 	var projText = $("#" + projNameId).val();
@@ -696,72 +755,65 @@ function saveProject(divID, projDbId, projNameId) {
 	if (projText != "") {
 		var jsonData = null;
 
-		$
-				.post(
-						jsonUrl,
-						{
-							operation : "SAVE_PROJECT",
-							id : projDbId,
-							text : projText
-						},
-						function(data) {
+	$.post(
+		jsonUrl,
+		{
+			operation : "SAVE_PROJECT",
+			id : projDbId,
+			text : projText
+		},
+		function(data) {
+		jsonData = data;
 
-							jsonData = data;
+		if (jsonData.error) {
+			alert(jsonData.error);
+		} else {
+			var projectId = jsonData.code;
+			var projectText = jsonData.value;
 
-							if (jsonData.error) {
-								alert(jsonData.error);
-							} else {
-								var projectId = jsonData.code;
-								var projectText = jsonData.value;
+			if (projDbId <= 0) {
 
-								if (projDbId <= 0) {
+				var projRowId = 'project_' + projectId + '_title';
+				var statusId = 'project_status_'+projectId;
 
-									var projRowId = 'project_' + projectId + '_title';
+				var newHTML = "<table class='projectTable' id='" + projectText 
+					+ "'><colgroup><col style='width: 88%' /><col style='width: 6%' /><col style='width: 6%' /></colgroup>";
+				newHTML = newHTML + "<tbody>";
+				newHTML = newHTML + "<tr id='" + projRowId + "'>";
+				newHTML = newHTML + "<td class='projectArea'>" + projectText + "</td>";
+				newHTML = newHTML + "<td align='center'><img alt='Edit' align='middle' class='icon' title='" + editTitle + "' src='" 
+					+ editIcon + "' onclick=\"editProject('" + projRowId + "'," + projectId + ")\" /></td>";
+				newHTML = newHTML + "<td align='center'><img alt='Delete' align='middle' class='icon' title='" + projectDeleteTitle 
+					+ "' src='" + deleteIcon + "' onclick=\"deleteProject('" + projectText + "'," + projectId + ")\" /></td>";
+				newHTML = newHTML + "</tr>";
 
-									var newHTML = "<table class='projectTable' id='"
-											+ projectText
-											+ "'><colgroup><col style='width: 88%' /><col style='width: 6%' /><col style='width: 6%' /></colgroup>";
-									newHTML = newHTML + "<tbody>";
-									newHTML = newHTML + "<tr id='" + projRowId + "'>";
-									newHTML = newHTML + "<td class='projectArea'>" + projectText + "</td>";
-									newHTML = newHTML
-											+ "<td align='center'><img alt='Edit' align='middle' class='icon' title='"
-											+ editTitle + "' src='" + editIcon + "' onclick=\"editProject('"
-											+ projRowId + "'," + projectId + ")\" /></td>";
-									newHTML = newHTML
-											+ "<td align='center'><img alt='Delete' align='middle' class='icon' title='"
-											+ projectDeleteTitle + "' src='" + deleteIcon
-											+ "' onclick=\"deleteProject('" + projectText + "'," + projectId
-											+ ")\" /></td>";
-									newHTML = newHTML + "</tr>";
+				var projLeadRowId = projectText + "_lead";
+				var projLeadId = 0;
+				newHTML = newHTML + "<tr id='" + projLeadRowId + "'>";
+				newHTML = newHTML + "<td class='leadArea'>Please select...</td>";
+				newHTML = newHTML + "<td align='center' colspan='2'><img alt='Edit Lead' align='middle' class='icon' title='" + editTitle 
+					+ "' src='" + editIcon + "' onclick=\"editLead('" + projLeadRowId + "'," + projectId +","+ projLeadId + ")\" /></td>";
+				newHTML = newHTML + "</tr>";
 
-									var projLeadId = projectText + "_lead";
-									newHTML = newHTML + "<tr id='" + projLeadId + "'>";
-									newHTML = newHTML + "<td class='leadArea'>Please select...</td>";
-									newHTML = newHTML
-											+ "<td align='center' colspan='2'><img alt='Edit Lead' align='middle' class='icon' title='"
-											+ editTitle + "' src='" + editIcon + "' onclick=\"editLead('" + projLeadId
-											+ "'," + projectId + ")\" /></td>";
-									newHTML = newHTML + "</tr>";
+				newHTML = newHTML + "</tbody>";
+				newHTML = newHTML + "<tfoot><tr>";
+				newHTML = newHTML + "<td align='left'>&nbsp;Active&nbsp;<input id='"+statusId+"' type='checkbox' value='true' onchange=\"toggleProjectStatus("+projectId+",'"+statusId+"','"+projRowId+"')\"/></td>";
+				newHTML = newHTML + "<td colspan='2' align='right'>";
+				newHTML = newHTML + "<input type='button' value='Add Activity' class='button' onclick=\"addNewActivity('" + projectText + "'," + projectId + ")\" />";
+				newHTML = newHTML + "</td></tfoot>";
+				newHTML = newHTML + "</table>";
 
-									newHTML = newHTML + "</tbody>";
-									newHTML = newHTML
-											+ "<tfoot><tr><td colspan='3' align='right'><input type='button' value='Add Activity' class='button' onclick=\"addNewActivity('"
-											+ projectText + "'," + projectId + ")\" /></td></tfoot>";
-									newHTML = newHTML + "</table>";
-
-									$("#" + divID).append(newHTML);
-									$("#" + projNameId).val("");
-								} else {
-									var row = document.getElementById(divID);
-									row.cells[0].innerHTML = projectText;
-									var editHTML = "<img alt='Edit' align='middle' class='icon' title='" + editTitle
-											+ "' src='" + editIcon + "' onclick=\"editProject('" + divID + "',"
-											+ projectId + ")\" />";
-									row.cells[1].innerHTML = editHTML;
-								}
-							}
-						}, "json");
+				$("#" + divID).append(newHTML);
+				$("#" + projNameId).val("");
+			} else {
+				var row = document.getElementById(divID);
+				row.cells[0].innerHTML = projectText;
+				var editHTML = "<img alt='Edit' align='middle' class='icon' title='" + editTitle + "' src='" + editIcon 
+					+ "' onclick=\"editProject('" + divID + "'," + projectId + ")\" />";
+				row.cells[1].innerHTML = editHTML;
+			}
+		}
+	}, "json");
 	} else {
 		alert(errorMsgNoData);
 	}
@@ -782,10 +834,10 @@ function addNewUser(tableID) {
 	var firstNameHTML = "<input type='text' class='newUserEdit'/>";
 	var lastNameHTML = "<input type='text' class='newUserEdit'/>";
 	var deleteUserHTML = "<img alt='Delete' align='middle' class='icon' title='" + userDeleteTitle + "' src='"
-			+ deleteIcon + "' onclick=\"deleteUser('" + newId + "'," + 0 + ")\"/>";
+	        + deleteIcon + "' onclick=\"deleteUser('" + newId + "'," + 0 + ")\"/>";
 
 	var saveUserHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='" + saveIcon
-			+ "' onclick=\"saveUser('" + newId + "',0)\"/>";
+	        + "' onclick=\"saveUser('" + newId + "',0)\"/>";
 
 	var cellNum = 0;
 
@@ -799,21 +851,27 @@ function addNewUser(tableID) {
 	/**
 	 * Create First Name Column
 	 */
-	var newcell = row.insertCell(cellNum++);
+	newcell = row.insertCell(cellNum++);
 	newcell.innerHTML = firstNameHTML;
 	newcell.align = "center";
 
 	/**
 	 * Create Last Name Column
 	 */
-	var newcell = row.insertCell(cellNum++);
+	newcell = row.insertCell(cellNum++);
 	newcell.innerHTML = lastNameHTML;
 	newcell.align = "center";
 
 	/**
 	 * Create Admin Column
 	 */
-	var newcell = row.insertCell(cellNum++);
+	newcell = row.insertCell(cellNum++);
+	
+	/**
+	 * Create Active/InActive Column
+	 */
+	newcell = row.insertCell(cellNum++);
+	newcell.align = "center";
 
 	/**
 	 * Create Edit Column
@@ -853,19 +911,17 @@ function editProject(projTitleId, projDbId) {
 
 	var saveHTML = "<img alt='Save' align='middle' class='icon' title='Save This Text'";
 	saveHTML = saveHTML + "src='" + saveIcon + "' onclick=\"saveProject('" + projTitleId + "'," + projDbId + ",'"
-			+ textId + "')\" />";
+	        + textId + "')\" />";
 
 	row.cells[1].innerHTML = saveHTML;
 }
 
 function deleteUser(userElmId, userDbId) {
-
 	if (userDbId > 0) {
 		$.post(jsonUrl, {
-			operation : "DELETE_USER",
-			id : userDbId
+		    operation : "DELETE_USER",
+		    id : userDbId
 		}, function(data) {
-
 			jsonData = data;
 
 			if (jsonData.error) {
@@ -912,7 +968,7 @@ function editUser(userElmId, userDbId) {
 	row.cells[3].innerHTML = adminHTML;
 
 	var saveHTML = "<img alt='Save' align='middle' class='icon' title='Save This Text' src='" + saveIcon
-			+ "' onclick=\"saveUser('" + userElmId + "'," + userDbId + ")\" />";
+	        + "' onclick=\"saveUser('" + userElmId + "'," + userDbId + ")\" />";
 
 	row.cells[4].innerHTML = saveHTML;
 }
@@ -933,14 +989,13 @@ function saveUser(userElmId, userDbId) {
 
 		if ((userId != "") && (fName != "") && (lName != "")) {
 			$.post(jsonUrl, {
-				operation : "SAVE_USER",
-				id : userDbId,
-				USER_ID : userId,
-				FIRST_NAME : fName,
-				LAST_NAME : lName,
-				ADMIN : admin
+			    operation : "SAVE_USER",
+			    id : userDbId,
+			    USER_ID : userId,
+			    FIRST_NAME : fName,
+			    LAST_NAME : lName,
+			    ADMIN : admin
 			}, function(data) {
-
 				jsonData = data;
 
 				if (jsonData.error) {
@@ -956,7 +1011,7 @@ function saveUser(userElmId, userDbId) {
 
 					if (jsonData.admin == "true") {
 						adminHTML = "<img alt='Admin' align='middle' class='icon' title='" + adminTitle + "' src=\""
-								+ adminIcon + "\"/>";
+						        + adminIcon + "\"/>";
 					}
 
 					if (userRow.children[3].children[0] != null) {
@@ -964,19 +1019,24 @@ function saveUser(userElmId, userDbId) {
 					}
 
 					userRow.children[3].innerHTML = adminHTML;
+					
+					
+					var userStatusId = "user_status_"+jsonData.id; 
+					var statusHTML = "<input id='"+userStatusId+"' type='checkbox' checked='checked' onchange=\"toggleUserStatus(" +jsonData.id+"'"+userStatusId+ "')\" />";
+					userRow.children[4].innerHTML = statusHTML;
 
 					var editHTML = "<img alt='Edit' align='middle' class='icon' title='" + editTitle + "' src='"
-							+ editIcon + "' onclick=\"editUser('" + userElmId + "'," + jsonData.id + ")\" />";
-					userRow.children[4].innerHTML = editHTML;
+					        + editIcon + "' onclick=\"editUser('" + userElmId + "'," + jsonData.id + ")\" />";
+					userRow.children[5].innerHTML = editHTML;
 
 					var resetHTML = "<img alt='Reset' align='middle' class='icon' title='" + resetTitle + "' src='"
-							+ resetIcon + "' onclick=\"resetUser('user_" + jsonData.id + "'," + jsonData.id + ")\"/>";
-					userRow.children[5].innerHTML = resetHTML;
+					        + resetIcon + "' onclick=\"resetUser('user_" + jsonData.id + "'," + jsonData.id + ")\"/>";
+					userRow.children[6].innerHTML = resetHTML;
 
 					var saveHTML = "<img alt='Delete' align='middle' class='icon' title='" + userDeleteTitle
-							+ "' src='" + deleteIcon + "' onclick=\"deleteUser('" + userElmId + "', " + jsonData.id
-							+ ")\" />";
-					userRow.children[6].innerHTML = saveHTML;
+					        + "' src='" + deleteIcon + "' onclick=\"deleteUser('" + userElmId + "', " + jsonData.id
+					        + ")\" />";
+					userRow.children[7].innerHTML = saveHTML;
 				}
 			}, "json");
 		} else {
@@ -991,10 +1051,9 @@ function resetUser(userElmId, userDbId) {
 	if (userDbId > 0) {
 
 		$.post(jsonUrl, {
-			operation : "RESET_USER",
-			id : userDbId
+		    operation : "RESET_USER",
+		    id : userDbId
 		}, function(data) {
-
 			jsonData = data;
 
 			if (jsonData.error) {
@@ -1011,11 +1070,9 @@ function editAccountSettings(rowElmId, userDbId) {
 	if ((rowElmId != "") && (userDbId > 0)) {
 
 		var selectedRow = document.getElementById(rowElmId);
-		selectedRow.cells[1].innerHTML = "<input type='text' value='" + selectedRow.cells[1].innerHTML
-				+ "' class='accountAreaEdit' maxlength='20'/>";
-		selectedRow.cells[2].innerHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='"
-				+ saveIcon + "' onclick=\"saveAccountSettings('" + rowElmId + "'," + userDbId + ")\" />";
-
+		selectedRow.cells[1].innerHTML = "<input type='text' value='" + selectedRow.cells[1].innerHTML + "' class='accountAreaEdit' maxlength='20'/>";
+		selectedRow.cells[2].innerHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='" + saveIcon + "' onclick=\"saveAccountSettings('" + rowElmId + "'," + userDbId + ")\" />";
+		
 	} else {
 		alert("Editing Not Allowed.");
 	}
@@ -1032,12 +1089,13 @@ function saveAccountSettings(elmId, userDbId) {
 			oprn = "MODIFY_USER_PREF";
 		}
 
+
 		if (userData != "") {
 			$.post(jsonUrl, {
-				operation : oprn,
-				id : userDbId,
-				field : elmId,
-				text : userData
+			    operation : oprn,
+			    id : userDbId,
+			    field : elmId,
+			    text : userData
 			}, function(data) {
 
 				var jsonData = data;
@@ -1069,7 +1127,7 @@ function saveAccountSettings(elmId, userDbId) {
 					selectedRow.cells[1].innerHTML = savedValue;
 
 					var editHTML = "<img alt='Edit' align='middle' class='icon' title='" + editTitle + "' src='"
-							+ editIcon + "' onclick=\"editAccountSettings('" + elmId + "'," + userDbId + ")\"  />";
+					        + editIcon + "' onclick=\"editAccountSettings('" + elmId + "'," + userDbId + ")\"  />";
 					selectedRow.cells[2].innerHTML = editHTML;
 				}
 			}, "json");
@@ -1079,12 +1137,10 @@ function saveAccountSettings(elmId, userDbId) {
 
 function searchEntries(divId, tbodyElmId, accordId, adminUser) {
 
-	var startDate = searchStartDate;
-	var endDate = searchEndDate;
 	var projId = document.getElementById("searchProjectId").value;
 	var actId = document.getElementById("searchActivityId").value;
-
 	var usrElm = document.getElementById("searchUserId");
+	
 	var userId = 0;
 
 	if (usrElm != null) {
@@ -1093,250 +1149,308 @@ function searchEntries(divId, tbodyElmId, accordId, adminUser) {
 
 	// clear the new entry table
 	var entryTableBody = document.getElementById("timeTable_body");
-
+	
 	if ((entryTableBody != null) && (entryTableBody.hasChildNodes())) {
 		$("#timeTable_body").html();
 	}
 
 	if ((tbodyElmId != null) && (tbodyElmId != "")) {
 
-		$
-				.getJSON(
-						jsonUrl,
-						{
-							operation : "SEARCH_ENTRIES",
-							weekStartDate : startDate,
-							weekEndDate : endDate,
-							startWeekNum : searchStartWeekNum,
-							endWeekNum : searchEndWeekNum,
-							startYear : searchStartYear,
-							endYear : searchEndYear,
-							projectId : projId,
-							activityId : actId,
-							userDbId : userId
-						},
-						function(data) {
+		$.getJSON(
+			jsonUrl,
+			{
+				operation : "SEARCH_ENTRIES",
+				weekStartDate : searchStartDate,
+				weekEndDate : searchEndDate,
+				startWeekNum : searchStartWeekNum,
+				endWeekNum : searchEndWeekNum,
+				startYear : searchStartYear,
+				endYear : searchEndYear,
+				projectId : projId,
+				activityId : actId,
+				userDbId : userId
+			},
+			function(data) {
+				var jsonData = data;
 
-							var jsonData = data;
+				if (jsonData.error) {
+					$("#" + divId).html();
+					$("#" + divId).html("<p class='error'>No Data Found</p>");
+				} else {
 
-							if (jsonData.error) {
-								$("#" + divId).html();
-								$("#" + divId).html("<p class='error'>No Data Found</p>");
-							} else {
+					if (jsonData.weeklyData.length > 0) {
+						var accDivHTML = "<p>Search Results</p><div style='margin-bottom: 2em;'><div id='" + accordId + "'>";
+						var weekHTML = "";
+						var currWeekData = null;
+						var dayLabel = null;
+						var entry = null;
+						var entryRowId = null;
 
-								if (jsonData.weeklyData.length > 0) {
-									var accDivHTML = "<p>Search Results</p><div style='margin-bottom: 2em;'><div id='"
-											+ accordId + "'>";
-									var weekHTML = "";
-									var currWeekData = null;
-									var dayLabel = null;
-									var entry = null;
-									var entryRowId = null;
+						for ( var i = 0; i < jsonData.weeklyData.length; i++) {
+							currWeekData = jsonData.weeklyData[i];
+							weekHTML = "<h3><a href='#week_" + currWeekData.weekId + "'>" + currWeekData.weekName + "</a></h3>";
+							weekHTML = weekHTML + "<div>";
+							weekHTML = weekHTML + "<table style='width: 100%;' id='timeTable_" + currWeekData.weekId + "'>";
+							weekHTML = weekHTML + "<colgroup><col style='width: 10%' /><col style='width: 10%' /><col style='width: 10%' /><col style='width: 10%' /><col style='width: 7%' /><col style='width: 7%' /><col style='width: 7%' /><col style='width: 7%' /><col style='width: 7%' /><col style='width: 7%' /><col style='width: 7%' /><col style='width: 5%' /><col style='width: 3%' /><col style='width: 3%' /></colgroup>";
 
-									for ( var i = 0; i < jsonData.weeklyData.length; i++) {
-										currWeekData = jsonData.weeklyData[i];
-										weekHTML = "<h3><a href='#week_" + currWeekData.weekId + "'>"
-												+ currWeekData.weekName + "</a></h3>";
-										weekHTML = weekHTML + "<div>";
-										weekHTML = weekHTML + "<table style='width: 100%;' id='timeTable_"
-												+ currWeekData.weekId + "'>";
-										weekHTML = weekHTML
-												+ "<colgroup><col style='width: 11%' /><col style='width: 11%' /><col style='width: 11%' /><col style='width: 8%' /><col style='width: 8%' /><col style='width: 8%' /><col style='width: 8%' /><col style='width: 8%' /><col style='width: 8%' /><col style='width: 8%' /><col style='width: 5%' /><col style='width: 3%' /><col style='width: 3%' /></colgroup>";
+							// head
+							weekHTML = weekHTML + "<thead><tr><th>User</th><th>Project</th><th>Activity</th><th>Lead</th>";
 
-										// head
-										weekHTML = weekHTML
-												+ "<thead><tr><th>Project</th><th>Activity</th><th>Lead</th>";
-
-										for ( var j = 0; j < currWeekData.weekDayLabels.length; j++) {
-											dayLabel = currWeekData.weekDayLabels[j];
-											weekHTML = weekHTML + "<th id=day_" + j + "_Text>" + dayLabel.label
-													+ "</th>";
-										}
-
-										weekHTML = weekHTML + "<th>Total</th><th colspan='2'>&nbsp;</th></tr></thead>";
-
-										// body
-										weekHTML = weekHTML + "<tbody id='" + tbodyElmId + "_" + currWeekData.weekId
-												+ "' class='reportBody'>";
-
-										for ( var k = 0; k < currWeekData.entryData.length; k++) {
-											entry = currWeekData.entryData[k];
-											entryRowId = "entry_" + entry.entryId;
-
-											weekHTML = weekHTML + "<tr id='" + entryRowId + "' class='leadColumn'>";
-											weekHTML = weekHTML + "<td>" + entry.projectName
-													+ "<input type='hidden' id='startDate_" + entry.entryId
-													+ "' value='" + entry.startDate + "' /></td>";
-											weekHTML = weekHTML + "<td>" + entry.activityName + "</td>";
-											weekHTML = weekHTML + "<td>" + entry.leadName + "</td>";
-
-											weekHTML = weekHTML + "<td>" + entry.day1 + "</td>";
-											weekHTML = weekHTML + "<td>" + entry.day2 + "</td>";
-											weekHTML = weekHTML + "<td>" + entry.day3 + "</td>";
-											weekHTML = weekHTML + "<td>" + entry.day4 + "</td>";
-											weekHTML = weekHTML + "<td>" + entry.day5 + "</td>";
-											weekHTML = weekHTML + "<td class='weekEnd'>" + entry.day6 + "</td>";
-											weekHTML = weekHTML + "<td class='weekEnd'>" + entry.day7 + "</td>";
-											weekHTML = weekHTML + "<td class='rowTotal'>" + entry.total + "</td>";
-
-											weekHTML = weekHTML
-													+ "<td align='center'><img alt='Edit' class='icon' title='"
-													+ editTitle + "' src='" + editIcon + "' onclick=\"editTimeEntry('"
-													+ entryRowId + "'," + entry.projectId + "," + entry.activityId
-													+ "," + entry.entryId + ")\" align='middle'></td>";
-											weekHTML = weekHTML
-													+ "<td align='center'><img alt='Delete' class='icon' title='Delete this row' src='"
-													+ deleteIcon + "' onclick=\"deleteTimeEntry('" + entryRowId + "',"
-													+ entry.entryId + ")\" align='middle'></td>";
-
-										}
-										weekHTML = weekHTML + "</tbody></table></div>";
-										accDivHTML = accDivHTML + weekHTML;
-									}
-									// clear existing and add results message
-									$("#" + divId).html();
-									$("#" + divId).html(accDivHTML + "</div></div>");
-									$("#" + accordId).accordion(accOptions);
-								}
+							for ( var j = 0; j < currWeekData.weekDayLabels.length; j++) {
+								dayLabel = currWeekData.weekDayLabels[j];
+								weekHTML = weekHTML + "<th id=day_" + j + "_Text>" + dayLabel.label + "</th>";
 							}
-						});
+
+							weekHTML = weekHTML + "<th>Total</th><th colspan='2'>&nbsp;</th></tr></thead>";
+
+							// body
+							weekHTML = weekHTML + "<tbody id='" + tbodyElmId + "_" + currWeekData.weekId + "' class='reportBody'>";
+
+							for ( var k = 0; k < currWeekData.entryData.length; k++) {
+								entry = currWeekData.entryData[k];
+								entryRowId = "entry_" + entry.entryId;
+
+								weekHTML = weekHTML + "<tr id='" + entryRowId + "' class='leadColumn'>";
+								weekHTML = weekHTML + "<td>" + entry.userName + "</td>";
+								weekHTML = weekHTML + "<td>" + entry.projectName
+								        + "<input type='hidden' id='startDate_" + entry.entryId
+								        + "' value='" + entry.startDate + "' /></td>";
+								weekHTML = weekHTML + "<td>" + entry.activityName + "</td>";
+								weekHTML = weekHTML + "<td>";
+								
+								if (entry.leadName != null) {
+									weekHTML = weekHTML + entry.leadName + "</td>";
+								} else {
+									weekHTML = weekHTML + "</td>";
+								}
+
+								weekHTML = weekHTML + "<td>" + entry.day1 + "</td>";
+								weekHTML = weekHTML + "<td>" + entry.day2 + "</td>";
+								weekHTML = weekHTML + "<td>" + entry.day3 + "</td>";
+								weekHTML = weekHTML + "<td>" + entry.day4 + "</td>";
+								weekHTML = weekHTML + "<td>" + entry.day5 + "</td>";
+								weekHTML = weekHTML + "<td class='weekEnd'>" + entry.day6 + "</td>";
+								weekHTML = weekHTML + "<td class='weekEnd'>" + entry.day7 + "</td>";
+								weekHTML = weekHTML + "<td class='rowTotal'>" + entry.total + "</td>";
+
+								weekHTML = weekHTML
+									+ "<td align='center'><img alt='Edit' class='icon' title='"
+									+ editTitle + "' src='" + editIcon + "' onclick=\"editTimeEntry('"+ entryRowId + "'," + entry.projectId + "," + entry.activityId + "," + entry.entryId + ")\" align='middle'></td>";
+								weekHTML = weekHTML
+									+ "<td align='center'><img alt='Delete' class='icon' title='Delete this row' src='"
+									+ deleteIcon + "' onclick=\"deleteTimeEntry('" + entryRowId + "'," + entry.entryId + ")\" align='middle'></td>";
+
+							}
+							weekHTML = weekHTML + "</tbody></table></div>";
+							accDivHTML = accDivHTML + weekHTML;
+						}
+						// clear existing and add results message
+						$("#" + divId).html();
+						$("#" + divId).html(accDivHTML + "</div></div>");
+						$("#" + accordId).accordion(accOptions);
+					}
+				}
+			});
+	}
+}
+
+function searchMissingEntries(accordId, divId) {
+
+	// clear the new entry table
+	$("#"+accordId).html();
+
+	if ((searchStartDate != null) && (searchEndDate != null)) {
+
+		$.getJSON(
+			jsonUrl,
+			{
+				operation : "SEARCH_USERS_WITHOUT_ENTRIES",
+				weekStartDate : searchStartDate,
+				weekEndDate : searchEndDate
+			},
+			function(data) {
+				var jsonData = data;
+
+				if (jsonData.error) {
+					$("#" + divId).html();
+					$("#" + divId).html("<p class='error'>No Data Found</p>");
+				} else {
+					if (jsonData.weeklyUserData.length > 0) {
+						var accDivHTML = "<p>Users With Missing Entries</p><div style='margin-bottom: 2em;'><div id='" + accordId + "'>";
+						var weekHTML = "";
+						var currWeekData = null;
+						var user = null;
+
+						for ( var i = 0; i < jsonData.weeklyUserData.length; i++) {
+							currWeekData = jsonData.weeklyUserData[i];
+							weekHTML = "<h3><a href='#missing_week_" + currWeekData.weekId + "'>" + currWeekData.weekName + "</a></h3>";
+							weekHTML = weekHTML + "<div>";
+							weekHTML = weekHTML + "<table style='width: 15%;' id='missing_timeTable_" + currWeekData.weekId + "'>";
+							weekHTML = weekHTML + "<colgroup><col style='width: 100%' /></colgroup>";
+
+							// head
+							weekHTML = weekHTML + "<thead><tr><th>Pending User</th></thead>";
+
+							// body
+							weekHTML = weekHTML + "<tbody class='reportBody'>";
+
+							for ( var k = 0; k < currWeekData.users.length; k++) {
+								user = currWeekData.users[k];
+								weekHTML = weekHTML + "<tr><td>" + user.userName + "</td></tr>";
+							}
+							
+							weekHTML = weekHTML + "</tbody></table></div>";
+							accDivHTML = accDivHTML + weekHTML;
+						}
+						// clear existing and add results message
+						$("#" + divId).html();
+						$("#" + divId).html(accDivHTML + "</div></div>");
+						$("#" + accordId).accordion(accOptions);
+					}
+				}
+			}
+		);
 	}
 }
 
 /**
- * Get Report Details.
- */
+* Get Report Details.
+*/
 function viewReportDetails(projId) {
 
-	if (!isNaN(projId)) {
+	if (!isNaN(projId)){
 
-		$
-				.getJSON(
-						jsonUrl,
-						{
-							operation : "REPORT_DETAIL",
-							projectId : projId
-						},
-						function(data) {
+		$.getJSON(
+			jsonUrl,
+			{
+				operation : "REPORT_DETAIL",
+				projectId : projId
+			},
+			function(data) {
+				var jsonData = data;
 
-							var jsonData = data;
+				if (jsonData.error) {
+					$("#reportDetails").html("<p class='error'>No Data Found</p>");
+				} else {
 
-							if (jsonData.error) {
-								$("#reportDetails").html("<p class='error'>No Data Found</p>");
-							} else {
+					if (jsonData.details.length > 0) {
 
-								if (jsonData.details.length > 0) {
+						var detailHTML = "<table style='width: 100%;' id='detailTable'>";
+						detailHTML = detailHTML + "<colgroup><col style='width: 25%' /><col style='width: 25%' /><col style='width: 30%' /><col style='width: 20%' /></colgroup>";
 
-									var detailHTML = "<table style='width: 100%;' id='detailTable'>";
-									detailHTML = detailHTML
-											+ "<colgroup><col style='width: 25%' /><col style='width: 25%' /><col style='width: 30%' /><col style='width: 20%' /></colgroup>";
+						// head
+						detailHTML = detailHTML + "<thead class='reportTotal'><tr><th>Week Start</th><th>Week End</th><th>Activity</th><th>&Sigma;&nbsp;Weekly</th></tr></thead>";
 
-									// head
-									detailHTML = detailHTML
-											+ "<thead class='reportTotal'><tr><th>Week Start</th><th>Week End</th><th>Activity</th><th>&Sigma;&nbsp;Weekly</th></tr></thead>";
+						// body
+						detailHTML = detailHTML + "<tbody class='reportBody'>";
 
-									// body
-									detailHTML = detailHTML + "<tbody class='reportBody'>";
+						var currDetail = null;
 
-									var currDetail = null;
+						for ( var k = 0; k < jsonData.details.length; k++) {
+							currDetail = jsonData.details[k];
+							detailHTML = detailHTML + "<tr>";
+							detailHTML = detailHTML + "<td>" + currDetail.weekStartDate + "</td>";
+							detailHTML = detailHTML + "<td>" + currDetail.weekEndDate + "</td>";
+							detailHTML = detailHTML + "<td>" + currDetail.activityName + "</td>";
+							detailHTML = detailHTML + "<td>" + currDetail.weeklySum + "</td>";
+							detailHTML = detailHTML + "</tr>";
+						}
 
-									for ( var k = 0; k < jsonData.details.length; k++) {
-										currDetail = jsonData.details[k];
-										detailHTML = detailHTML + "<tr>";
-										detailHTML = detailHTML + "<td>" + currDetail.weekStartDate + "</td>";
-										detailHTML = detailHTML + "<td>" + currDetail.weekEndDate + "</td>";
-										detailHTML = detailHTML + "<td>" + currDetail.activityName + "</td>";
-										detailHTML = detailHTML + "<td>" + currDetail.weeklySum + "</td>";
-										detailHTML = detailHTML + "</tr>";
-									}
+						//footer row
+						detailHTML = detailHTML + "<tr class='reportTotal'>";
+						detailHTML = detailHTML + "<td colspan='3'>TOTAL</td>";
+						detailHTML = detailHTML + "<td title='Total across all above weeks'>" + jsonData.totalSum + "</td>";
+						detailHTML = detailHTML + "</tr>";
 
-									// footer row
-									detailHTML = detailHTML + "<tr class='reportTotal'>";
-									detailHTML = detailHTML + "<td colspan='3'>TOTAL</td>";
-									detailHTML = detailHTML + "<td title='Total across all above weeks'>"
-											+ jsonData.totalSum + "</td>";
-									detailHTML = detailHTML + "</tr>";
 
-									detailHTML = detailHTML + "</tbody>";
-									detailHTML = detailHTML + "</table>";
+						detailHTML = detailHTML +"</tbody>";
+						detailHTML = detailHTML +"</table>";
 
-									$("#reportDetails").html(detailHTML);
+						$("#reportDetails").html(detailHTML);
 
-									document.getElementById('light').style.display = 'block';
-									document.getElementById('fade').style.display = 'block';
+						document.getElementById('light').style.display='block';
+						document.getElementById('fade').style.display='block';
 
-									document.onkeydown = function(evt) {
-
-										evt = evt || window.event;
-										if (evt.keyCode == 27) {
-											hideReportDetails();
-										}
-									};
-
-									$("#light").draggable();
-								}
+						document.onkeydown = function(evt) {
+							evt = evt || window.event;
+							if (evt.keyCode == 27) {
+								hideReportDetails();
 							}
-						});
+						};
+						
+						$("#light").draggable();
+					}
+				}
+			}
+		);
 	}
 }
 
 /**
- * Hide Report Details.
- */
+* Hide Report Details.
+*/
 function hideReportDetails() {
-
-	document.getElementById('reportDetails').innerHTML = '';
-	document.getElementById('light').style.display = 'none';
-	document.getElementById('fade').style.display = 'none';
+	document.getElementById('reportDetails').innerHTML ='';
+	document.getElementById('light').style.display='none';
+	document.getElementById('fade').style.display='none';
 }
 
 function focus(elementId) {
-
 	$("#" + elementId).focus();
 };
 
 $(function() {
 
-	$("#accordion").accordion({
-		autoHeight : false,
-		navigation : true,
-		collapsible : true,
-		active : 0
+	$("#newEntryAccordion").accordion({
+	    autoHeight : false,
+	    navigation : true,
+	    collapsible : true,
+	    active : 0
 	});
 
 	$("#my_entry_accordion").accordion({
-		autoHeight : false,
-		navigation : true,
-		collapsible : true,
-		active : 0
+	    autoHeight : false,
+	    navigation : true,
+	    collapsible : true,
+	    active : 0
 	});
 
 	$("#my_change_accordion").accordion({
-		autoHeight : false,
-		navigation : true,
-		collapsible : true,
-		active : 0
+	    autoHeight : false,
+	    navigation : true,
+	    collapsible : true,
+	    active : 0
+	});
+
+	$("#adminAccordion").accordion({
+	    autoHeight : false,
+	    navigation : true,
+	    collapsible : true,
+	    active : 2
+	});
+	
+	$("#my_missing_entry_accordion").accordion({
+	    autoHeight : false,
+	    navigation : true,
+	    collapsible : true,
+	    active : 0
 	});
 
 	$("#weekImg").click(function() {
-
 		$("#weekpicker").datepicker('show');
 	});
 
 	$('#fromDateImg').click(function() {
-
 		$('#fromDate').datepicker('show');
 	});
 
 	$('#toDateImg').click(function() {
-
 		$('#toDate').datepicker('show');
 	});
 
 	var currentDate = new Date();
 
 	$(function() {
-
 		var from = $('#fromDate').val();
 
 		if ((from == null) || (from == "")) {
@@ -1352,42 +1466,36 @@ $(function() {
 	});
 
 	$(function() {
-
 		$('#fromDate').datepicker({
-			showOtherMonths : true,
-			selectOtherMonths : true,
-			changeMonth : true,
-			changeYear : true,
-			firstDay : 1,
-			dateFormat : "dd M yy"
+		    showOtherMonths : true,
+		    selectOtherMonths : true,
+		    changeMonth : true,
+		    changeYear : true,
+		    firstDay : 1,
+		    dateFormat : "dd M yy"
 		});
-
+		
 		$('#toDate').datepicker({
-			showOtherMonths : true,
-			selectOtherMonths : true,
-			changeMonth : true,
-			changeYear : true,
-			firstDay : 1,
-			dateFormat : "dd M yy"
+		    showOtherMonths : true,
+		    selectOtherMonths : true,
+		    changeMonth : true,
+		    changeYear : true,
+		    firstDay : 1,
+		    dateFormat : "dd M yy"
 		});
 	});
 
 	$(function() {
-
 		var startDate;
 		var endDate;
 
 		var selectCurrentWeek = function() {
-
 			window.setTimeout(function() {
-
-				$('.ui-weekpicker').find('.ui-datepicker-current-day a').addClass('ui-state-active').removeClass(
-						'ui-state-default');
+				$('.ui-weekpicker').find('.ui-datepicker-current-day a').addClass('ui-state-active').removeClass('ui-state-default');
 			}, 1);
 		};
 
 		var setDates = function(input, targetCalendarFieldId) {
-
 			var $input = $(input);
 			var selectedDate = $input.datepicker('getDate');
 
@@ -1403,15 +1511,16 @@ $(function() {
 				// get the week start & end day
 				startDate = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate() - dayAdjustment);
 				endDate = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate() - dayAdjustment + 6);
-
+				
 				// store the week start day
 				if (targetCalendarFieldId == "weekArea") {
 					weekStartDate = $.datepicker.formatDate('dd.mm.yy', startDate);
-				} else if (targetCalendarFieldId == "startWeekSearch") {
+				} else if ((targetCalendarFieldId == "startWeekSearch") || (targetCalendarFieldId == "missingStartWeekSearch")) {
 					searchStartDate = $.datepicker.formatDate('dd.mm.yy', startDate);
 					searchStartWeekNum = $.datepicker.iso8601Week(endDate)
 					searchStartYear = endDate.getFullYear();
-				} else if (targetCalendarFieldId == "endWeekSearch") {
+				} else if ((targetCalendarFieldId == "endWeekSearch") || (targetCalendarFieldId == "missingEndWeekSearch")) {
+					searchEndDate = $.datepicker.formatDate('dd.mm.yy', endDate);
 					searchEndWeekNum = $.datepicker.iso8601Week(endDate)
 					searchEndYear = endDate.getFullYear();
 				}
@@ -1420,38 +1529,23 @@ $(function() {
 				var weekDetails = $.datepicker.formatDate('dd M', startDate) + ' - ';
 				var year = $.datepicker.formatDate('yy', endDate);
 				weekDetails = weekDetails + $.datepicker.formatDate('dd M', endDate) + ', ' + year;
-
+				
 				// set the formatted date in textbox
 				$("#" + targetCalendarFieldId).val(weekDetails);
 			}
 		};
 
 		var setDateLabels = function(strtDt) {
-
 			var startDate = strtDt;
-
+			
 			// set the day labels
-			$("#day1Text").text(
-					$.datepicker.formatDate('D : dd-M', new Date(startDate.getFullYear(), startDate.getMonth(),
-							startDate.getDate())));
-			$("#day2Text").text(
-					$.datepicker.formatDate('D : dd-M', new Date(startDate.getFullYear(), startDate.getMonth(),
-							startDate.getDate() + 1)));
-			$("#day3Text").text(
-					$.datepicker.formatDate('D : dd-M', new Date(startDate.getFullYear(), startDate.getMonth(),
-							startDate.getDate() + 2)));
-			$("#day4Text").text(
-					$.datepicker.formatDate('D : dd-M', new Date(startDate.getFullYear(), startDate.getMonth(),
-							startDate.getDate() + 3)));
-			$("#day5Text").text(
-					$.datepicker.formatDate('D : dd-M', new Date(startDate.getFullYear(), startDate.getMonth(),
-							startDate.getDate() + 4)));
-			$("#day6Text").text(
-					$.datepicker.formatDate('D : dd-M', new Date(startDate.getFullYear(), startDate.getMonth(),
-							startDate.getDate() + 5)));
-			$("#day7Text").text(
-					$.datepicker.formatDate('D : dd-M', new Date(startDate.getFullYear(), startDate.getMonth(),
-							startDate.getDate() + 6)));
+			$("#day1Text").text( $.datepicker.formatDate('D : dd-M', new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())));
+			$("#day2Text").text( $.datepicker.formatDate('D : dd-M', new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + 1)));
+			$("#day3Text").text( $.datepicker.formatDate('D : dd-M', new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + 2)));
+			$("#day4Text").text( $.datepicker.formatDate('D : dd-M', new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + 3)));
+			$("#day5Text").text( $.datepicker.formatDate('D : dd-M', new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + 4)));
+			$("#day6Text").text( $.datepicker.formatDate('D : dd-M', new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + 5)));
+			$("#day7Text").text( $.datepicker.formatDate('D : dd-M', new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + 6)));
 
 			// clean any rows already present
 			$("#timeTable_body").empty();
@@ -1459,12 +1553,10 @@ $(function() {
 
 		$('#weekpicker').datepicker({
 			beforeShow : function() {
-
 				$('#ui-datepicker-div').addClass('ui-weekpicker');
 				selectCurrentWeek();
 			},
 			onClose : function() {
-
 				$('#ui-datepicker-div').removeClass('ui-weekpicker');
 			},
 			showOtherMonths : true,
@@ -1474,7 +1566,6 @@ $(function() {
 			firstDay : 1,
 			showWeek : true,
 			onSelect : function(dateText, inst) {
-
 				setDates(this, "weekArea");
 				$(this).datepicker("hide");
 				setDateLabels(startDate);
@@ -1482,7 +1573,6 @@ $(function() {
 				$(this).change();
 			},
 			beforeShowDay : function(date) {
-
 				var cssClass = '';
 
 				if (date >= startDate && date <= endDate) {
@@ -1492,7 +1582,6 @@ $(function() {
 				return [ true, cssClass ];
 			},
 			onChangeMonthYear : function(year, month, inst) {
-
 				selectCurrentWeek();
 			}
 		});
@@ -1500,104 +1589,160 @@ $(function() {
 		setDates('#weekpicker');
 
 		var $calendarTR = $('.ui-weekpicker .ui-datepicker-calendar tr');
-
+		
 		$calendarTR.live('mousemove', function() {
-
 			$(this).find('td a').addClass('ui-state-hover');
 		});
-
+		
 		$calendarTR.live('mouseleave', function() {
-
 			$(this).find('td a').removeClass('ui-state-hover');
 		});
 
 		$("#startWeekImg").click(function() {
-
 			$('#startWeekSearch').datepicker('show');
 		});
 
 		$('#startWeekSearch').datepicker({
-			beforeShow : function() {
-
-				$('#ui-datepicker-div').addClass('ui-weekpicker');
-				selectCurrentWeek();
-			},
-			onClose : function() {
-
-				$('#ui-datepicker-div').removeClass('ui-weekpicker');
-			},
-			showOtherMonths : true,
-			selectOtherMonths : true,
-			changeMonth : true,
-			changeYear : true,
-			firstDay : 1,
-			showWeek : true,
-			onSelect : function(dateText, inst) {
-
-				setDates(this, "startWeekSearch");
-				selectCurrentWeek();
-				$(this).change();
-			},
-			beforeShowDay : function(date) {
-
-				var cssClass = '';
-				if (date >= startDate && date <= endDate)
-					cssClass = 'ui-datepicker-current-day';
-				return [ true, cssClass ];
-			},
-			onChangeMonthYear : function(year, month, inst) {
-
-				selectCurrentWeek();
-			}
+		    beforeShow : function() {
+			    $('#ui-datepicker-div').addClass('ui-weekpicker');
+			    selectCurrentWeek();
+		    },
+		    onClose : function() {
+			    $('#ui-datepicker-div').removeClass('ui-weekpicker');
+		    },
+		    showOtherMonths : true,
+		    selectOtherMonths : true,
+		    changeMonth : true,
+		    changeYear : true,
+		    firstDay : 1,
+		    showWeek : true,
+		    onSelect : function(dateText, inst) {
+			    setDates(this, "startWeekSearch");
+			    selectCurrentWeek();
+			    $(this).change();
+		    },
+		    beforeShowDay : function(date) {
+			    var cssClass = '';
+			    if (date >= startDate && date <= endDate)
+				    cssClass = 'ui-datepicker-current-day';
+			    return [ true, cssClass ];
+		    },
+		    onChangeMonthYear : function(year, month, inst) {
+			    selectCurrentWeek();
+		    }
 		});
-
+		
 		$("#endWeekImg").click(function() {
-
 			$('#endWeekSearch').datepicker('show');
 		});
 
 		$('#endWeekSearch').datepicker({
-			beforeShow : function() {
+		    beforeShow : function() {
+			    $('#ui-datepicker-div').addClass('ui-weekpicker');
+			    selectCurrentWeek();
+		    },
+		    onClose : function() {
+			    $('#ui-datepicker-div').removeClass('ui-weekpicker');
+		    },
+		    showOtherMonths : true,
+		    selectOtherMonths : true,
+		    changeMonth : true,
+		    changeYear : true,
+		    firstDay : 1,
+		    showWeek : true,
+		    onSelect : function(dateText, inst) {
+			    setDates(this, "endWeekSearch");
+			    selectCurrentWeek();
+			    $(this).change();
+		    },
+		    beforeShowDay : function(date) {
+			    var cssClass = '';
+			    if (date >= startDate && date <= endDate)
+				    cssClass = 'ui-datepicker-current-day';
+			    return [ true, cssClass ];
+		    },
+		    onChangeMonthYear : function(year, month, inst) {
+			    selectCurrentWeek();
+		    }
+		});
+		
+		//missing user start week
+		$("#missingStartWeekImg").click(function() {
+			$('#missingStartWeekSearch').datepicker('show');
+		});
 
-				$('#ui-datepicker-div').addClass('ui-weekpicker');
-				selectCurrentWeek();
-			},
-			onClose : function() {
+		$('#missingStartWeekSearch').datepicker({
+		    beforeShow : function() {
+			    $('#ui-datepicker-div').addClass('ui-weekpicker');
+			    selectCurrentWeek();
+		    },
+		    onClose : function() {
+			    $('#ui-datepicker-div').removeClass('ui-weekpicker');
+		    },
+		    showOtherMonths : true,
+		    selectOtherMonths : true,
+		    changeMonth : true,
+		    changeYear : true,
+		    firstDay : 1,
+		    showWeek : true,
+		    onSelect : function(dateText, inst) {
+			    setDates(this, "missingStartWeekSearch");
+			    selectCurrentWeek();
+			    $(this).change();
+		    },
+		    beforeShowDay : function(date) {
+			    var cssClass = '';
+			    if (date >= startDate && date <= endDate)
+				    cssClass = 'ui-datepicker-current-day';
+			    return [ true, cssClass ];
+		    },
+		    onChangeMonthYear : function(year, month, inst) {
+			    selectCurrentWeek();
+		    }
+		});
+		
+		//missing user end week
+		$("#missingEndWeekImg").click(function() {
+			$('#missingEndWeekSearch').datepicker('show');
+		});
 
-				$('#ui-datepicker-div').removeClass('ui-weekpicker');
-			},
-			showOtherMonths : true,
-			selectOtherMonths : true,
-			changeMonth : true,
-			changeYear : true,
-			firstDay : 1,
-			showWeek : true,
-			onSelect : function(dateText, inst) {
-
-				setDates(this, "endWeekSearch");
-				selectCurrentWeek();
-				$(this).change();
-			},
-			beforeShowDay : function(date) {
-
-				var cssClass = '';
-				if (date >= startDate && date <= endDate)
-					cssClass = 'ui-datepicker-current-day';
-				return [ true, cssClass ];
-			},
-			onChangeMonthYear : function(year, month, inst) {
-
-				selectCurrentWeek();
-			}
+		$('#missingEndWeekSearch').datepicker({
+		    beforeShow : function() {
+			    $('#ui-datepicker-div').addClass('ui-weekpicker');
+			    selectCurrentWeek();
+		    },
+		    onClose : function() {
+			    $('#ui-datepicker-div').removeClass('ui-weekpicker');
+		    },
+		    showOtherMonths : true,
+		    selectOtherMonths : true,
+		    changeMonth : true,
+		    changeYear : true,
+		    firstDay : 1,
+		    showWeek : true,
+		    onSelect : function(dateText, inst) {
+			    setDates(this, "missingEndWeekSearch");
+			    selectCurrentWeek();
+			    $(this).change();
+		    },
+		    beforeShowDay : function(date) {
+			    var cssClass = '';
+			    if (date >= startDate && date <= endDate)
+				    cssClass = 'ui-datepicker-current-day';
+			    return [ true, cssClass ];
+		    },
+		    onChangeMonthYear : function(year, month, inst) {
+			    selectCurrentWeek();
+		    }
 		});
 	});
+
 
 	$.getJSON(jsonUrl, {
 		operation : "project"
 	}, function(data) {
-
 		projectsAvailableJSON = data;
-
+		
 		if ((projectsAvailableJSON != null) && (projectsAvailableJSON.projects != null)) {
 			for ( var i = 0; i < projectsAvailableJSON.projects.length; i++) {
 				projectArr[projectsAvailableJSON.projects[i].code] = projectsAvailableJSON.projects[i].value;

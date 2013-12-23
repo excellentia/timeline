@@ -1,6 +1,7 @@
 package org.ag.timeline.business.service.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +29,7 @@ import org.ag.timeline.presentation.transferobject.common.CodeValue;
 import org.ag.timeline.presentation.transferobject.input.AuthenticationInput;
 import org.ag.timeline.presentation.transferobject.input.CodeValueInput;
 import org.ag.timeline.presentation.transferobject.input.ProjectInput;
+import org.ag.timeline.presentation.transferobject.input.StatusInput;
 import org.ag.timeline.presentation.transferobject.input.TimeDataInput;
 import org.ag.timeline.presentation.transferobject.input.UserInput;
 import org.ag.timeline.presentation.transferobject.input.UserPreferencesInput;
@@ -48,6 +50,7 @@ import org.ag.timeline.presentation.transferobject.reply.UserPreferenceSearchRep
 import org.ag.timeline.presentation.transferobject.reply.UserReply;
 import org.ag.timeline.presentation.transferobject.reply.UserSearchReply;
 import org.ag.timeline.presentation.transferobject.reply.WeekReply;
+import org.ag.timeline.presentation.transferobject.reply.WeeklyUserReply;
 import org.ag.timeline.presentation.transferobject.search.ActivitySearchParameter;
 import org.ag.timeline.presentation.transferobject.search.AuditDataSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.ProjectSearchParameter;
@@ -401,12 +404,32 @@ public class TimelineServiceImpl implements TimelineService {
 					long time = System.nanoTime();
 
 					Activity activity = (Activity) session.get(Activity.class, new Long(myTimeData.getActivityId()));
-					User user = (User) session.get(User.class, myTimeData.getUserId());
+					User currentUser = (User) session.get(User.class, myTimeData.getUserId());
 					Date startDate = myTimeData.getDate();
-					Long year = TextHelper.getYear(startDate);
-					Long weekNum = TextHelper.getWeekNumber(startDate);
+					Long year = TextHelper.getYearForWeekDay(startDate);
+					User proxiedUser = null;
 
-					if ((activity != null) && (user != null) && (weekNum > 0)) {
+					// set the user as current user by default
+					User user = currentUser;
+
+					if (myTimeData.getProxiedUserDbId() > 0) {
+						proxiedUser = (User) session.get(User.class, myTimeData.getProxiedUserDbId());
+
+						if (proxiedUser != null) {
+
+							// update the user as proxied user
+							user = proxiedUser;
+
+						} else {
+
+							// throw exception as user being proxied is not
+							// present in system
+							throw new TimelineException("Proxied User does not exist in system.");
+
+						}
+					}
+
+					if ((activity != null) && (user != null) && (startDate != null) && (user.getId() > 0)) {
 
 						// week handling
 						Week week = null;
@@ -415,7 +438,7 @@ public class TimelineServiceImpl implements TimelineService {
 						if (week == null) {
 							Criteria criteria = session.createCriteria(Week.class);
 							criteria.add(Restrictions.and(Restrictions.eq("year", year),
-									Restrictions.eq("weekNumber", weekNum), Restrictions.eq("startDate", startDate)));
+									Restrictions.eq("startDate", startDate)));
 							criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 							@SuppressWarnings("unchecked")
@@ -429,7 +452,7 @@ public class TimelineServiceImpl implements TimelineService {
 								week = new Week();
 
 								week.setYear(year);
-								week.setWeekNumber(weekNum);
+								week.setWeekNumber(TextHelper.getWeekNumber(startDate));
 								week.setStartDate(TextHelper.getFirstDayOfWeek(startDate));
 								week.setEndDate(TextHelper.getLastDayOfWeek(startDate));
 
@@ -447,7 +470,8 @@ public class TimelineServiceImpl implements TimelineService {
 							criteria.createAlias("activity", "act");
 							criteria.createAlias("project", "proj");
 							criteria.createAlias("week", "wk");
-							criteria.add(Restrictions.and(Restrictions.eq("wk.weekNumber", new Long(weekNum)),
+							criteria.add(Restrictions.and(
+									Restrictions.eq("wk.weekNumber", new Long(week.getWeekNumber())),
 									Restrictions.eq("wk.year", new Long(year)),
 									Restrictions.eq("usr.id", new Long(user.getId())),
 									Restrictions.eq("act.id", new Long(activity.getId())),
@@ -460,7 +484,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 							// user is trying to add same activity as existing
 							if ((list != null) && (list.size() > 0)) {
-								reply.setErrorMessage("An entry for same project, activity and week already exists.");
+								reply.setErrorMessage("An entry for same user, project, activity and week already exists.");
 							} else {
 
 								// ceate new entry
@@ -573,6 +597,7 @@ public class TimelineServiceImpl implements TimelineService {
 						user.setFirstName(first);
 						user.setLastName(last);
 						user.setUserId(userId);
+						user.setActive(true);
 
 						if (password != null) {
 							user.setPassword(password);
@@ -1540,6 +1565,7 @@ public class TimelineServiceImpl implements TimelineService {
 			if (entryId > 0) {
 
 				try {
+
 					// create data, hence using AuditableSession()
 					session = getAuditableSession();
 					transaction = session.beginTransaction();
@@ -1551,23 +1577,65 @@ public class TimelineServiceImpl implements TimelineService {
 
 					if ((data != null) && (activity != null)) {
 
-						data.setActivity(activity);
-						data.setProject(activity.getProject());
+						// check if there is already an entry with same
+						// activity, user and week
+						{
 
-						data.setData_weekday_1(TextHelper.getScaledBigDecimal(myTimeData.getDay_1_time()));
-						data.setData_weekday_2(TextHelper.getScaledBigDecimal(myTimeData.getDay_2_time()));
-						data.setData_weekday_3(TextHelper.getScaledBigDecimal(myTimeData.getDay_3_time()));
-						data.setData_weekday_4(TextHelper.getScaledBigDecimal(myTimeData.getDay_4_time()));
-						data.setData_weekday_5(TextHelper.getScaledBigDecimal(myTimeData.getDay_5_time()));
-						data.setData_weekday_6(TextHelper.getScaledBigDecimal(myTimeData.getDay_6_time()));
-						data.setData_weekday_7(TextHelper.getScaledBigDecimal(myTimeData.getDay_7_time()));
+							boolean hasConflict = false;
 
-						// save the data
-						session.saveOrUpdate(data);
+							if (data.getActivity().getId() != activity.getId()) {
 
-						reply.setCodeValue(new CodeValue(data.getId()));
-						reply.setSuccessMessage("Saved successfully.");
+								// search for existing activities
+								Criteria criteria = session.createCriteria(TimeData.class);
+								criteria.createAlias("user", "usr");
+								criteria.createAlias("activity", "act");
+								criteria.createAlias("project", "proj");
+								criteria.createAlias("week", "wk");
+								criteria.add(Restrictions.and(
+										Restrictions.eq("wk.weekNumber", new Long(data.getWeek().getWeekNumber())),
+										Restrictions.eq("wk.year", new Long(data.getWeek().getYear())),
+										Restrictions.eq("usr.id", new Long(data.getUser().getId())),
+										Restrictions.eq("act.id", new Long(activity.getId())),
+										Restrictions.eq("proj.id", new Long(activity.getProject().getId()))));
 
+								criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+								@SuppressWarnings("unchecked")
+								List<TimeData> list = criteria.list();
+
+								if ((list != null) && (list.size() > 0)) {
+									hasConflict = true;
+								}
+
+							}
+
+							if (hasConflict) {
+
+								// user is trying to add same activity as
+								// existing
+								reply.setErrorMessage("An entry for same user, project, activity and week already exists.");
+
+							} else {
+
+								// update the entry
+								data.setActivity(activity);
+								data.setProject(activity.getProject());
+
+								data.setData_weekday_1(TextHelper.getScaledBigDecimal(myTimeData.getDay_1_time()));
+								data.setData_weekday_2(TextHelper.getScaledBigDecimal(myTimeData.getDay_2_time()));
+								data.setData_weekday_3(TextHelper.getScaledBigDecimal(myTimeData.getDay_3_time()));
+								data.setData_weekday_4(TextHelper.getScaledBigDecimal(myTimeData.getDay_4_time()));
+								data.setData_weekday_5(TextHelper.getScaledBigDecimal(myTimeData.getDay_5_time()));
+								data.setData_weekday_6(TextHelper.getScaledBigDecimal(myTimeData.getDay_6_time()));
+								data.setData_weekday_7(TextHelper.getScaledBigDecimal(myTimeData.getDay_7_time()));
+
+								// save the data
+								session.saveOrUpdate(data);
+
+								reply.setCodeValue(new CodeValue(data.getId()));
+								reply.setSuccessMessage("Saved successfully.");
+							}
+						}
 					} else {
 						reply.setErrorMessage("Mandatory data is missing.");
 					}
@@ -1628,6 +1696,7 @@ public class TimelineServiceImpl implements TimelineService {
 			final String userId = TextHelper.trimToNull(input.getUserId());
 			final String password = TextHelper.trimToNull(input.getPassword());
 			final boolean adminFlag = input.isAdmin();
+			final boolean activeFlag = input.isActive();
 			final TimelineConstants.UserDataFieldType type = input.getType();
 
 			if (id > 0) {
@@ -1668,29 +1737,33 @@ public class TimelineServiceImpl implements TimelineService {
 
 							if (type != null) {
 								switch (type) {
-								case ADMIN:
-									user.setAdmin(adminFlag);
-									break;
-								case FIRST_NAME:
-									user.setFirstName(first);
-									break;
-								case LAST_NAME:
-									user.setLastName(last);
-									break;
-								case PASSWORD:
-									user.setPassword(password);
-									break;
-								case USER_ID:
-									user.setUserId(userId);
-									break;
-								default:
-									break;
+									case ADMIN:
+										user.setAdmin(adminFlag);
+										break;
+									case FIRST_NAME:
+										user.setFirstName(first);
+										break;
+									case LAST_NAME:
+										user.setLastName(last);
+										break;
+									case PASSWORD:
+										user.setPassword(password);
+										break;
+									case USER_ID:
+										user.setUserId(userId);
+										break;
+									case ACTIVE:
+										user.setActive(activeFlag);
+										break;
+									default:
+										break;
 								}
 							} else {
 								user.setFirstName(first);
 								user.setLastName(last);
 								user.setUserId(userId);
 								user.setAdmin(input.isAdmin());
+								user.setActive(input.isActive());
 							}
 
 							session.update(user);
@@ -1802,14 +1875,14 @@ public class TimelineServiceImpl implements TimelineService {
 
 						} else {
 							switch (type) {
-							case QUESTION:
-								preferences.setQuestion(question);
-								break;
-							case ANSWER:
-								preferences.setAnswer(answer);
-								break;
-							default:
-								break;
+								case QUESTION:
+									preferences.setQuestion(question);
+									break;
+								case ANSWER:
+									preferences.setAnswer(answer);
+									break;
+								default:
+									break;
 							}
 						}
 
@@ -2049,12 +2122,14 @@ public class TimelineServiceImpl implements TimelineService {
 			long time = System.nanoTime();
 			Long projectId = 0l;
 			String projectName = null;
+			boolean searchActiveProjects = false;
 
 			Criteria criteria = session.createCriteria(Project.class);
 
 			if (searchParameters != null) {
 				projectId = searchParameters.getProjectId();
 				projectName = TextHelper.trimToNull(searchParameters.getProjectName());
+				searchActiveProjects = searchParameters.isSearchActiveProjects();
 			}
 
 			if (projectId > 0) {
@@ -2063,6 +2138,10 @@ public class TimelineServiceImpl implements TimelineService {
 
 			if (projectName != null) {
 				criteria.add(Restrictions.ilike("name", projectName.toLowerCase(), MatchMode.ANYWHERE));
+			}
+
+			if (searchActiveProjects) {
+				criteria.add(Restrictions.eq("status", Boolean.TRUE));
 			}
 
 			// add order
@@ -2081,9 +2160,11 @@ public class TimelineServiceImpl implements TimelineService {
 					projectData = new ProjectData();
 					projectData.setCode(project.getId());
 					projectData.setValue(project.getName());
+					projectData.setActive(project.isActive());
 
 					if (project.getLead() != null) {
 						projectData.setLeadName(project.getLead().getUserName());
+						projectData.setLeadDbId(project.getLead().getId());
 					}
 
 					reply.addProject(projectData);
@@ -2141,15 +2222,15 @@ public class TimelineServiceImpl implements TimelineService {
 			Long userId = 0l;
 			Long projectId = 0l;
 			Long activityId = 0l;
-			
-			Long startWeekId = 0l;			
+
+			Long startWeekId = 0l;
 			Long startWeekNum = 0l;
 			Long startYear = 0l;
 
 			Long endWeekId = 0l;
 			Long endWeekNum = 0l;
 			Long endYear = 0l;
-			
+
 			Criteria criteria = session.createCriteria(TimeData.class);
 
 			if (searchParameters != null) {
@@ -2189,24 +2270,57 @@ public class TimelineServiceImpl implements TimelineService {
 			}
 
 			if (startWeekId > 0) {
-				criteria.add(Restrictions.eq("wk.id", startWeekId));
+				criteria.add(Restrictions.ge("wk.id", startWeekId));
 			}
 
 			if (endWeekId > 0) {
-				criteria.add(Restrictions.eq("wk.id", endWeekId));
+				criteria.add(Restrictions.le("wk.id", endWeekId));
 			}
 
 			// add date restrictions
 			if ((startWeekNum > 0) && (startYear > 0) && (endWeekNum > 0) && (endYear > 0)) {
-				criteria.add(Restrictions.and(Restrictions.ge("wk.weekNumber", startWeekNum),
-						Restrictions.ge("wk.year", startYear), Restrictions.le("wk.weekNumber", endWeekNum),
-						Restrictions.le("wk.year", endYear)));
+
+				{
+					Criteria subCriteria = session.createCriteria(Week.class);
+					subCriteria.add(Restrictions.and(Restrictions.eq("year", startYear),
+							Restrictions.eq("weekNumber", startWeekNum)));
+					subCriteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+					@SuppressWarnings("unchecked")
+					List<Week> list = subCriteria.list();
+
+					if ((list != null) && (list.size() > 0)) {
+						startWeekId = ((Week) list.get(0)).getId();
+					}
+				}
+
+				{
+					Criteria subCriteria = session.createCriteria(Week.class);
+					subCriteria.add(Restrictions.and(Restrictions.eq("year", endYear),
+							Restrictions.eq("weekNumber", endWeekNum)));
+					subCriteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+					@SuppressWarnings("unchecked")
+					List<Week> list = subCriteria.list();
+
+					if ((list != null) && (list.size() > 0)) {
+						endWeekId = ((Week) list.get(0)).getId();
+					}
+				}
+
+				criteria.add(Restrictions.and(Restrictions.between("wk.year", startYear, endYear),
+						Restrictions.between("wk.id", startWeekId, endWeekId)));
+
 			} else if ((startWeekNum > 0) && (startYear > 0) && ((endWeekNum <= 0) || ((endYear <= 0)))) {
-				criteria.add(Restrictions.and(Restrictions.ge("wk.weekNumber", startWeekNum),
-						Restrictions.ge("wk.year", startYear)));
+
+				criteria.add(Restrictions.and(Restrictions.ge("wk.year", startYear),
+						Restrictions.ge("wk.weekNumber", startWeekNum)));
+
 			} else if ((endWeekNum > 0) && (endYear > 0) && ((startWeekNum <= 0) || ((startYear <= 0)))) {
-				criteria.add(Restrictions.and(Restrictions.le("wk.weekNumber", endWeekNum),
-						Restrictions.le("wk.year", endYear)));
+
+				criteria.add(Restrictions.and(Restrictions.le("wk.year", endYear),
+						Restrictions.le("wk.weekNumber", endWeekNum)));
+
 			}
 
 			criteria.addOrder(Order.asc("usr.id"));
@@ -2360,6 +2474,7 @@ public class TimelineServiceImpl implements TimelineService {
 			String firstName = null;
 			String lastName = null;
 			boolean admin = false;
+			boolean active = false;
 
 			Criteria criteria = session.createCriteria(User.class);
 
@@ -2368,6 +2483,7 @@ public class TimelineServiceImpl implements TimelineService {
 				firstName = TextHelper.trimToNull(searchParameters.getFirstName());
 				lastName = TextHelper.trimToNull(searchParameters.getLastName());
 				admin = searchParameters.getOnlyAdmin();
+				active = searchParameters.getOnlyActive();
 			}
 
 			if (userId > 0) {
@@ -2386,11 +2502,15 @@ public class TimelineServiceImpl implements TimelineService {
 				criteria.add(Restrictions.eq("admin", Boolean.TRUE));
 			}
 
+			if (active) {
+				criteria.add(Restrictions.eq("active", Boolean.TRUE));
+			}
+
 			// remove admin getting fetched
 			criteria.add(Restrictions.gt("id", new Long(0)));
 
 			// add order
-			criteria.addOrder(Order.asc("admin"));
+			// criteria.addOrder(Order.asc("admin"));
 			criteria.addOrder(Order.asc("userId"));
 
 			criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
@@ -2604,15 +2724,14 @@ public class TimelineServiceImpl implements TimelineService {
 									week.setStartDate(weekStartDate);
 									week.setEndDate(weekEndDate);
 									week.setWeekNumber(weekNum);
-
-									if (weekNum > 1) {
-										year = TextHelper.getYear(weekStartDate);
-									} else {
-										// Fix for setting the year correctly as new year
-										// for 1st week of year
-										year = TextHelper.getYear(weekEndDate);
-									}
-
+									/*
+									 * if (weekNum > 1) { year =
+									 * TextHelper.getYear(weekStartDate); } else
+									 * { // Fix for setting the year correctly
+									 * as new year // for 1st week of year year
+									 * = TextHelper.getYear(weekEndDate); }
+									 */
+									year = TextHelper.getYearForWeekDay(start);
 									week.setYear(year);
 									week.setCreateDate(createDate);
 									week.setCreateUserId(createUserId);
@@ -2811,7 +2930,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	}
 
-	@Override
 	public DetailedReportReply getDetailedReport(ReportSearchParameters searchParameters) throws TimelineException {
 
 		Session session = null;
@@ -2908,6 +3026,235 @@ public class TimelineServiceImpl implements TimelineService {
 			}
 		}
 
+		return reply;
+	}
+
+	@Override
+	public CodeValueReply modifyStatus(StatusInput input) throws TimelineException {
+
+		Session session = null;
+		Transaction transaction = null;
+		final CodeValueReply reply = new CodeValueReply();
+
+		if (input != null) {
+			TimelineConstants.StatusEntity entity = input.getEntity();
+			final Long id = input.getEntityId();
+
+			if ((id > 0) && (entity != null)) {
+
+				try {
+					// create data, hence using AuditableSession()
+					session = getAuditableSession();
+					transaction = session.beginTransaction();
+
+					long time = System.nanoTime();
+					String retVal = null;
+					boolean hasError = false;
+
+					switch (entity) {
+						case PROJECT: {
+							Project project = (Project) session.get(Project.class, id);
+
+							if (project == null) {
+								hasError = true;
+								reply.setErrorMessage("Specified Project is not present in system.");
+							} else {
+								project.setActive(input.isActive());
+								session.update(project);
+								retVal = project.getName();
+							}
+						}
+							break;
+
+						case USER: {
+							User user = (User) session.get(User.class, id);
+
+							if (user == null) {
+								hasError = true;
+								reply.setErrorMessage("Specified User is not present in system.");
+							} else if (id == RequestContext.getTimelineContext().getContextUserId()) {
+								hasError = true;
+								reply.setErrorMessage("User can not change own status.");
+							} else {
+								user.setActive(input.isActive());
+								session.update(user);
+								retVal = user.getUserName();
+							}
+						}
+							break;
+
+						default:
+							hasError = true;
+							break;
+					}
+
+					if (!hasError) {
+						reply.setSuccessMessage("Updated successfully.");
+
+						// populate the code value
+						CodeValue codeValue = new CodeValue(id, retVal);
+
+						reply.setCodeValue(codeValue);
+					}
+
+					TextHelper.logMessage("modifyStatus() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+
+					// commit the transaction
+					transaction.commit();
+
+				} catch (HibernateException hibernateException) {
+
+					// rollback transaction
+					if (transaction != null) {
+						transaction.rollback();
+					}
+
+					hibernateException.printStackTrace();
+
+					// create a reply for error message
+					reply.setErrorMessage("Status update failed due to Technical Reasons.");
+
+				} finally {
+					// close the session
+					if (session != null) {
+						session.close();
+					}
+				}
+			} else {
+				if (id <= 0) {
+					reply.setErrorMessage("Invalid ID specified.");
+				} else if (entity == null) {
+					reply.setErrorMessage("Invalid entity specified.");
+				}
+			}
+		}
+
+		return reply;
+	}
+
+	@Override
+	public WeeklyUserReply searchUsersWithoutEntries(WeekSearchParameter searchParameters) throws TimelineException {
+
+		Session session = null;
+		Transaction transaction = null;
+		final WeeklyUserReply reply = new WeeklyUserReply();
+
+		try {
+			// read data, hence using normal session()
+			session = getNormalSession();
+			transaction = session.beginTransaction();
+
+			long time = System.nanoTime();
+			Date startDate = null;
+			Date endDate = null;
+			final Date currentDate = new Date();
+
+			if (searchParameters != null) {
+				startDate = searchParameters.getStartDate();
+				endDate = searchParameters.getEndDate();
+			}
+
+			if (startDate == null) {
+				startDate = TextHelper.getFirstDayOfWeek(currentDate);
+			}
+
+			if (endDate == null) {
+				endDate = TextHelper.getLastDayOfWeek(currentDate);
+			}
+
+			{
+				Criteria criteria = session.createCriteria(User.class);
+				criteria.add(Restrictions.eq("active", Boolean.TRUE));
+				criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+				@SuppressWarnings("unchecked")
+				List<User> activeUsers = criteria.list();
+
+				if ((activeUsers != null) && (activeUsers.size() > 0)) {
+
+					Criteria timeEntryCriteria = session.createCriteria(TimeData.class);
+					timeEntryCriteria.createAlias("week", "week");
+					timeEntryCriteria.createAlias("user", "user");
+					timeEntryCriteria.add(Restrictions.and(Restrictions.ge("week.startDate", startDate),
+							Restrictions.le("week.endDate", endDate), Restrictions.eq("user.active", Boolean.TRUE)));
+					timeEntryCriteria.addOrder(Order.asc("week"));
+					timeEntryCriteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+					@SuppressWarnings("unchecked")
+					List<TimeData> timeEntries = timeEntryCriteria.list();
+
+					if ((timeEntries != null) && (timeEntries.size() > 0)) {
+
+						// populate the existing entries
+						for (TimeData timeData : timeEntries) {
+							reply.addWeeklyUser(timeData.getWeek(), timeData.getUser());
+						}
+
+						// iterate over the collected users & replace
+						List<Week> weekIdList = reply.getWeekList();
+						List<User> userList = null;
+						List<User> missingUserList = null;
+
+						for (Week week : weekIdList) {
+
+							missingUserList = new ArrayList<User>();
+							missingUserList.addAll(activeUsers);
+
+							userList = reply.getWeeklyUsers(week.getId());
+
+							if (userList != null) {
+								missingUserList.removeAll(userList);
+							}
+
+							reply.setWeeklyUserList(week, missingUserList);
+						}
+					} else {
+						
+						//if no entries in a given period
+						Criteria weekCriteria = session.createCriteria(Week.class);
+						weekCriteria.add(Restrictions.and(Restrictions.ge("week.startDate", startDate),
+								Restrictions.le("week.endDate", endDate)));
+						weekCriteria.addOrder(Order.asc("id"));
+						weekCriteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+						@SuppressWarnings("unchecked")
+						List<Week> allWeekList = weekCriteria.list();
+
+						for (Week week : allWeekList) {
+							reply.setWeeklyUserList(week, activeUsers);
+						}
+					}
+				}
+			}
+
+			if (reply.getUserCount() == 0) {
+				reply.setErrorMessage("No results found.");
+			}
+
+			TextHelper.logMessage("searchUsersWithoutEntries() > Time taken : "
+					+ ((System.nanoTime() - time) / 1000000));
+
+			// commit the transaction
+			transaction.commit();
+
+		} catch (HibernateException hibernateException) {
+
+			// rollback transaction
+			if (transaction != null) {
+				transaction.rollback();
+			}
+
+			hibernateException.printStackTrace();
+
+			// create a reply for error message
+			reply.setErrorMessage("Search failed due to Technical Reasons.");
+
+		} finally {
+			// close the session
+			if (session != null) {
+				session.close();
+			}
+		}
 		return reply;
 	}
 }

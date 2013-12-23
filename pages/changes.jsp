@@ -24,13 +24,13 @@
 
 			<div class="thin">From</div>
 			<div class="thin" style="padding-left: 0.5em; padding-right: 1.5em;">
-				<input type="text" id="fromDate" name="fromDate" class="dateSearch" style="width: 7.5em;" value="${fromDate}" readonly="readonly">
-				<img id="fromDateImg" src="./pages/inc/images/calendar.gif" />
+				<input type="text" id="fromDate" name="fromDate" class="dateSearch" style="width: 7.5em;" value="${fromDate}"
+					readonly="readonly"><img id="fromDateImg" src="./pages/inc/images/calendar.gif" />
 			</div>
 			<div class="thin">To</div>
 			<div class="thin" style="padding-left: 0.5em; padding-right: 1.5em;">
-				<input type="text" id="toDate" name="toDate" class="dateSearch" style="width: 7.5em;" value="${toDate}" readonly="readonly">
-				<img id="toDateImg" src="./pages/inc/images/calendar.gif" />
+				<input type="text" id="toDate" name="toDate" class="dateSearch" style="width: 7.5em;" value="${toDate}"
+					readonly="readonly"><img id="toDateImg" src="./pages/inc/images/calendar.gif" />
 			</div>
 			<div class="thin">Type</div>
 			<div class="thin" style="padding-left: 0.5em; padding-right: 1.5em;">
@@ -46,7 +46,8 @@
 				<select id="operationType" size="1" name="operationType" class="dateSearch" title="Select Operation Type">
 					<option value="0" <c:if test="${selectedOperationId == 0}">selected="selected"</c:if>>All Operations</option>
 					<c:forEach var="operationType" items="${OPERATION_TYPE_LIST}">
-						<option value="${operationType.code}" <c:if test="${selectedOperationId == operationType.code}">selected="selected"</c:if>>${operationType.value}</option>
+						<option value="${operationType.code}"
+							<c:if test="${selectedOperationId == operationType.code}">selected="selected"</c:if>>${operationType.value}</option>
 					</c:forEach>
 				</select>
 			</div>
@@ -62,7 +63,7 @@
 				</div>
 			</c:if>
 			<div class="thin" style="padding-left: 1em;">
-				<input type="submit" value="Display Changes" class="button" style="font-size: 0.8em;" />
+				<input type="submit" value="Display Changes" class="button" style="font-size : 0.8em;"/>
 			</div>
 		</form>
 	</div>

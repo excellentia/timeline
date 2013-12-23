@@ -10,21 +10,33 @@ import java.util.Date;
  * 
  * @author Abhishek Gaurav
  */
-public class TimeDataInput extends AbstractTimelineInput{
+public class TimeDataInput extends AbstractTimelineInput {
 
 	private long id = 0;
+
 	private long userId = 0;
+
 	private long activityId = 0;
+
 	// private long projectId = 0;
+	private long proxiedUserDbId = 0;
+
 	private Date date = null;
+
 	private double day_1_time = 0;
+
 	private double day_2_time = 0;
+
 	private double day_3_time = 0;
+
 	private double day_4_time = 0;
+
 	private double day_5_time = 0;
+
 	private double day_6_time = 0;
+
 	private double day_7_time = 0;
-	
+
 	/**
 	 * Getter for id.
 	 * 
@@ -241,6 +253,24 @@ public class TimeDataInput extends AbstractTimelineInput{
 		this.date = date;
 	}
 
+	/**
+	 * Getter for proxiedUserDbId.
+	 * 
+	 * @return The proxiedUserDbId.
+	 */
+	public long getProxiedUserDbId() {
+		return proxiedUserDbId;
+	}
+
+	/**
+	 * Setter for proxiedUserDbId.
+	 * 
+	 * @param proxiedUserDbId The proxiedUserDbId to set.
+	 */
+	public void setProxiedUserDbId(long proxiedUserDbId) {
+		this.proxiedUserDbId = proxiedUserDbId;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -253,6 +283,8 @@ public class TimeDataInput extends AbstractTimelineInput{
 		builder.append(id);
 		builder.append(", userId=");
 		builder.append(userId);
+		builder.append(", proxiedUserDbId=");
+		builder.append(proxiedUserDbId);
 		builder.append(", activityId=");
 		builder.append(activityId);
 		// builder.append(", projectId=");

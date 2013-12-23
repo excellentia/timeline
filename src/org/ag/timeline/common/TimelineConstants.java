@@ -6,6 +6,8 @@ package org.ag.timeline.common;
  * @author Abhishek Gaurav
  */
 public interface TimelineConstants {
+	
+	public String DOT = ".";
 
 	public String EMPTY = "";
 
@@ -29,6 +31,15 @@ public interface TimelineConstants {
 
 	public String WEEK_SEPARATOR = " - ";
 
+	public static enum StatusEntity {
+		PROJECT, USER;
+
+		public final String getText() {
+			return this.toString();
+		}
+	}
+
+	
 	public static enum RequestType {
 		GET, POST;
 
@@ -119,6 +130,7 @@ public interface TimelineConstants {
 		id,
 		refId,
 		text,
+		status,
 		field,
 		entryId,
 		projectId,
@@ -130,6 +142,7 @@ public interface TimelineConstants {
 		startWeekNum,
 		endWeekNum,
 		userDbId,
+		proxiedUserDbId,
 		day1,
 		day2,
 		day3,
@@ -165,9 +178,11 @@ public interface TimelineConstants {
 		ACTIVTIES(false),
 		LEAD(false),
 		SAVE_PROJECT(true),
+		SAVE_PROJECT_STATUS(true),
 		SAVE_ACTIVITY(true),
 		SAVE_LEAD(true),
 		SAVE_USER(true),
+		SAVE_USER_STATUS(true),
 		SAVE_TIME_ENTRY(false),
 		DELETE_PROJECT(true),
 		DELETE_ACTIVITY(true),
@@ -177,7 +192,8 @@ public interface TimelineConstants {
 		MODIFY_USER(false),
 		MODIFY_USER_PREF(false),
 		SEARCH_ENTRIES(false),
-		REPORT_DETAIL(false);
+		REPORT_DETAIL(false),
+		SEARCH_USERS_WITHOUT_ENTRIES(false);
 
 		/**
 		 * Denotes if an operation can be done by admin only.
@@ -225,7 +241,7 @@ public interface TimelineConstants {
 
 	public static enum UserDataFieldType {
 
-		FIRST_NAME, LAST_NAME, USER_ID, PASSWORD, ADMIN;
+		FIRST_NAME, LAST_NAME, USER_ID, PASSWORD, ADMIN, ACTIVE;
 
 		public static final UserDataFieldType getType(String text) {
 			UserDataFieldType type = null;

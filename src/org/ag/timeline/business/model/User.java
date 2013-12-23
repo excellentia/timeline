@@ -23,6 +23,8 @@ public class User extends AbstractModel {
 
 	private boolean admin = false;
 
+	private boolean active = true;
+
 	/**
 	 * Getter for userId.
 	 * 
@@ -114,6 +116,24 @@ public class User extends AbstractModel {
 	}
 
 	/**
+	 * Getter for active.
+	 * 
+	 * @return the active.
+	 */
+	public boolean isActive() {
+		return this.active;
+	}
+
+	/**
+	 * Setter for active.
+	 * 
+	 * @param active the active to set.
+	 */
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	/**
 	 * Business method creating simple representation if user name.
 	 * 
 	 * @return User name
@@ -130,6 +150,33 @@ public class User extends AbstractModel {
 
 		if ((firstName != null) && (lastName != null)) {
 			builder.append(TimelineConstants.SPACE).append(lastName);
+		} else if (lastName != null) {
+			builder.append(lastName);
+		}
+
+		return builder.toString();
+
+	}
+
+	/**
+	 * Business method creating simple representation if user name with
+	 * abbreviated lastname.
+	 * 
+	 * @return User name
+	 */
+	public String getAbbrvUserName() {
+		StringBuilder builder = new StringBuilder();
+
+		String firstName = TextHelper.trimToNull(this.firstName);
+		String lastName = TextHelper.trimToNull(this.lastName);
+
+		if (firstName != null) {
+			builder.append(firstName);
+		}
+
+		if ((firstName != null) && (lastName != null)) {
+			builder.append(TimelineConstants.SPACE).append(lastName.substring(0, 1).toUpperCase())
+					.append(TimelineConstants.DOT);
 		} else if (lastName != null) {
 			builder.append(lastName);
 		}
@@ -155,6 +202,8 @@ public class User extends AbstractModel {
 		builder.append(lastName);
 		builder.append(", admin=");
 		builder.append(admin);
+		builder.append(", active=");
+		builder.append(active);
 		builder.append("]");
 		return builder.toString();
 	}

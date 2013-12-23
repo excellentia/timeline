@@ -64,24 +64,22 @@ public class TextHelper {
 		return retVal;
 	}
 
-	// /**
-	// * Trims incoming string, returns "" in case the value is null.
-	// *
-	// * @param str String to be trimmed.
-	// * @return trimmed string or null.
-	// */
-	// public static String trimToEmpty(final String str) {
-	// String retVal = null;
-	//
-	// if ((str != null)) {
-	// retVal = str.trim();
-	// } else {
-	// retVal = TimelineConstants.EMPTY;
-	// }
-	//
-	// return retVal;
-	// }
-	//
+	/**
+	 * Trims incoming string, returns "" in case the value is null.
+	 * 
+	 * @param str String to be trimmed.
+	 * @return trimmed string or null.
+	 */
+	public static String trimToEmpty(final String str) {
+		String retVal = TextHelper.trimToNull(str);
+
+		if (str == null) {
+			retVal = TimelineConstants.EMPTY;
+		}
+
+		return retVal;
+	}
+
 	public static int getIntValue(String str) {
 		int retVal = 0;
 
@@ -182,11 +180,11 @@ public class TextHelper {
 		return retVal;
 	}
 
-	// public static boolean getBooleanValue(String str) {
-	// boolean retVal = Boolean.valueOf(trimToNull(str));
-	// return retVal;
-	// }
-	//
+	public static boolean getBooleanValue(String str) {
+		boolean retVal = Boolean.valueOf(trimToNull(str));
+		return retVal;
+	}
+
 	public static Date getValidDate(String str) {
 		Date date = null;
 		String data = trimToNull(str);
@@ -410,12 +408,31 @@ public class TextHelper {
 
 	}
 
-	public static long getYear(Date date) {
+	private static long getYear(Date date) {
 		long year = 0;
 		if (date != null) {
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(date);
 			year = calendar.get(Calendar.YEAR);
+		}
+
+		return year;
+	}
+
+	public static long getYearForWeekDay(Date date) {
+		long year = 0;
+
+		if (date != null) {
+
+			long weekNum = TextHelper.getWeekNumber(date);
+
+			if (weekNum > 1) {
+				year = TextHelper.getYear(TextHelper.getFirstDayOfWeek(date));
+			} else {
+				// Fix for setting the year correctly as
+				// new year for 1st week of year
+				year = TextHelper.getYear(TextHelper.getLastDayOfWeek(date));
+			}
 		}
 
 		return year;
@@ -453,9 +470,20 @@ public class TextHelper {
 			builder.append(WEEK_FORMAT.format(TextHelper.getLastDayOfWeek(endDate)));
 			builder.append(TimelineConstants.COMMA);
 			builder.append(TimelineConstants.SPACE);
-			builder.append(TextHelper.getYear(endDate));
+			builder.append(TextHelper.getYearForWeekDay(endDate));
 
 			val = builder.toString();
+		}
+
+		return val;
+	}
+	
+	public static String getDisplayWeek(final Date startDate, final Date endDate, final String defaultLabel) {
+		
+		String val = TextHelper.trimToNull(TextHelper.getDisplayWeek(startDate, endDate));
+
+		if (val == null) {
+			val = defaultLabel;
 		}
 
 		return val;
@@ -489,13 +517,60 @@ public class TextHelper {
 	}
 
 	public static void main(String[] args) {
-		Date date = getValidDate("01.07.2012");
-		System.out.println(getFirstDayOfWeek(date));
-		System.out.println(getLastDayOfWeek(date));
-		System.out.println(getWeekNumber(date));
-		System.out.println(getYear(date));
-		System.out.println(DISPLAY_FORMAT.format(date));
-		System.out.println(WEEK_FORMAT.format(date));
-		System.out.println("Week Number : "+getWeekNumber(getValidDate("31.12.2012")));
+		{
+			Date date = getValidDate("01.07.2012");
+			System.out.println("Current Date : " + date);
+			System.out.println("First Day Of Week : " + getFirstDayOfWeek(date));
+			System.out.println("Last Day Of Week : " + getLastDayOfWeek(date));
+			System.out.println("Week Number : " + getWeekNumber(date));
+			System.out.println("Year : " + getYear(date));
+			System.out.println("Display Formatted : " + DISPLAY_FORMAT.format(date));
+			System.out.println("Week Formatted : " + WEEK_FORMAT.format(date));
+		}
+
+		System.out.println("===============================");
+
+		{
+			final Date currentDate = getValidDate("31.12.2012");
+			System.out.println("Current Date : " + currentDate);
+			System.out.println("Week Number : " + getWeekNumber(currentDate));
+			System.out.println("Year For Week Day : " + getYearForWeekDay(currentDate));
+		}
+
+		System.out.println("===============================");
+
+		{
+			final Date currentDate = getValidDate("9.12.2013");
+			System.out.println("Current Date : " + currentDate);
+			{
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(currentDate);
+//				calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+				calendar.add(Calendar.DAY_OF_YEAR, 6);
+				calendar.set(Calendar.HOUR_OF_DAY, 0);
+				calendar.set(Calendar.MINUTE, 0);
+				calendar.set(Calendar.SECOND, 0);
+
+				System.out.println("Date (Week Day is not set) : " + calendar.getTime());
+			}
+
+			System.out.println("Date (Week Day is set) : " + TextHelper.getDateAfter(currentDate, 6));
+
+			System.out.println(TextHelper.getDisplayWeek(currentDate, TextHelper.getDateAfter(currentDate, 6)));
+		}
+		
+		System.out.println("===============================");
+
+		{
+			Date date = new Date();
+			System.out.println("Day Start : "+ getAuditTimestamp(getAuditDayStartTimestamp(date)));
+			System.out.println("Day End : "+ getAuditTimestamp(getAuditDayEndTimestamp(date)));
+			
+			System.out.println("Week Start Date :" + getFirstDayOfWeek(date));
+			System.out.println("Week End Date :" + getLastDayOfWeek(date));
+		}
+		
+		
+
 	}
 }

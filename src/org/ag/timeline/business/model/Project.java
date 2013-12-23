@@ -19,6 +19,8 @@ public class Project extends AbstractModel {
 
 	private Set<Activity> activities = null;
 
+	private boolean active = false;
+
 	/**
 	 * Getter for name.
 	 * 
@@ -108,6 +110,24 @@ public class Project extends AbstractModel {
 		this.lead = lead;
 	}
 
+	/**
+	 * Getter for active.
+	 * 
+	 * @return the active.
+	 */
+	public boolean isActive() {
+		return this.active;
+	}
+
+	/**
+	 * Setter for active.
+	 * 
+	 * @param active the active to set.
+	 */
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -134,7 +154,8 @@ public class Project extends AbstractModel {
 
 			builder.append("]");
 		}
-
+		builder.append(", active=");
+		builder.append(active);
 		builder.append("]");
 		return builder.toString();
 	}

@@ -12,7 +12,7 @@
 <%-- Main content --%>
 <div id="content">
 	<%-- Time Entry Area --%>
-	<div id="accordion">
+	<div id="newEntryAccordion">
 		<%-- New Entry Section--%>
 		<h3>
 			<a href="#section1">Create Time Entry</a>
@@ -21,29 +21,48 @@
 			<%-- Week Select Area --%>
 			<p class="message">Select Week</p>
 			<div id="searchBar">
-				<input id="weekArea" type="text" class="dateSearch" readonly="readonly" title="Selected Week" disabled="disabled" /> 
-				<input id="weekpicker" type="hidden" /> 
-				<img id="weekImg" title="Click To Select Week" alt="Click To Select Week" src="./pages/inc/images/calendar.gif" />
+				<div class="weekChoice">
+					<input id="weekArea" type="text" class="dateSearch" readonly="readonly" title="Selected Week" disabled="disabled" /> <input id="weekpicker" type="hidden" /> <img id="weekImg"
+						title="Click To Select Week" alt="Click To Select Week" src="./pages/inc/images/calendar.gif"
+					/>
+				</div>
+				<div class="proxyChoice">
+					<%-- Proxy Users --%>
+					<c:if test="${SESSION_USER.admin}">
+						<div style="display: inline; padding: 0; margin: 0; padding-left: 2em;">
+							<select id="proxyUserArea" size="1" name="proxiedUserDbId" class="dateSearch" title="Select User to Proxy">
+								<option value="0" selected="selected">Select Proxy User...</option>
+								<c:forEach var="user" items="${USER_LIST.users}">
+									<c:if test="${SESSION_USER.id != user.id}">
+										<option value="${user.id}">${user.userName}</option>
+									</c:if>
+								</c:forEach>
+							</select>
+						</div>
+					</c:if>
+				</div>
 			</div>
 			<div>
 				<table style="width: 100%;" id="timeTable">
 					<colgroup>
-						<col style="width: 11%" />
-						<col style="width: 11%" />
-						<col style="width: 11%" />
-						<col style="width: 8%" />
-						<col style="width: 8%" />
-						<col style="width: 8%" />
-						<col style="width: 8%" />
-						<col style="width: 8%" />
-						<col style="width: 8%" />
-						<col style="width: 8%" />
+						<col style="width: 10%" />
+						<col style="width: 10%" />
+						<col style="width: 10%" />
+						<col style="width: 10%" />
+						<col style="width: 7%" />
+						<col style="width: 7%" />
+						<col style="width: 7%" />
+						<col style="width: 7%" />
+						<col style="width: 7%" />
+						<col style="width: 7%" />
+						<col style="width: 7%" />
 						<col style="width: 5%" />
 						<col style="width: 3%" />
 						<col style="width: 3%" />
 					</colgroup>
 					<thead>
 						<tr>
+							<th>User</th>
 							<th>Project</th>
 							<th>Activity</th>
 							<th>Lead</th>
@@ -63,27 +82,27 @@
 				</table>
 			</div>
 			<div id="toolbar">
-				<input type="button" value="Add Activity" class="button" onclick="addActivityRow('timeTable')" />
+				<input type="button" value="Add Entry" class="button" onclick="addEntryRow('timeTable')" />
 			</div>
 		</div>
 		<%-- Existing Entry Search Section--%>
 		<h3>
-			<a href="#section2">Search My Time Entries</a>
+			<a href="#section2">Search Time Entries</a>
 		</h3>
 		<div>
 			<%-- Search Area --%>
 			<div id="searchBar">
 				<%-- Start Week --%>
 				<div style="display: inline; padding: 0; margin: 0">
-					<input id="startWeekSearch" type="text" class="dateSearch" readonly="readonly" title="Start Week" disabled="disabled" value="${startWeekLabel}" /> 
-					<input id="startWeekPicker" type="hidden" /> 
-					<img id="startWeekImg" title="Click To Select Start Week" alt="Click To Select Start Week" src="./pages/inc/images/calendar.gif" /> &nbsp;to&nbsp;
+					<input id="startWeekSearch" type="text" class="dateSearch" readonly="readonly" title="Start Week" disabled="disabled" value="${startWeekLabel}" /> <input id="startWeekPicker" type="hidden" /> <img
+						id="startWeekImg" title="Click To Select Start Week" alt="Click To Select Start Week" src="./pages/inc/images/calendar.gif"
+					/> &nbsp;to&nbsp;
 				</div>
 				<%-- End Week --%>
 				<div style="display: inline; padding: 0; margin: 0">
-					<input id="endWeekSearch" type="text" class="dateSearch" readonly="readonly" title="End Week" disabled="disabled" value="${endWeekLabel}" /> 
-					<input id="endWeekPicker" type="hidden" /> 
-					<img id="endWeekImg" title="Click To Select End Week" alt="Click To Select End Week" src="./pages/inc/images/calendar.gif" />
+					<input id="endWeekSearch" type="text" class="dateSearch" readonly="readonly" title="End Week" disabled="disabled" value="${endWeekLabel}" /> <input id="endWeekPicker" type="hidden" /> <img
+						id="endWeekImg" title="Click To Select End Week" alt="Click To Select End Week" src="./pages/inc/images/calendar.gif"
+					/>
 				</div>
 				<%-- Project --%>
 				<div style="display: inline; padding: 0; margin: 0; margin-left: 2em;">
@@ -135,22 +154,24 @@
 								<div>
 									<table style="width: 100%;" id="${tableId}">
 										<colgroup>
-											<col style="width: 11%" />
-											<col style="width: 11%" />
-											<col style="width: 11%" />
-											<col style="width: 8%" />
-											<col style="width: 8%" />
-											<col style="width: 8%" />
-											<col style="width: 8%" />
-											<col style="width: 8%" />
-											<col style="width: 8%" />
-											<col style="width: 8%" />
+											<col style="width: 10%" />
+											<col style="width: 10%" />
+											<col style="width: 10%" />
+											<col style="width: 10%" />
+											<col style="width: 7%" />
+											<col style="width: 7%" />
+											<col style="width: 7%" />
+											<col style="width: 7%" />
+											<col style="width: 7%" />
+											<col style="width: 7%" />
+											<col style="width: 7%" />
 											<col style="width: 5%" />
 											<col style="width: 3%" />
 											<col style="width: 3%" />
 										</colgroup>
 										<thead>
 											<tr>
+												<th>User</th>
 												<th>Project</th>
 												<th>Activity</th>
 												<th>Lead</th>
@@ -167,10 +188,11 @@
 												<c:forEach var="weeklyEntry" items="${entries}">
 													<c:set var="entryId">entry_${weeklyEntry.id}</c:set>
 													<tr id='${entryId}' class="leadColumn">
+														<td>${weeklyEntry.userFullName}</td>
 														<td>${weeklyEntry.projectName} <input type="hidden" id="startDate_${weeklyEntry.id}" value="${weeklyEntry.formattedStartDate}" />
 														</td>
 														<td>${weeklyEntry.activityName}</td>
-														<td>${weeklyEntry.leadName}</td>
+														<td><c:if test="${weeklyEntry.leadName != null}">${weeklyEntry.leadName}</c:if></td>
 														<td>${weeklyEntry.day_1_time}</td>
 														<td>${weeklyEntry.day_2_time}</td>
 														<td>${weeklyEntry.day_3_time}</td>
@@ -179,14 +201,74 @@
 														<td class="weekEnd">${weeklyEntry.day_6_time}</td>
 														<td class="weekEnd">${weeklyEntry.day_7_time}</td>
 														<td class="rowTotal">${weeklyEntry.weeklySum}</td>
-														<td align="center">
-															<img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" 
-																onclick="editTimeEntry('${entryId}',${weeklyEntry.projectId},${weeklyEntry.activityId}, ${weeklyEntry.id})" />
-														</td>
-														<td align="center">
-															<img alt="Delete" align="middle" class="icon" title="${activityDeleteTitle}" src="${deleteIconPath}" 
-																onclick="deleteTimeEntry('${entryId}',${weeklyEntry.id})" />
-														</td>
+														<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}"
+															onclick="editTimeEntry('${entryId}',${weeklyEntry.projectId},${weeklyEntry.activityId}, ${weeklyEntry.id})"
+														/></td>
+														<td align="center"><img alt="Delete" align="middle" class="icon" title="${activityDeleteTitle}" src="${deleteIconPath}" onclick="deleteTimeEntry('${entryId}',${weeklyEntry.id})" /></td>
+													</tr>
+												</c:forEach>
+											</c:if>
+										</tbody>
+									</table>
+								</div>
+							</c:forEach>
+						</div>
+					</div>
+				</c:if>
+			</div>
+		</div>
+		<%-- Pending Entry User Search Section--%>
+		<h3>
+			<a href="#section3">Pending Entries</a>
+		</h3>
+		<div>
+			<%-- Search Area --%>
+			<div id="searchBar">
+				<%-- Start Week --%>
+				<div style="display: inline; padding: 0; margin: 0">
+					<input id="missingStartWeekSearch" type="text" class="dateSearch" readonly="readonly" title="Start Week" disabled="disabled" value="${startWeekLabel}" /> 
+					<input id="missingStartWeekPicker" type="hidden" /> 
+					<img id="missingStartWeekImg" title="Click To Select Start Week" alt="Click To Select Start Week" src="./pages/inc/images/calendar.gif"/> &nbsp;to&nbsp;
+				</div>
+				<%-- End Week --%>
+				<div style="display: inline; padding: 0; margin: 0">
+					<input id="missingEndWeekSearch" type="text" class="dateSearch" readonly="readonly" title="End Week" disabled="disabled" value="${endWeekLabel}" /> 
+					<input id="missingEndWeekPicker" type="hidden" /> 
+					<img id="missingEndWeekImg" title="Click To Select End Week" alt="Click To Select End Week" src="./pages/inc/images/calendar.gif"/>
+				</div>
+				<div style="display: inline; padding: 0; margin: 0; margin-left: 1em;">
+					<input type="button" value="Search" class="button" style="height: 1.5em;" onclick="searchMissingEntries('my_missing_entry_accordion','missingUserResults')" />
+				</div>
+			</div>
+			<%-- Results Area --%>
+			<div id="missingUserResults">
+				<c:set var="userCount" value="${pendingUsers.userCount}" />
+				<c:set var="weekIdList" value="${pendingUsers.weekIdList}" />
+				<c:if test="${(weekIdList != null) && (weekIdList.size() > 0)}">
+					<p>Users With Missing Entries</p>
+					<div style="margin-bottom: 2em;">
+						<div id="my_missing_entry_accordion">
+							<c:forEach var="weekId" items="${weekIdList}">
+								<c:set var="tableId">missing_timeTable_${weekId}</c:set>
+								<h3>
+									<a href="#missing_week_${weekId}">${pendingUsers.getWeekLabel(weekId)}</a>
+								</h3>
+								<div>
+									<table style="width: 15%;" id="${tableId}">
+										<colgroup>
+											<col style="width: 100%" />
+										</colgroup>
+										<thead>
+											<tr>
+												<th>Pending User</th>
+											</tr>
+										</thead>
+										<tbody class="reportBody">
+											<c:set var="users" value="${pendingUsers.getWeeklyUsers(weekId)}" />
+											<c:if test="${users != null}">
+												<c:forEach var="user" items="${users}">
+													<tr>
+														<td>${user.userName}</td>
 													</tr>
 												</c:forEach>
 											</c:if>

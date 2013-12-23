@@ -7,6 +7,7 @@ import org.ag.timeline.application.exception.TimelineException;
 import org.ag.timeline.presentation.transferobject.input.AuthenticationInput;
 import org.ag.timeline.presentation.transferobject.input.CodeValueInput;
 import org.ag.timeline.presentation.transferobject.input.ProjectInput;
+import org.ag.timeline.presentation.transferobject.input.StatusInput;
 import org.ag.timeline.presentation.transferobject.input.TimeDataInput;
 import org.ag.timeline.presentation.transferobject.input.UserInput;
 import org.ag.timeline.presentation.transferobject.input.UserPreferencesInput;
@@ -22,6 +23,7 @@ import org.ag.timeline.presentation.transferobject.reply.UserPreferenceSearchRep
 import org.ag.timeline.presentation.transferobject.reply.UserReply;
 import org.ag.timeline.presentation.transferobject.reply.UserSearchReply;
 import org.ag.timeline.presentation.transferobject.reply.WeekReply;
+import org.ag.timeline.presentation.transferobject.reply.WeeklyUserReply;
 import org.ag.timeline.presentation.transferobject.search.ActivitySearchParameter;
 import org.ag.timeline.presentation.transferobject.search.AuditDataSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.ProjectSearchParameter;
@@ -40,8 +42,6 @@ public interface TimelineService {
 
 	public UserReply autheticateUser(AuthenticationInput input) throws TimelineException;
 	public UserReply resetUserCredentials(CodeValueInput input) throws TimelineException;
-	public void systemManagement() throws TimelineException;
-
 	
 	public CodeValueReply createProject(ProjectInput input) throws TimelineException;
 	public CodeValueReply createActivity(CodeValueInput input) throws TimelineException;
@@ -53,14 +53,13 @@ public interface TimelineService {
 	public UserReply deleteUser(CodeValueInput input) throws TimelineException;
 	public CodeValueReply deleteTimeData(CodeValueInput input) throws TimelineException;
 	public CodeValueReply deleteUserPreferences(CodeValueInput input) throws TimelineException;
-
 	
 	public CodeValueReply modifyActivity(CodeValueInput input) throws TimelineException;
 	public CodeValueReply modifyProject(ProjectInput input) throws TimelineException;
 	public UserReply modifyUser(final UserInput userInput) throws TimelineException;
 	public CodeValueReply modifyTimeData(final TimeDataInput myTimeData) throws TimelineException;
 	public UserPreferenceReply saveUserPreferences(final UserPreferencesInput input) throws TimelineException;
-
+	public CodeValueReply modifyStatus(final StatusInput input) throws TimelineException;
 	
 	public ProjectReply searchProjects(final ProjectSearchParameter searchParameters) throws TimelineException;
 	public ActivityReply searchActivities(final ActivitySearchParameter searchParameters) throws TimelineException;
@@ -68,9 +67,12 @@ public interface TimelineService {
 	public UserPreferenceSearchReply searchUserPreferences(final UserPreferenceSearchParameter searchParameters ) throws TimelineException;
 	public WeekReply searchWeeks(final WeekSearchParameter searchParameters) throws TimelineException;
 	public TimeDataReply searchTimeData(final TimeDataSearchParameters searchParameters) throws TimelineException;
+	public AuditDataReply searchAuditData(final AuditDataSearchParameters searchParameters) throws TimelineException;
+	public WeeklyUserReply searchUsersWithoutEntries(final WeekSearchParameter searchParameters) throws TimelineException;
+	
 	public SummaryReportReply getSummaryReport(final ReportSearchParameters searchParameters) throws TimelineException;
 	public DetailedReportReply getDetailedReport(final ReportSearchParameters searchParameters) throws TimelineException;
 	
-	public AuditDataReply searchAuditData(final AuditDataSearchParameters searchParameters) throws TimelineException;
+	public void systemManagement() throws TimelineException;
 
 }

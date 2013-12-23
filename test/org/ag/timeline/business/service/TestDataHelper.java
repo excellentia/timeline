@@ -309,7 +309,7 @@ public final class TestDataHelper {
 			// begin transaction
 			Transaction transaction = session.beginTransaction();
 			final long weekNumber = TextHelper.getWeekNumber(currentDate);
-			final long year = TextHelper.getYear(currentDate);
+			final long year = TextHelper.getYearForWeekDay(currentDate);
 			final Date startDate = TextHelper.getFirstDayOfWeek(currentDate);
 			final Date endDate = TextHelper.getLastDayOfWeek(currentDate);
 

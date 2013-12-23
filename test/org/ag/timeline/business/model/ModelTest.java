@@ -71,7 +71,7 @@ public class ModelTest {
 		week.setStartDate(TextHelper.getFirstDayOfWeek(date));
 		week.setEndDate(TextHelper.getLastDayOfWeek(date));
 		week.setWeekNumber(TextHelper.getWeekNumber(date));
-		week.setYear(TextHelper.getYear(date));
+		week.setYear(TextHelper.getYearForWeekDay(date));
 
 		saveOrUpdate(session, week);
 

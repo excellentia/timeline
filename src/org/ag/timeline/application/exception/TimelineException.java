@@ -15,7 +15,27 @@ public class TimelineException extends Exception {
 	 */
 	private static final long serialVersionUID = 5155281030548336427L;
 
+	/**
+	 * Error message.
+	 */
 	private String errorMessage = null;
+
+	/**
+	 * Default Constructor.
+	 */
+	public TimelineException() {
+	}
+
+	/**
+	 * Constructor that takes in a error message.
+	 * 
+	 * @param message String error message to be associated with this
+	 *            {@link TimelineException}.
+	 */
+	public TimelineException(String message) {
+		super(message);
+		this.setErrorMessage(message);
+	}
 
 	/**
 	 * Getter for errorMessage.

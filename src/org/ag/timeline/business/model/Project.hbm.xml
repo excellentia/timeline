@@ -11,7 +11,13 @@
 			</generator>
 		</id>
 
-		<property name="name" type="string" not-null="true" column="NAME" />
+		<property name="name" type="string" not-null="true">
+			<column name="NAME" />
+		</property>
+
+		<property name="active" type="boolean">
+			<column name="ACTIVE" />
+		</property>
 
 		<many-to-one name="lead" class="org.ag.timeline.business.model.User" column="LEAD_ID" cascade="none" />
 

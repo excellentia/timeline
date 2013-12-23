@@ -25,6 +25,10 @@
 		<property name="admin" type="boolean">
 			<column name="ADMIN" />
 		</property>
+		<property name="active" type="boolean">
+			<column name="ACTIVE" />
+		</property>
+		
 
 		<property name="createUserId" type="java.lang.Long" not-null="true">
 			<column name="CREATE_USER" />

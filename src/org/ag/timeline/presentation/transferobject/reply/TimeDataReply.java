@@ -5,6 +5,7 @@ package org.ag.timeline.presentation.transferobject.reply;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import java.util.TreeSet;
 
 import org.ag.timeline.business.model.TimeData;
 import org.ag.timeline.common.TextHelper;
+import org.ag.timeline.common.TimeDataRowComparator;
 import org.ag.timeline.common.TimelineConstants;
 
 /**
@@ -25,22 +27,31 @@ import org.ag.timeline.common.TimelineConstants;
 public class TimeDataReply extends BusinessReply {
 
 	private Set<TimeDataRow> dataSet = null;
+
 	private boolean entryPresent = false;
 
 	private Map<Long, List<TimeDataRow>> projTimeMap = null;
+
 	private Map<Long, List<TimeDataRow>> actTimeMap = null;
+
 	private Map<Long, List<TimeDataRow>> userTimeMap = null;
+
 	private Map<Long, List<TimeDataRow>> weekTimeMap = null;
+
 	private Map<Long, List<TimeDataRow>> yearTimeMap = null;
 
 	private Set<Long> userIdList = null;
+
 	private Set<Long> weekIdList = null;
 
 	private Map<Long, String> projectMap = null;
+
 	private Map<Long, String> activityMap = null;
 
 	private Map<Long, List<String>> weekDayLabelMap = null;
+
 	private Map<Long, String> weekLabelMap = null;
+
 	private Map<Long, Map<Long, Double>> reportAggregateMap = null;
 
 	private String getDayLabel(final Date startDate, int offsetDays) {
@@ -48,16 +59,6 @@ public class TimeDataReply extends BusinessReply {
 
 		if (startDate != null) {
 			label = TextHelper.getDisplayDate(startDate, offsetDays);
-		}
-
-		return label;
-	}
-
-	private String getWeekLabel(final Date startDate, final Date endDate) {
-		String label = TimelineConstants.EMPTY;
-
-		if ((startDate != null) && (endDate != null)) {
-			label = TextHelper.getDisplayWeek(startDate, endDate);
 		}
 
 		return label;
@@ -94,7 +95,13 @@ public class TimeDataReply extends BusinessReply {
 		final long userId = data.getUser().getId();
 		final long projectId = data.getProject().getId();
 		final String projectName = data.getProject().getName();
-		final String leadName = data.getProject().getLead().getUserName();
+		
+		String leadName = TimelineConstants.EMPTY;
+		
+		if (data.getProject().getLead() != null) {
+			leadName = data.getProject().getLead().getUserName();
+		}
+		
 		final long activityId = data.getActivity().getId();
 		final String activityName = data.getActivity().getName();
 		final long weekId = data.getWeek().getId();
@@ -113,12 +120,15 @@ public class TimeDataReply extends BusinessReply {
 		row.setUserFirstName(data.getUser().getFirstName());
 		row.setUserLastName(data.getUser().getLastName());
 		row.setUserFullName(data.getUser().getUserName());
+		row.setUserAbbrvName(data.getUser().getAbbrvUserName());
 
 		row.setWeekId(data.getWeek().getId());
 		row.setWeekNum(data.getWeek().getWeekNumber());
 		row.setYear(data.getWeek().getYear());
 		row.setEndDate(data.getWeek().getEndDate());
 		row.setStartDate(data.getWeek().getStartDate());
+
+		row.setProxyRow(data.isProxyData());
 
 		row.setDay_1_time(TextHelper.getScaledDouble(data.getData_weekday_1()));
 		row.setDay_2_time(TextHelper.getScaledDouble(data.getData_weekday_2()));
@@ -177,7 +187,8 @@ public class TimeDataReply extends BusinessReply {
 			}
 
 			if (this.weekLabelMap.get(weekId) == null) {
-				this.weekLabelMap.put(weekId, getWeekLabel(row.getStartDate(), row.getEndDate()));
+				this.weekLabelMap.put(weekId,
+						TextHelper.getDisplayWeek(row.getStartDate(), row.getEndDate(), TimelineConstants.EMPTY));
 			}
 		}
 	}
@@ -230,6 +241,10 @@ public class TimeDataReply extends BusinessReply {
 
 		if ((this.weekTimeMap != null) && (this.weekTimeMap.containsKey(weekId))) {
 			list = this.weekTimeMap.get(weekId);
+
+			if (list != null) {
+				Collections.sort(list, new TimeDataRowComparator());
+			}
 		}
 
 		return list;

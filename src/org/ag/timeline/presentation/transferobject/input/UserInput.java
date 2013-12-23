@@ -143,5 +143,23 @@ public class UserInput extends AbstractTimelineInput {
 	public void setType(TimelineConstants.UserDataFieldType type) {
 		this.type = type;
 	}
+	
+	/**
+	 * Getter for active.
+	 * 
+	 * @return the active.
+	 */
+	public boolean isActive() {
+		return this.user.isActive();
+	}
+
+	/**
+	 * Setter for active.
+	 * 
+	 * @param active the active to set.
+	 */
+	public void setActive(boolean active) {
+		this.user.setActive(active);
+	}
 
 }

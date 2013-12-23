@@ -93,7 +93,7 @@ public class Week extends AbstractModel {
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -114,7 +114,7 @@ public class Week extends AbstractModel {
 		builder.append("]");
 		return builder.toString();
 	}
-
+	
 	@Override
 	public String getDescription() {
 		return TextHelper.getDisplayWeek(this.getStartDate(), this.getEndDate());

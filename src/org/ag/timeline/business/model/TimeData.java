@@ -236,6 +236,23 @@ public class TimeData extends AbstractModel {
 	}
 
 	/**
+	 * Business method. Checks if this time data was created as Proxy.
+	 * 
+	 * @return true is proxy data, false otherwise.
+	 */
+	public boolean isProxyData() {
+
+		boolean proxy = false;
+
+		if ((this.getUser() != null) && (this.getUser().getId() != this.getCreateUserId())) {
+			proxy = true;
+		}
+
+		return proxy;
+
+	}
+
+	/**
 	 * Business methid. Returns the sum of all the week day time entries for
 	 * this object.
 	 * 

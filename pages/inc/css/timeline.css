@@ -97,7 +97,7 @@ html,body {
 	filter: none;
 	background-color: #FFF;
 	color: #609AFA;
-	border: 1px solid #FFF;
+	border : 1px solid #FFF;
 }
 
 #menubar .activeMenu {
@@ -202,10 +202,22 @@ html,body {
 	font-family: Arial, sans-serif;
 }
 
-#searchBar {
+#searchBar .weekChoice {
 	line-height: 2em;
 	margin-bottom: 1em;
 	font-family: Arial, sans-serif;
+	width : 50%;
+	display : inline;
+}
+
+#searchBar .proxyChoice {
+	line-height: 2em;
+	margin-bottom: 1em;
+	font-family: Arial, sans-serif;
+	width : 50%;
+	display : inline;
+	text-align : right;
+	float : right;
 }
 
 #searchBar .dateSearch {
@@ -314,8 +326,8 @@ html,body {
 	font-family: Arial, sans-serif;
 	border: 1px solid #A0C2FA;
 	background: #FFFFBF;
-	padding: 0;
-	margin: 0;
+	padding : 0;
+	margin : 0;
 	text-align: left;
 	padding-left: 1.5em;
 	height: 1.6em;
@@ -328,7 +340,7 @@ html,body {
 	width: 98%;
 	border: 1px solid #A0C2FA;
 	background: #FFFFBF;
-	font-size: 1 em;
+	font-size : 1 em;
 	font-family: Arial, sans-serif;
 }
 
@@ -368,57 +380,7 @@ html,body {
 	font-weight: normal;
 	font-style: italic;
 	color: RED;
-	padding-bottom: 2em;
-	padding-top: 1em;
-}
-
-.icon {
-	width: 1.5em;
-	height: 1.5em;
-	text-align: center;
-	border: none;
-}
-
-.titleBar {
-	color: #FFF;
-	background: #609AFA;
-	text-align: center;
-	font-family: Arial;
-	font-weight: bold;
-}
-
-.thin {
-	display: inline;
-	padding: 0;
-	margin: 0;
-}
-
-.black_overlay {
-	display: none;
-	position: absolute;
-	top: 0%;
-	left: 0%;
-	width: 100%;
-	height: 100%;
-	background-color: black;
-	z-index: 1001;
-	-moz-opacity: 0.65;
-	opacity: .65;
-	filter: alpha(opacity =   65);
-}
-
-.white_content {
-	display: none;
-	position: absolute;
-	top: 25%;
-	left: 25%;
-	width: 50%;
-	min-height: 20%;
-	padding: 16px;
-	border: 16px solid #A0C2FA;
-	background-color: white;
-	z-index: 1002;
-	overflow: auto;
+	padding-bottom: 2em;padding-top: 1em;
 }
 
 #content .reportTotal {
@@ -476,4 +438,64 @@ html,body {
 	padding-left: 0.5em;
 	line-height: 2em;
 	font-family: Arial;
+}
+
+.icon {
+	width: 1.5em;
+	height: 1.5em;
+	text-align: center;
+	border: none;
+}
+
+.titleBar {
+	color: #FFF;
+	background: #609AFA;
+	text-align: center;
+	font-family: Arial;
+	font-weight: bold;
+}
+
+.thin {
+	display: inline;
+	padding: 0;
+	margin: 0;
+}
+
+.black_overlay{
+	display: none;
+	position: absolute;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	z-index:1001;
+	-moz-opacity: 0.65;
+	opacity:.65;
+	filter: alpha(opacity=65);
+}
+.white_content {
+	display: none;
+	position: absolute;
+	top: 25%;
+	left: 25%;
+	width: 50%;
+	min-height: 20%;
+	padding: 16px;
+	border: 16px solid #A0C2FA;
+	background-color: white;
+	z-index:1002;
+	overflow: auto;
+}
+
+.proxyRow {
+	background-color: #EFEFFF;
+}
+
+.activeEntity {
+	background-color : #CCFF6B;
+}
+
+.inActiveEntity {
+	background-color : #FFCDCD;
 }

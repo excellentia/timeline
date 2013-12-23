@@ -51,7 +51,7 @@
 	<div>
 		<c:if test="${((reply != null) && (reply.rowCount > 0))}">
 			<form name="detailForm" id="detailForm" action="ReportDetail" method="POST">
-				<input type="hidden" name="projectId" value="0" />
+				<input type="hidden" name="projectId" value="0"/>
 			</form>
 			<c:forEach var="projectId" items="${reply.projectIds}">
 				<table id="timeTable" class="reportResult">
@@ -90,7 +90,7 @@
 						</c:forEach>
 						<tr class="reportTotal">
 							<td>TOTAL</td>
-							<td title="Total Across All Activities">${total}</td>
+							<td title="Total Across All Activities"><fmt:formatNumber value="${total}" maxFractionDigits="2"/></td>
 						</tr>
 						<tr>
 							<td colspan="3"></td>
@@ -109,12 +109,10 @@
 						</c:forEach>
 						<tr class="reportTotal">
 							<td>TOTAL</td>
-							<td title="Total Across All Team Members">${total}</td>
+							<td title="Total Across All Team Members"><fmt:formatNumber value="${total}" minFractionDigits="1" maxFractionDigits="1"/></td>
 						</tr>
 						<tr>
-							<td colspan="2">
-								<img id="showDetailReport" alt="View Details" align="middle" class="icon" title="${detailTitle}" src="${detailIconPath}" onclick="viewReportDetails(${projectId})" />
-							</td>
+							<td colspan="2"><img id="showDetailReport" alt="View Details" align="middle" class="icon" title="${detailTitle}" src="${detailIconPath}" onclick="viewReportDetails(${projectId})" /></td>
 						</tr>
 					</tbody>
 				</table>
@@ -124,10 +122,11 @@
 			<p class="error">No Data Found</p>
 		</c:if>
 	</div>
-	<div id="light" class="white_content" style="margin: 0; padding: 0.5em;">
-		<div id="reportDetails" style="display: inline; width: 100%; height: 95%; clear: both"></div>
-		<div id="closeBar" style="display: inline; width: 100%; padding-top: 0.5em; height: 5%; text-align: right; float: right; clear: both">
-			<a href="javascript:void(0)" onclick="hideReportDetails()" title="Click to Close / Press Esc">Close</a>
+	<div id="light" class="white_content" style="margin : 0; padding : 0.5em;">
+		<div id="reportDetails" style="display:inline; width: 100%;height : 95%; clear : both">
+		</div>
+		<div id="closeBar" style="display:inline; width: 100%; padding-top : 0.5em; height : 5%; text-align : right;float : right; clear : both">
+			<a href = "javascript:void(0)" onclick = "hideReportDetails()" title="Click to Close / Press Esc">Close</a>
 		</div>
 	</div>
 	<div id="fade" class="black_overlay"></div>
