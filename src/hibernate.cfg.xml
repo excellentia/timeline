@@ -8,7 +8,6 @@
 
 		<!-- Basic Configuration -->
 		 <property name="hibernate.connection.driver_class">org.hsqldb.jdbc.JDBCDriver</property> 
-		<!--<property name="hibernate.connection.driver_class">com.p6spy.engine.spy.P6SpyDriver</property>-->
 		<property name="hibernate.connection.url">jdbc:hsqldb:hsql://localhost/timelinedb</property>
 		<property name="hibernate.connection.username">sa</property>
 		<property name="hibernate.connection.password"></property>
