@@ -3164,7 +3164,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 			{
 				Criteria criteria = session.createCriteria(User.class);
-				criteria.add(Restrictions.eq("active", Boolean.TRUE));
+				criteria.add(Restrictions.and(Restrictions.eq("active", Boolean.TRUE), Restrictions.gt("id", Long.valueOf(0))));
 				criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 				@SuppressWarnings("unchecked")

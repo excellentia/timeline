@@ -12,6 +12,7 @@ import org.ag.timeline.business.model.User;
 import org.ag.timeline.business.model.Week;
 import org.ag.timeline.common.TextHelper;
 import org.ag.timeline.common.TimelineConstants;
+import org.ag.timeline.common.UserComparator;
 
 /**
  * Wrapper for search results for collection of {@link User} objects grouped per
@@ -114,7 +115,9 @@ public class WeeklyUserReply extends BusinessReply {
 	 * @return the WeeklyUsers.
 	 */
 	public List<User> getWeeklyUsers(Long weekId) {
-		return this.weeklyUserMap.get(weekId);
+		List<User> list = this.weeklyUserMap.get(weekId);
+		Collections.sort(list, new UserComparator());
+		return list;
 	}
 
 	/**
