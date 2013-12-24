@@ -131,7 +131,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 						Criteria criteria = session.createCriteria(User.class);
 						criteria.add(Restrictions.and(Restrictions.eq("userId", usrId),
-								Restrictions.eq("password", pwd)));
+								Restrictions.eq("password", pwd), Restrictions.eq("active", Boolean.TRUE)));
 						criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 						@SuppressWarnings("unchecked")
@@ -147,7 +147,8 @@ public class TimelineServiceImpl implements TimelineService {
 						Criteria criteria = session.createCriteria(UserPreferences.class);
 						criteria.createAlias("user", "usr");
 						criteria.add(Restrictions.and(Restrictions.eq("usr.userId", usrId),
-								Restrictions.eq("question", question), Restrictions.eq("answer", answer)));
+								Restrictions.eq("usr.active", Boolean.TRUE), Restrictions.eq("question", question),
+								Restrictions.eq("answer", answer)));
 						criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 						@SuppressWarnings("unchecked")
@@ -2141,11 +2142,12 @@ public class TimelineServiceImpl implements TimelineService {
 			}
 
 			if (searchActiveProjects) {
-				criteria.add(Restrictions.eq("status", Boolean.TRUE));
+				criteria.add(Restrictions.eq("active", Boolean.TRUE));
 			}
 
 			// add order
 			criteria.addOrder(Order.asc("name"));
+			criteria.addOrder(Order.desc("active"));
 
 			criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
@@ -2510,8 +2512,9 @@ public class TimelineServiceImpl implements TimelineService {
 			criteria.add(Restrictions.gt("id", new Long(0)));
 
 			// add order
-			// criteria.addOrder(Order.asc("admin"));
+			criteria.addOrder(Order.asc("admin"));
 			criteria.addOrder(Order.asc("userId"));
+			criteria.addOrder(Order.desc("active"));
 
 			criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
@@ -3164,7 +3167,8 @@ public class TimelineServiceImpl implements TimelineService {
 
 			{
 				Criteria criteria = session.createCriteria(User.class);
-				criteria.add(Restrictions.and(Restrictions.eq("active", Boolean.TRUE), Restrictions.gt("id", Long.valueOf(0))));
+				criteria.add(Restrictions.and(Restrictions.eq("active", Boolean.TRUE),
+						Restrictions.gt("id", Long.valueOf(0))));
 				criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 				@SuppressWarnings("unchecked")
@@ -3209,8 +3213,8 @@ public class TimelineServiceImpl implements TimelineService {
 							reply.setWeeklyUserList(week, missingUserList);
 						}
 					} else {
-						
-						//if no entries in a given period
+
+						// if no entries in a given period
 						Criteria weekCriteria = session.createCriteria(Week.class);
 						weekCriteria.add(Restrictions.and(Restrictions.ge("week.startDate", startDate),
 								Restrictions.le("week.endDate", endDate)));
