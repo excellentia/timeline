@@ -70,7 +70,7 @@
 		</div>
 		<%-- Project Related Section--%>
 		<h3>
-			<a href="#section1">Project & Activity Configuration</a>
+			<a href="#section1">Project &amp; Activity Configuration</a>
 		</h3>
 		<div>
 			<div id="searchBar">
@@ -88,12 +88,8 @@
 								<col style="width: 6%" />
 							</colgroup>
 							<tbody>
-								<c:set var="statusClass" value="activeEntity"/>
-								<c:if test="${project.active == false}">
-									<c:set var="statusClass" value="inActiveEntity"/>
-								</c:if>
 								<c:set var="projTitleId">${projId}_title</c:set>
-								<tr id="${projTitleId}" class="${statusClass}">
+								<tr id="${projTitleId}">
 									<td class="projectArea">${project.value}</td>
 									<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" onclick="editProject('${projTitleId}',${project.code})" /></td>
 									<td align="center"><img alt="Delete" align="middle" class="icon" title="${projectDeleteTitle}" src="${deleteIconPath}" onclick="deleteProject('${projId}',${project.code})" /></td>
