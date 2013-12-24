@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.struts2.interceptor.SessionAware;
-
 import org.ag.timeline.application.exception.TimelineException;
 import org.ag.timeline.business.model.User;
 import org.ag.timeline.business.service.iface.TimelineService;
@@ -18,6 +16,9 @@ import org.ag.timeline.presentation.transferobject.common.CodeValue;
 import org.ag.timeline.presentation.transferobject.reply.ActivityReply;
 import org.ag.timeline.presentation.transferobject.reply.ProjectReply;
 import org.ag.timeline.presentation.transferobject.reply.UserSearchReply;
+import org.ag.timeline.presentation.transferobject.search.ProjectSearchParameter;
+import org.ag.timeline.presentation.transferobject.search.UserSearchParameter;
+import org.apache.struts2.interceptor.SessionAware;
 
 import com.opensymphony.xwork2.Action;
 import com.opensymphony.xwork2.ActionContext;
@@ -112,13 +113,17 @@ public abstract class BaseAction implements Action, SessionAware {
 	protected void refreshSessionData() throws TimelineException {
 
 		// get projects
-		ProjectReply projectReply = service.searchProjects(null);
+		ProjectSearchParameter projectSearchParameter = new ProjectSearchParameter();
+		projectSearchParameter.setSearchActiveProjects(Boolean.TRUE);
+		ProjectReply projectReply = service.searchProjects(projectSearchParameter);
 
 		// get activities
 		ActivityReply activityReply = service.searchActivities(null);
 
 		// get users
-		UserSearchReply searchReply = service.searchUsers(null);
+		UserSearchParameter userSearchParameter = new UserSearchParameter();
+		userSearchParameter.setOnlyActive(Boolean.TRUE);
+		UserSearchReply searchReply = service.searchUsers(userSearchParameter);
 
 		// get data types
 		List<CodeValue> typeList = new ArrayList<CodeValue>();
