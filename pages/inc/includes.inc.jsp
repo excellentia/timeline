@@ -10,12 +10,19 @@
 <c:set var="saveIconPath" value="./pages/inc/icons/save.png" />
 <c:set var="resetIconPath" value="./pages/inc/icons/reset.png" />
 <c:set var="adminIconPath" value="./pages/inc/icons/admin.png" />
+<c:set var="noteIconPath" value="./pages/inc/icons/note.png" />
+<c:set var="emailIconPath" value="./pages/inc/icons/email.png" />
+
+<%-- <c:set var="calendarIconPath" value="./pages/inc/images/calendar.gif" /> --%>
+<c:set var="calendarIconPath" value="./pages/inc/icons/calendar.png" />
 
 <c:set var="detailTitle" value="View Details" />
 <c:set var="editTitle" value="Edit This Text" />
 <c:set var="adminTitle" value="Admin User" />
 <c:set var="saveTitle" value="Save This Text" />
 <c:set var="resetTitle" value="Reset User Password" />
+<c:set var="noteTitle" value="Attach A Note To This Item" />
+<c:set var="emailTitle" value="Send an Email" />
 
 <c:set var="projectDeleteTitle" value="Delete This Project" />
 <c:set var="activityDeleteTitle" value="Delete This Activity" />
