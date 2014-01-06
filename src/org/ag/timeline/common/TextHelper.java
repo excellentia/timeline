@@ -16,13 +16,13 @@ import java.util.List;
  */
 public class TextHelper {
 
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+	public static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 
 	private static final DateFormat DISPLAY_FORMAT = new SimpleDateFormat("E : dd-MMM");
 
 	private static final DateFormat WEEK_FORMAT = new SimpleDateFormat("dd MMM");
 
-	private static final DateFormat WEEK_DAY_FORMAT = new SimpleDateFormat("dd MMM yyyy");
+	public static final DateFormat WEEK_DAY_FORMAT = new SimpleDateFormat("dd MMM yyyy");
 
 	// private static final DateFormat SERVER_FORMAT = new
 	// SimpleDateFormat("dd MMM yyyy");
@@ -30,7 +30,8 @@ public class TextHelper {
 	private static final DateFormat AUDIT_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
 	private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
-
+	
+	
 	//
 	// private static final long MILLISEC_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -408,7 +409,7 @@ public class TextHelper {
 
 	}
 
-	private static long getYear(Date date) {
+	public static long getYear(Date date) {
 		long year = 0;
 		if (date != null) {
 			Calendar calendar = Calendar.getInstance();
@@ -515,7 +516,7 @@ public class TextHelper {
 
 		return list;
 	}
-
+	
 	public static void main(String[] args) {
 		{
 			Date date = getValidDate("01.07.2012");
