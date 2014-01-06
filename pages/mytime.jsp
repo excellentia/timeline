@@ -3,6 +3,7 @@
 
 <%-- Header Setup --%>
 <c:set var="pageTitle" value="Time" />
+<c:set var="pageScriptName" value="mytime" />
 <%@ include file="inc/header.inc.jsp"%>
 
 <%-- Menu Setup --%>
@@ -143,7 +144,7 @@
 			<div id="mySearchResults">
 				<c:set var="weekList" value="${timeData.weekIds}" />
 				<c:if test="${(weekList != null) && (weekList.size() > 0)}">
-					<p>Search Results</p>
+					<p style="margin: 1em 0 1em 0;">Search Results</p>
 					<div style="margin-bottom: 2em;">
 						<div id="my_entry_accordion">
 							<c:forEach var="weekId" items="${weekList}">
@@ -214,6 +215,17 @@
 							</c:forEach>
 						</div>
 					</div>
+					<div style="display: inline; padding: 0; margin: 0; margin-left: 1em;">
+						<form name="exportForm" id="exportForm" action="Export" method="POST">
+							<input type="hidden" id="exportStartDate" name="exportStartDate" value="" />
+							<input type="hidden" id="exportEndDate" name="exportEndDate" value="" />
+							<input type="hidden" id="exportProjectId" name="exportProjectId" value="" />
+							<input type="hidden" id="exportActivityId" name="exportActivityId" value="" />
+							<input type="hidden" id="exportUserDbId" name="exportUserDbId" value="" />
+							<input type="hidden" name="command" value="TIME_ENTRIES" />
+							<input type="button" value="Export" class="button" style="height: 1.5em;" onclick="exportEntries('exportForm')" />
+						</form>
+					</div>
 				</c:if>
 			</div>
 		</div>
@@ -245,7 +257,7 @@
 				<c:set var="userCount" value="${pendingUsers.userCount}" />
 				<c:set var="weekIdList" value="${pendingUsers.weekIdList}" />
 				<c:if test="${(weekIdList != null) && (weekIdList.size() > 0)}">
-					<p>Users With Missing Entries</p>
+					<p style="margin: 1em 0 1em 0;">Users With Missing Entries</p>
 					<div style="margin-bottom: 2em;">
 						<div id="my_missing_entry_accordion">
 							<c:forEach var="weekId" items="${weekIdList}">
@@ -256,23 +268,46 @@
 								<div>
 									<table style="width: 15%;" id="${tableId}">
 										<colgroup>
-											<col style="width: 100%" />
+											<col style="width: 15%" />
+											<col style="width: 70%" />
+											<col style="width: 15%" />
 										</colgroup>
 										<thead>
 											<tr>
-												<th>Pending User</th>
+												<th colspan="3">User Name</th>
 											</tr>
 										</thead>
+										<c:set var="users" value="${pendingUsers.getWeeklyUsers(weekId)}" />
+										<c:set var="userCount" value="${users.size()}" />
+										<c:set var="allUserEmail" value="" />
 										<tbody class="reportBody">
-											<c:set var="users" value="${pendingUsers.getWeeklyUsers(weekId)}" />
 											<c:if test="${users != null}">
-												<c:forEach var="user" items="${users}">
+												<c:forEach var="user" items="${users}" varStatus="count">
 													<tr>
-														<td>${user.userName}</td>
+														<td>${count.index+1}</td>
+														<td style="text-align: left; padding-left : 0.5em;">${user.userName}</td>
+														<td>
+															<c:set var="email" value="${pendingUsers.getUserEmail(user.id)}" />
+															<c:if test="${email != null}">
+																<a href="mailto:${email}"><img class="icon" id="sendEmail" title="${emailTitle}" alt="${emailTitle}" src="${emailIconPath}"/></a>
+																<c:set var="allUserEmail" value="${email},${allUserEmail}" />
+															</c:if>
+															<c:remove var="email"/>
+														</td>
 													</tr>
 												</c:forEach>
 											</c:if>
 										</tbody>
+										<tfoot>
+											<tr>
+												<td colspan="2" style="text-align: center;">Total Users : ${userCount}</td>
+												<td>
+													<a href="mailto:${allUserEmail}">
+														<img class="icon" style="margin: 0; padding: 0; border: 2px solid #609AFA" id="sendEmail" title="Send Email To Users (Ones with Email Icon)" alt="Send Email" src="${emailIconPath}"/>
+													</a>
+												</td>
+											</tr>
+										</tfoot>
 									</table>
 								</div>
 							</c:forEach>
@@ -288,3 +323,4 @@
 <%@ include file="inc/footer.inc.jsp"%>
 <%-- Focus  --%>
 <script type="text/javascript">focus('weekImg');</script>
+
