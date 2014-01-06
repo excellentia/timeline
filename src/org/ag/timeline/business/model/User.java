@@ -3,6 +3,9 @@
  */
 package org.ag.timeline.business.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.ag.timeline.common.TextHelper;
 import org.ag.timeline.common.TimelineConstants;
 
@@ -24,6 +27,8 @@ public class User extends AbstractModel {
 	private boolean admin = false;
 
 	private boolean active = true;
+
+	private Set<UserPreferences> preferences = null;
 
 	/**
 	 * Getter for userId.
@@ -131,6 +136,32 @@ public class User extends AbstractModel {
 	 */
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+
+	/**
+	 * Getter for preferences.
+	 * 
+	 * @return the preferences.
+	 */
+	public Set<UserPreferences> getPreferences() {
+		return this.preferences;
+	}
+	
+	public void addPreference(UserPreferences preferences) {
+		if (this.preferences == null) {
+			this.preferences = new HashSet<UserPreferences>(0);
+		}
+		
+		this.preferences.add(preferences);
+	}
+
+	/**
+	 * Setter for preferences.
+	 * 
+	 * @param preferences the preferences to set.
+	 */
+	public void setPreferences(Set<UserPreferences> preferences) {
+		this.preferences = preferences;
 	}
 
 	/**
