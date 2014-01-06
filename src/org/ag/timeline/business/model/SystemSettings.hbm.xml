@@ -2,25 +2,18 @@
 <!DOCTYPE hibernate-mapping PUBLIC 
 "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<hibernate-mapping schema="TIMELINE_SCHEMA">
-	<class name="org.ag.timeline.business.model.SystemSettings" table="SYSTEM_SETTINGS_T">
+<hibernate-mapping schema="TIMELINE_SCHEMA" package="org.ag.timeline.business.model">
+	<class name="SystemSettings" table="SYSTEM_SETTINGS_T">
+		
 		<id name="id" type="java.lang.Long" column="ID">
 			<generator class="sequence">
 				<param name="sequence">SYSTEM_SETTINGS_S</param>
 			</generator>
 		</id>
 
-		<property name="name" type="string" not-null="true">
-			<column name="SETTING_NAME" />
-		</property>
-
-		<property name="type" type="string" not-null="true">
-			<column name="SETTING_TYPE" />
-		</property>
-
-		<property name="value" type="string" not-null="true">
-			<column name="SETTING_VALUE" />
-		</property>
+		<property name="name" type="string" not-null="true" column="SETTING_NAME" />
+		<property name="type" type="string" not-null="true" column="SETTING_TYPE" />
+		<property name="value" type="string" not-null="true" column="SETTING_VALUE" />
 
 	</class>
 </hibernate-mapping>

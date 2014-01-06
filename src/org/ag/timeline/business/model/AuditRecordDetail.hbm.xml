@@ -3,8 +3,8 @@
 "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
-<hibernate-mapping schema="TIMELINE_SCHEMA">
-	<class name="org.ag.timeline.business.model.AuditRecordDetail" table="AUDIT_DETAIL_T" dynamic-update="true" dynamic-insert="true">
+<hibernate-mapping schema="TIMELINE_SCHEMA" package="org.ag.timeline.business.model">
+	<class name="AuditRecordDetail" table="AUDIT_DETAIL_T" dynamic-update="true" dynamic-insert="true">
 
 		<id name="id" type="java.lang.Long" column="ID">
 			<generator class="sequence">
@@ -12,18 +12,11 @@
 			</generator>
 		</id>
 
-		<property name="fieldName" type="string" not-null="true">
-			<column name="FIELD_NAME" />
-		</property>
-		<property name="fieldType" type="integer" not-null="true">
-			<column name="FIELD_TYPE" />
-		</property>
-		<property name="oldValue" type="string">
-			<column name="OLD_VALUE" />
-		</property>
-		<property name="newValue" type="string">
-			<column name="NEW_VALUE" />
-		</property>
-		<many-to-one name="auditRecord" class="org.ag.timeline.business.model.AuditRecord" column="AUDIT_ID" cascade="none" not-null="true" />
+		<property name="fieldName" type="string" not-null="true" column="FIELD_NAME" />
+		<property name="fieldType" type="integer" not-null="true" column="FIELD_TYPE" />
+		<property name="oldValue" type="string" column="OLD_VALUE" />
+		<property name="newValue" type="string" column="NEW_VALUE" />
+		
+		<many-to-one name="auditRecord" class="AuditRecord" column="AUDIT_ID" cascade="none" not-null="true" />
 	</class>
 </hibernate-mapping>

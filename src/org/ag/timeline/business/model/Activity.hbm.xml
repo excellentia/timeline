@@ -3,9 +3,9 @@
 "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
-<hibernate-mapping schema="TIMELINE_SCHEMA">
+<hibernate-mapping schema="TIMELINE_SCHEMA" package="org.ag.timeline.business.model">
 
-	<class name="org.ag.timeline.business.model.Activity" table="ACTIVITY_T" dynamic-update="true" dynamic-insert="true">
+	<class name="Activity" table="ACTIVITY_T" dynamic-update="true" dynamic-insert="true">
 
 		<id name="id" type="java.lang.Long" column="ID">
 			<generator class="sequence">
@@ -15,9 +15,7 @@
 
 		<property name="name" type="string" not-null="true" column="NAME" />
 
-		<many-to-one name="project" class="org.ag.timeline.business.model.Project" cascade="none">
-			<column name="PROJECT_ID"></column>
-		</many-to-one>
+		<many-to-one name="project" class="Project" cascade="none" column="PROJECT_ID"/>
 
 		<property name="createUserId" type="java.lang.Long" column="CREATE_USER" not-null="true" />
 		<property name="createDate" type="java.util.Date" not-null="true" column="CREATE_DATE" />

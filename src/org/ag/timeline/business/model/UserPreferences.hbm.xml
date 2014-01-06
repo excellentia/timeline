@@ -3,32 +3,25 @@
 "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
-<hibernate-mapping schema="TIMELINE_SCHEMA">
-	<class name="org.ag.timeline.business.model.UserPreferences" table="USER_PREF_T" dynamic-update="true" dynamic-insert="true">
+<hibernate-mapping schema="TIMELINE_SCHEMA" package="org.ag.timeline.business.model">
+	<class name="UserPreferences" table="USER_PREF_T" dynamic-update="true" dynamic-insert="true">
+
 		<id name="id" type="java.lang.Long" column="ID">
 			<generator class="sequence">
 				<param name="sequence">USER_PREF_S</param>
 			</generator>
 		</id>
-		<property name="question" type="string">
-			<column name="QUESTION" />
-		</property>
-		<property name="answer" type="string">
-			<column name="ANSWER" />
-		</property>
-		<many-to-one name="user" class="org.ag.timeline.business.model.User" column="USER_ID" cascade="none" not-null="true" />
+
+		<property name="question" type="string" column="QUESTION" />
+		<property name="answer" type="string" column="ANSWER" />
+		<property name="email" type="string" column="EMAIL" />
+
+		<many-to-one name="user" class="User" column="USER_ID" cascade="none" not-null="true" />
 
 		<property name="createUserId" type="java.lang.Long" column="CREATE_USER" not-null="true" />
-
-		<property name="createDate" type="java.util.Date" not-null="true">
-			<column name="CREATE_DATE" />
-		</property>
-
+		<property name="createDate" type="java.util.Date" not-null="true" column="CREATE_DATE" />
 		<property name="modifyUserId" type="java.lang.Long" column="MODIFY_USER" />
-
-		<property name="modifyDate" type="java.util.Date">
-			<column name="MODIFY_DATE" />
-		</property>
+		<property name="modifyDate" type="java.util.Date" column="MODIFY_DATE" />
 
 	</class>
 </hibernate-mapping>

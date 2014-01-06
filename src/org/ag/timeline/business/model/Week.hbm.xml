@@ -3,37 +3,24 @@
 "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
-<hibernate-mapping schema="TIMELINE_SCHEMA">
-	<class name="org.ag.timeline.business.model.Week" table="WEEK_T" dynamic-update="true" dynamic-insert="true">
+<hibernate-mapping schema="TIMELINE_SCHEMA" package="org.ag.timeline.business.model">
+	<class name="Week" table="WEEK_T" dynamic-update="true" dynamic-insert="true">
+		
 		<id name="id" type="java.lang.Long" column="ID">
 			<generator class="sequence">
 				<param name="sequence">WEEK_S</param>
 			</generator>
 		</id>
-		<property name="year" type="java.lang.Long" not-null="true">
-			<column name="YEAR" />
-		</property>
-		<property name="weekNumber" type="java.lang.Long" not-null="true">
-			<column name="WEEK_NUM" />
-		</property>
-		<property name="startDate" type="java.util.Date" not-null="true">
-			<column name="START_DATE" />
-		</property>
-		<property name="endDate" type="java.util.Date" not-null="true">
-			<column name="END_DATE" />
-		</property>
+		
+		<property name="year" type="java.lang.Long" not-null="true" column="YEAR" />
+		<property name="weekNumber" type="java.lang.Long" not-null="true" column="WEEK_NUM" />
+		<property name="startDate" type="java.util.Date" not-null="true" column="START_DATE" />
+		<property name="endDate" type="java.util.Date" not-null="true" column="END_DATE" />
 
 		<property name="createUserId" type="java.lang.Long" column="CREATE_USER" not-null="true" />
-
-		<property name="createDate" type="java.util.Date" not-null="true">
-			<column name="CREATE_DATE" />
-		</property>
-
+		<property name="createDate" type="java.util.Date" not-null="true" column="CREATE_DATE" />
 		<property name="modifyUserId" type="java.lang.Long" column="MODIFY_USER" />
-
-		<property name="modifyDate" type="java.util.Date">
-			<column name="MODIFY_DATE" />
-		</property>
+		<property name="modifyDate" type="java.util.Date" column="MODIFY_DATE" />
 
 	</class>
 </hibernate-mapping>
