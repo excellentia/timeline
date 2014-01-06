@@ -8,7 +8,7 @@
 
 		<!-- Basic Configuration -->
 		<property name="hibernate.connection.driver_class">org.hsqldb.jdbc.JDBCDriver</property>
-		<!-- Give the path to database folder in timeline deployed on  webserver -->
+		<!-- Give the path to database folder in timeline deployed on webserver -->
 		<!-- example <property name="hibernate.connection.url">jdbc:hsqldb:file:/Software/apache-tomcat-7.0.26/webapps/timeline/database/timelinedb</property> -->
 		<property name="hibernate.connection.url"></property>
 		<property name="hibernate.connection.username">sa</property>
@@ -19,15 +19,17 @@
 		<property name="dialect">org.hibernate.dialect.HSQLDialect</property>
 
 		<!-- Mapping files -->
+		<mapping resource="org/ag/timeline/business/model/SystemSettings.hbm.xml" />
+		<mapping resource="org/ag/timeline/business/model/Week.hbm.xml" />
 		<mapping resource="org/ag/timeline/business/model/User.hbm.xml" />
+		<mapping resource="org/ag/timeline/business/model/UserPreferences.hbm.xml" />
 		<mapping resource="org/ag/timeline/business/model/Project.hbm.xml" />
 		<mapping resource="org/ag/timeline/business/model/Activity.hbm.xml" />
-		<mapping resource="org/ag/timeline/business/model/Week.hbm.xml" />
-		<mapping resource="org/ag/timeline/business/model/SystemSettings.hbm.xml" />
 		<mapping resource="org/ag/timeline/business/model/TimeData.hbm.xml" />
-		<mapping resource="org/ag/timeline/business/model/UserPreferences.hbm.xml" />
+		<mapping resource="org/ag/timeline/business/model/ProjectMetrics.hbm.xml" />
+		<mapping resource="org/ag/timeline/business/model/Task.hbm.xml" />
 		<mapping resource="org/ag/timeline/business/model/AuditRecord.hbm.xml" />
 		<mapping resource="org/ag/timeline/business/model/AuditRecordDetail.hbm.xml" />
-		
+
 	</session-factory>
 </hibernate-configuration>
