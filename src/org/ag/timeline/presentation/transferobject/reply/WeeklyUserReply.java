@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.ag.timeline.business.model.User;
+import org.ag.timeline.business.model.UserPreferences;
 import org.ag.timeline.business.model.Week;
 import org.ag.timeline.common.TextHelper;
 import org.ag.timeline.common.TimelineConstants;
@@ -26,6 +27,8 @@ public class WeeklyUserReply extends BusinessReply {
 	private Map<Long, List<User>> weeklyUserMap = null;
 
 	private Map<Long, String> weeklyLabelMap = null;
+	
+	private Map<Long, String> userEmailMap = null;
 
 	private Set<Week> weekSet = null;
 
@@ -40,6 +43,7 @@ public class WeeklyUserReply extends BusinessReply {
 		this.weekSet = new HashSet<Week>();
 		this.weeklyLabelMap = new HashMap<Long, String>();
 		this.weeklyUserMap = new HashMap<Long, List<User>>();
+		this.userEmailMap = new HashMap<Long, String>();
 	}
 
 	public void addWeeklyUser(Week week, User user) {
@@ -74,6 +78,16 @@ public class WeeklyUserReply extends BusinessReply {
 
 			if (users != null) {
 				this.userCount += users.size();
+				
+				for (User user : users) {
+					
+					for (UserPreferences preference : user.getPreferences()) {
+						
+						if (preference != null) {
+							userEmailMap.put(user.getId(), preference.getEmail());
+						}
+					}
+				}
 			}
 		}
 	}
@@ -127,6 +141,10 @@ public class WeeklyUserReply extends BusinessReply {
 	 */
 	public long getUserCount() {
 		return this.userCount;
+	}
+	
+	public String getUserEmail(final long userDbId) {
+		return this.userEmailMap.get(userDbId);
 	}
 
 }
