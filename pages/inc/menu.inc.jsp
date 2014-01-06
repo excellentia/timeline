@@ -6,6 +6,7 @@
 			<li title="View Reports"><a <c:if test="${activeMenu == 'report'}">class="activeMenu"</c:if> href="./Report">Reports</a></li>
 			<li title="View Change History"><a <c:if test="${activeMenu == 'changes'}">class="activeMenu"</c:if> href="./Changes">Changes</a></li>
 			<c:if test="${SESSION_USER.admin}">
+				<li title="Manage Metrics"><a <c:if test="${activeMenu == 'metrics'}">class="activeMenu"</c:if> href="./Metrics">Metrics</a></li>
 				<li title="Manage System" ><a <c:if test="${activeMenu == 'admin'}">class="activeMenu"</c:if> href="./Admin">Admin</a></li>
 			</c:if>
 		</ul>
