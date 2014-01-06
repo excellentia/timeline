@@ -29,21 +29,38 @@
 			<result name="error">pages/login.jsp</result>
 		</action>
 
-		<action name="ReportDetail"
-			class="org.ag.timeline.presentation.action.ReportDetailAction">
+		<action name="ReportDetail" class="org.ag.timeline.presentation.action.ReportDetailAction">
 			<result name="success">pages/report-details.jsp</result>
 			<result name="error">pages/login.jsp</result>
 		</action>
 
-		<action name="Account"
-			class="org.ag.timeline.presentation.action.AccountSettingsAction">
+		<action name="Metrics" class="org.ag.timeline.presentation.action.MetricsAction">
+			<result name="success">pages/metrics.jsp</result>
+			<result name="error">pages/login.jsp</result>
+		</action>
+
+		<action name="MetricsDetailsAction" class="org.ag.timeline.presentation.action.MetricsDetailsAction">
+			<result name="success">pages/metric-details.inc.jsp</result>
+			<result name="error">pages/login.jsp</result>
+		</action>
+
+		<action name="Account" class="org.ag.timeline.presentation.action.AccountSettingsAction">
 			<result name="success">pages/account-settings.jsp</result>
 			<result name="error">pages/login.jsp</result>
 		</action>
 
-		<action name="Changes"
-			class="org.ag.timeline.presentation.action.ChangeSearchAction">
+		<action name="Changes" class="org.ag.timeline.presentation.action.ChangeSearchAction">
 			<result name="success">pages/changes.jsp</result>
+			<result name="error">pages/login.jsp</result>
+		</action>
+
+		<action name="Export" class="org.ag.timeline.presentation.action.ExportAction">
+			<result name ="success" type="stream">
+				<param name="contentType">"application/vnd.ms-excel"</param>
+				<param name="inputName">excelStream</param>
+				<param name="contentDisposition">attachment;filename="${fileName}"</param>
+				<param name="bufferSize">1024</param>
+			</result>
 			<result name="error">pages/login.jsp</result>
 		</action>
 
@@ -52,8 +69,7 @@
 			<result name="error">pages/login.jsp</result>
 		</action>
 
-		<action name="Reset"
-			class="org.ag.timeline.presentation.action.ForgotPasswordAction">
+		<action name="Reset" class="org.ag.timeline.presentation.action.ForgotPasswordAction">
 			<result name="success" type="redirect">/Account</result>
 			<result name="stepTwo">pages/password-reset.jsp</result>
 			<result name="error">pages/password-reset.jsp</result>
