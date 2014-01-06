@@ -7,26 +7,27 @@
 	<session-factory>
 
 		<!-- Basic Configuration -->
-		 <property name="hibernate.connection.driver_class">org.hsqldb.jdbc.JDBCDriver</property> 
+		<property name="hibernate.connection.driver_class">org.hsqldb.jdbc.JDBCDriver</property>
 		<property name="hibernate.connection.url">jdbc:hsqldb:hsql://localhost/timelinedb</property>
 		<property name="hibernate.connection.username">sa</property>
 		<property name="hibernate.connection.password"></property>
 		<property name="hibernate.connection.pool_size">10</property>
 		<property name="hibernate.jdbc.batch_size">20</property>
-		<property name="show_sql">true</property>
+		<property name="show_sql">false</property>
 		<property name="dialect">org.hibernate.dialect.HSQLDialect</property>
 
 		<!-- Mapping files -->
+		<mapping resource="org/ag/timeline/business/model/SystemSettings.hbm.xml" />
+		<mapping resource="org/ag/timeline/business/model/Week.hbm.xml" />
 		<mapping resource="org/ag/timeline/business/model/User.hbm.xml" />
+		<mapping resource="org/ag/timeline/business/model/UserPreferences.hbm.xml" />
 		<mapping resource="org/ag/timeline/business/model/Project.hbm.xml" />
 		<mapping resource="org/ag/timeline/business/model/Activity.hbm.xml" />
-		<mapping resource="org/ag/timeline/business/model/Week.hbm.xml" />
-		<mapping resource="org/ag/timeline/business/model/SystemSettings.hbm.xml" />
 		<mapping resource="org/ag/timeline/business/model/TimeData.hbm.xml" />
-		<mapping resource="org/ag/timeline/business/model/UserPreferences.hbm.xml" />
+		<mapping resource="org/ag/timeline/business/model/ProjectMetrics.hbm.xml" />
+		<mapping resource="org/ag/timeline/business/model/Task.hbm.xml" />
 		<mapping resource="org/ag/timeline/business/model/AuditRecord.hbm.xml" />
 		<mapping resource="org/ag/timeline/business/model/AuditRecordDetail.hbm.xml" />
-		
 
 	</session-factory>
 </hibernate-configuration>
