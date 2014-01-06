@@ -1,14 +1,19 @@
 package org.ag.timeline.presentation.transferobject.input;
 
+import org.ag.timeline.business.model.Project;
+import org.ag.timeline.business.model.User;
+
 public class ProjectInput extends AbstractTimelineInput {
 
-	private long projectId = 0;
+	private Project project = null;
 
-	private long leadId = 0;
-
-	private String newLabelText = null;
-
-	private boolean active = false;
+	/**
+	 * Default Constructor.
+	 */
+	public ProjectInput() {
+		this.project = new Project();
+		this.project.setLead(new User());
+	}
 
 	/**
 	 * Getter for projectId.
@@ -16,7 +21,7 @@ public class ProjectInput extends AbstractTimelineInput {
 	 * @return the projectId.
 	 */
 	public long getProjectId() {
-		return projectId;
+		return this.project.getId();
 	}
 
 	/**
@@ -25,7 +30,7 @@ public class ProjectInput extends AbstractTimelineInput {
 	 * @param id the projectId to set.
 	 */
 	public void setProjectId(long id) {
-		this.projectId = id;
+		this.project.setId(id);
 	}
 
 	/**
@@ -34,7 +39,7 @@ public class ProjectInput extends AbstractTimelineInput {
 	 * @return the leadId
 	 */
 	public long getLeadId() {
-		return leadId;
+		return this.project.getLead().getId();
 	}
 
 	/**
@@ -43,7 +48,7 @@ public class ProjectInput extends AbstractTimelineInput {
 	 * @param leadId the leadId to set
 	 */
 	public void setLeadId(long leadId) {
-		this.leadId = leadId;
+		this.project.getLead().setId(leadId);
 	}
 
 	/**
@@ -52,7 +57,7 @@ public class ProjectInput extends AbstractTimelineInput {
 	 * @return the newLabelText
 	 */
 	public String getNewLabelText() {
-		return newLabelText;
+		return this.project.getName();
 	}
 
 	/**
@@ -61,7 +66,7 @@ public class ProjectInput extends AbstractTimelineInput {
 	 * @param newLabelText the newLabelText to set
 	 */
 	public void setNewLabelText(String newLabelText) {
-		this.newLabelText = newLabelText;
+		this.project.setName(newLabelText);
 	}
 
 	/**
@@ -70,7 +75,7 @@ public class ProjectInput extends AbstractTimelineInput {
 	 * @return the active.
 	 */
 	public boolean isActive() {
-		return this.active;
+		return this.project.isActive();
 	}
 
 	/**
@@ -79,7 +84,7 @@ public class ProjectInput extends AbstractTimelineInput {
 	 * @param active the active to set.
 	 */
 	public void setActive(boolean active) {
-		this.active = active;
+		this.project.setActive(active);
 	}
 
 	/*
@@ -89,9 +94,7 @@ public class ProjectInput extends AbstractTimelineInput {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("ProjectInput [projectId=").append(projectId).append(", leadId=").append(leadId)
-				.append(", newLabelText=").append(newLabelText).append(", active=").append(active).append("]");
+		builder.append("ProjectInput [").append(project).append("]");
 		return builder.toString();
 	}
-
 }

@@ -1,14 +1,22 @@
 package org.ag.timeline.presentation.transferobject.input;
 
+import org.ag.timeline.business.model.User;
+import org.ag.timeline.business.model.UserPreferences;
 import org.ag.timeline.common.TimelineConstants;
 
 public class UserPreferencesInput extends AbstractTimelineInput {
 
-	private long userDbId = 0;
-	private String userId = null;
-	private String question = null;
-	private String answer = null;
+	private UserPreferences preferences;
+
 	private TimelineConstants.UserPrefDataFieldType type = null;
+
+	/**
+	 * Default Constructor.
+	 */
+	public UserPreferencesInput() {
+		this.preferences = new UserPreferences();
+		this.preferences.setUser(new User());
+	}
 
 	/**
 	 * Getter for userDbId.
@@ -16,7 +24,7 @@ public class UserPreferencesInput extends AbstractTimelineInput {
 	 * @return the userDbId.
 	 */
 	public long getUserDbId() {
-		return this.userDbId;
+		return this.preferences.getUser().getId();
 	}
 
 	/**
@@ -25,7 +33,7 @@ public class UserPreferencesInput extends AbstractTimelineInput {
 	 * @param userDbId the userDbId to set.
 	 */
 	public void setUserDbId(long userDbId) {
-		this.userDbId = userDbId;
+		this.preferences.getUser().setId(userDbId);
 	}
 
 	/**
@@ -34,7 +42,7 @@ public class UserPreferencesInput extends AbstractTimelineInput {
 	 * @return the userId.
 	 */
 	public String getUserId() {
-		return this.userId;
+		return this.preferences.getUser().getUserId();
 	}
 
 	/**
@@ -43,7 +51,7 @@ public class UserPreferencesInput extends AbstractTimelineInput {
 	 * @param userId the userId to set.
 	 */
 	public void setUserId(String userId) {
-		this.userId = userId;
+		this.preferences.getUser().setUserId(userId);
 	}
 
 	/**
@@ -52,7 +60,7 @@ public class UserPreferencesInput extends AbstractTimelineInput {
 	 * @return the question
 	 */
 	public String getQuestion() {
-		return question;
+		return this.preferences.getQuestion();
 	}
 
 	/**
@@ -61,7 +69,7 @@ public class UserPreferencesInput extends AbstractTimelineInput {
 	 * @param question the question to set
 	 */
 	public void setQuestion(String question) {
-		this.question = question;
+		this.preferences.setQuestion(question);
 	}
 
 	/**
@@ -70,7 +78,7 @@ public class UserPreferencesInput extends AbstractTimelineInput {
 	 * @return the answer
 	 */
 	public String getAnswer() {
-		return answer;
+		return this.preferences.getAnswer();
 	}
 
 	/**
@@ -79,7 +87,25 @@ public class UserPreferencesInput extends AbstractTimelineInput {
 	 * @param answer the answer to set
 	 */
 	public void setAnswer(String answer) {
-		this.answer = answer;
+		this.preferences.setAnswer(answer);
+	}
+
+	/**
+	 * Getter for Email.
+	 * 
+	 * @return the Email
+	 */
+	public String getEmail() {
+		return this.preferences.getEmail();
+	}
+
+	/**
+	 * Setter for Email.
+	 * 
+	 * @param Email the Email to set
+	 */
+	public void setEmail(String email) {
+		this.preferences.setEmail(email);
 	}
 
 	/**
@@ -107,14 +133,8 @@ public class UserPreferencesInput extends AbstractTimelineInput {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("UserPreferencesInput [userDbId=");
-		builder.append(userDbId);
-		builder.append(", userId=");
-		builder.append(userId);
-		builder.append(", question=");
-		builder.append(question);
-		builder.append(", answer=");
-		builder.append(answer);
+		builder.append("UserPreferencesInput [");
+		builder.append(preferences);
 		builder.append(", type=");
 		builder.append(type);
 		builder.append("]");
