@@ -37,6 +37,10 @@ public class TimeData extends AbstractModel {
 
 	private BigDecimal data_weekday_7 = null;
 
+	private Task task = null;
+
+	private String note = null;
+
 	/**
 	 * Getter for user.
 	 * 
@@ -236,6 +240,42 @@ public class TimeData extends AbstractModel {
 	}
 
 	/**
+	 * Getter for task.
+	 * 
+	 * @return the task.
+	 */
+	public Task getTask() {
+		return this.task;
+	}
+
+	/**
+	 * Setter for task.
+	 * 
+	 * @param task the task to set.
+	 */
+	public void setTask(Task task) {
+		this.task = task;
+	}
+
+	/**
+	 * Getter for note.
+	 * 
+	 * @return the note.
+	 */
+	public String getNote() {
+		return this.note;
+	}
+
+	/**
+	 * Setter for note.
+	 * 
+	 * @param note the note to set.
+	 */
+	public void setNote(String note) {
+		this.note = note;
+	}
+	
+	/**
 	 * Business method. Checks if this time data was created as Proxy.
 	 * 
 	 * @return true is proxy data, false otherwise.
@@ -253,7 +293,7 @@ public class TimeData extends AbstractModel {
 	}
 
 	/**
-	 * Business methid. Returns the sum of all the week day time entries for
+	 * Business method. Returns the sum of all the week day time entries for
 	 * this object.
 	 * 
 	 * @return {@link BigDecimal} total sum.
@@ -274,7 +314,7 @@ public class TimeData extends AbstractModel {
 		StringBuilder builder = new StringBuilder();
 		builder.append("TimeData [id=");
 		builder.append(super.getId());
-		builder.append(", [user=");
+		builder.append(", user=");
 		builder.append(user);
 		builder.append(", project=");
 		builder.append(project);
@@ -296,6 +336,10 @@ public class TimeData extends AbstractModel {
 		builder.append(data_weekday_6);
 		builder.append(", data_weekday_7=");
 		builder.append(data_weekday_7);
+		builder.append(", task=");
+		builder.append(task);
+		builder.append(", note=");
+		builder.append(note);
 		builder.append("]");
 		return builder.toString();
 	}
