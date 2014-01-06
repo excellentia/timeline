@@ -3,52 +3,34 @@
 "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
-<hibernate-mapping schema="TIMELINE_SCHEMA">
-	<class name="org.ag.timeline.business.model.TimeData" table="TIME_DATA_T" dynamic-update="true" dynamic-insert="true">
+<hibernate-mapping schema="TIMELINE_SCHEMA" package="org.ag.timeline.business.model">
+	<class name="TimeData" table="TIME_DATA_T" dynamic-update="true" dynamic-insert="true">
+		
 		<id name="id" type="java.lang.Long" column="ID">
 			<generator class="sequence">
 				<param name="sequence">TIME_DATA_S</param>
 			</generator>
 		</id>
 
-		<many-to-one name="user" class="org.ag.timeline.business.model.User" column="USER_ID" cascade="none" not-null="true" />
-		<many-to-one name="project" class="org.ag.timeline.business.model.Project" column="PROJECT_ID" cascade="none" not-null="true" />
-		<many-to-one name="activity" class="org.ag.timeline.business.model.Activity" column="ACTIVITY_ID" cascade="none" not-null="true" />
-		<many-to-one name="week" class="org.ag.timeline.business.model.Week" column="WEEK_ID" cascade="none" not-null="true" />
-
-		<property name="data_weekday_1" type="java.math.BigDecimal">
-			<column name="WEEK_DAY_1" />
-		</property>
-		<property name="data_weekday_2" type="java.math.BigDecimal">
-			<column name="WEEK_DAY_2" />
-		</property>
-		<property name="data_weekday_3" type="java.math.BigDecimal">
-			<column name="WEEK_DAY_3" />
-		</property>
-		<property name="data_weekday_4" type="java.math.BigDecimal">
-			<column name="WEEK_DAY_4" />
-		</property>
-		<property name="data_weekday_5" type="java.math.BigDecimal">
-			<column name="WEEK_DAY_5" />
-		</property>
-		<property name="data_weekday_6" type="java.math.BigDecimal">
-			<column name="WEEK_DAY_6" />
-		</property>
-		<property name="data_weekday_7" type="java.math.BigDecimal">
-			<column name="WEEK_DAY_7" />
-		</property>
+		<many-to-one name="user" class="User" column="USER_ID" cascade="none" not-null="true" />
+		<many-to-one name="project" class="Project" column="PROJECT_ID" cascade="none" not-null="true" />
+		<many-to-one name="activity" class="Activity" column="ACTIVITY_ID" cascade="none" not-null="true" />
+		<many-to-one name="week" class="Week" column="WEEK_ID" cascade="none" not-null="true" />
+		<many-to-one name="task" class="Task" column="TASK_ID" cascade="none" not-null="true" />
+		
+		<property name="data_weekday_1" type="java.math.BigDecimal" column="WEEK_DAY_1" />
+		<property name="data_weekday_2" type="java.math.BigDecimal" column="WEEK_DAY_2" />
+		<property name="data_weekday_3" type="java.math.BigDecimal" column="WEEK_DAY_3" />
+		<property name="data_weekday_4" type="java.math.BigDecimal" column="WEEK_DAY_4" />
+		<property name="data_weekday_5" type="java.math.BigDecimal" column="WEEK_DAY_5" />
+		<property name="data_weekday_6" type="java.math.BigDecimal" column="WEEK_DAY_6" />
+		<property name="data_weekday_7" type="java.math.BigDecimal" column="WEEK_DAY_7" />
+		<property name="note" type="string" column="NOTE" />
 
 		<property name="createUserId" type="java.lang.Long" column="CREATE_USER" not-null="true" />
-
-		<property name="createDate" type="java.util.Date" not-null="true">
-			<column name="CREATE_DATE" />
-		</property>
-
+		<property name="createDate" type="java.util.Date" not-null="true" column="CREATE_DATE" />
 		<property name="modifyUserId" type="java.lang.Long" column="MODIFY_USER" />
-
-		<property name="modifyDate" type="java.util.Date">
-			<column name="MODIFY_DATE" />
-		</property>
+		<property name="modifyDate" type="java.util.Date" column="MODIFY_DATE" />
 
 	</class>
 </hibernate-mapping>
