@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.ag.timeline.presentation.transferobject.reply;
 
 import org.ag.timeline.application.exception.TimelineException;
