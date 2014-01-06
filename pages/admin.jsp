@@ -3,6 +3,7 @@
 
 <%-- Header Setup --%>
 <c:set var="pageTitle" value="Admin" />
+<c:set var="pageScriptName" value="admin" />
 <%@ include file="inc/header.inc.jsp"%>
 
 <%-- Menu Setup --%>
