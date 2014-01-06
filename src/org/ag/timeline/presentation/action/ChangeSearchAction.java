@@ -1,7 +1,5 @@
 package org.ag.timeline.presentation.action;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.ag.timeline.business.model.AuditRecord;
@@ -26,8 +24,6 @@ public class ChangeSearchAction extends SecureBaseAction {
 	private boolean search = false;
 
 	private AuditDataReply reply = null;
-
-	private static final DateFormat FORMAT = new SimpleDateFormat("dd MMM yyyy");
 
 	/**
 	 * Getter for entityType.
@@ -160,8 +156,8 @@ public class ChangeSearchAction extends SecureBaseAction {
 
 		if (search) {
 
-			Date fromDat = TextHelper.getValidDate(fromDate, FORMAT);
-			Date toDat = TextHelper.getValidDate(toDate, FORMAT);
+			Date fromDat = TextHelper.getValidDate(fromDate, TextHelper.WEEK_DAY_FORMAT);
+			Date toDat = TextHelper.getValidDate(toDate, TextHelper.WEEK_DAY_FORMAT);
 
 			AuditDataSearchParameters parameters = new AuditDataSearchParameters();
 			parameters.setFromDate(fromDat);
