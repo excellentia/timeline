@@ -3,6 +3,7 @@
 
 <%-- Header Setup --%>
 <c:set var="pageTitle" value="Report" />
+<c:set var="pageScriptName" value="report" />
 <%@ include file="inc/header.inc.jsp"%>
 
 <%-- Menu Setup --%>
@@ -35,7 +36,7 @@
 					</c:if>
 				</select>
 			</div>
-			<div style="display: inline; padding: 0; margin: 0">
+			<div style="display: inline; padding: 0; margin: 0;">
 				<select id="userId" size="1" name="userId" class="dateSearch" title="Select User">
 					<option value="0" <c:if test="${selectedUserId == 0}">selected="selected"</c:if>>All Users</option>
 					<c:forEach var="user" items="${USER_LIST.users}">
@@ -43,7 +44,7 @@
 					</c:forEach>
 				</select>
 			</div>
-			<div style="display: inline; padding: 0; margin: 0">
+			<div style="display: inline; padding: 0; padding-left : 1em; margin: 0">
 				<input type="submit" value="Create Report" class="button" />
 			</div>
 		</form>
