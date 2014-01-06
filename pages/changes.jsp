@@ -3,6 +3,7 @@
 
 <%-- Header Setup --%>
 <c:set var="pageTitle" value="Change History" />
+<c:set var="pageScriptName" value="changes" />
 <%@ include file="inc/header.inc.jsp"%>
 
 <%-- Menu Setup --%>

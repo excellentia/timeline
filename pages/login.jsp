@@ -1,8 +1,11 @@
 <%-- TLD inclusion --%>
 <%@ include file="inc/includes.inc.jsp"%>
+
 <%-- Header Setup --%>
 <c:set var="pageTitle" value="Login" />
+<c:set var="pageScriptName" value="login" />
 <%@ include file="inc/header.inc.jsp"%>
+
 <%-- Main content --%>
 <div id="content">
 	<div id="login" align="center">
