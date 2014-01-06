@@ -3,7 +3,6 @@
  */
 package org.ag.timeline.business.model;
 
-
 /**
  * User Preferences.
  * 
@@ -16,6 +15,8 @@ public class UserPreferences extends AbstractModel {
 	private String question = null;
 
 	private String answer = null;
+
+	private String email = null;
 
 	/**
 	 * Getter for user.
@@ -71,6 +72,24 @@ public class UserPreferences extends AbstractModel {
 		this.answer = answer;
 	}
 
+	/**
+	 * Getter for email.
+	 * 
+	 * @return the email.
+	 */
+	public String getEmail() {
+		return this.email;
+	}
+
+	/**
+	 * Setter for email.
+	 * 
+	 * @param email the email to set.
+	 */
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -78,8 +97,10 @@ public class UserPreferences extends AbstractModel {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("UserPreferences [user=").append(user).append(", question=").append(question)
-				.append(", answer=").append(answer).append("]");
+		builder.append("UserPreferences [user=").append(user);
+		builder.append(", question=").append(question);
+		builder.append(", answer=").append(answer);
+		builder.append(", email=").append(email).append("]");
 		return builder.toString();
 	}
 
