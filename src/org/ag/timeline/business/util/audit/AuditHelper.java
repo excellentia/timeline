@@ -12,6 +12,7 @@ import org.ag.timeline.application.context.TimelineContext;
 import org.ag.timeline.business.model.AbstractModel;
 import org.ag.timeline.business.model.Activity;
 import org.ag.timeline.business.model.Project;
+import org.ag.timeline.business.model.ProjectMetrics;
 import org.ag.timeline.business.model.TimeData;
 import org.ag.timeline.business.model.User;
 import org.ag.timeline.business.model.UserPreferences;
@@ -173,6 +174,16 @@ final class AuditHelper {
 		return value;
 	}
 
+	static String getNullSafeWeekDay(Date date) {
+		String value = null;
+
+		if (date != null) {
+			value = TextHelper.getDisplayWeekDay(date);
+		}
+
+		return value;
+	}
+
 	static String getNullSafeBigDecValue(BigDecimal number) {
 		String value = null;
 
@@ -186,7 +197,9 @@ final class AuditHelper {
 	static TimelineConstants.AuditDataType getDataType(String entityName) {
 		TimelineConstants.AuditDataType type = null;
 
-		if (entityName.contains("Project")) {
+		if (entityName.contains("Metrics")) {
+			type = TimelineConstants.AuditDataType.METRICS;
+		} else if (entityName.contains("Project")) {
 			type = TimelineConstants.AuditDataType.PROJECT;
 		} else if (entityName.contains("User")) {
 			type = TimelineConstants.AuditDataType.USER;
@@ -268,6 +281,9 @@ final class AuditHelper {
 				Map<String, String> map = new HashMap<String, String>();
 				map.put("name", "Name");
 				map.put("lead", "Lead");
+				map.put("budgetAtCompletion", "BAC");
+				map.put("startDate", "Start Date");
+				map.put("endDate", "End Date");
 
 				entityFieldNameMap.put(Project.class.getSimpleName(), map);
 			}
@@ -325,6 +341,19 @@ final class AuditHelper {
 
 				entityFieldNameMap.put(Week.class.getSimpleName(), map);
 			}
+			
+			// Metrics entity
+			{
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("plannedValue", "PV");
+				map.put("earnedValue", "EV");
+				map.put("actualCost", "AC");
+				map.put("actualsToDate", "ATD");
+				map.put("softwareProgrammingEffort", "SPE");
+				map.put("defects", "Bugs");
+
+				entityFieldNameMap.put(ProjectMetrics.class.getSimpleName(), map);
+			}
 		}
 
 		return entityFieldNameMap;
@@ -340,7 +369,7 @@ final class AuditHelper {
 
 		PROJECT(Project.class.getSimpleName()), ACTIVITY(Activity.class.getSimpleName()), USER(User.class
 				.getSimpleName()), PREFERENCES(UserPreferences.class.getSimpleName()), TIME_DATA(TimeData.class
-				.getSimpleName()), WEEK(Week.class.getSimpleName());
+				.getSimpleName()), WEEK(Week.class.getSimpleName()), METRICS(ProjectMetrics.class.getSimpleName());
 
 		private final String entityName;
 

@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.ag.timeline.business.model.AbstractModel;
@@ -15,6 +16,7 @@ import org.ag.timeline.business.model.Activity;
 import org.ag.timeline.business.model.AuditRecord;
 import org.ag.timeline.business.model.AuditRecordDetail;
 import org.ag.timeline.business.model.Project;
+import org.ag.timeline.business.model.ProjectMetrics;
 import org.ag.timeline.business.model.TimeData;
 import org.ag.timeline.business.model.User;
 import org.ag.timeline.business.model.Week;
@@ -102,11 +104,23 @@ public class AuditInterceptor extends EmptyInterceptor {
 		int weekDayNum = 0;
 		TimelineConstants.FieldType fieldType = TimelineConstants.FieldType.DATA;
 
+		Map<String, String> propertyMap = null;
+		boolean isMetricEntry = false;
+		
+		boolean isProject = false;
+
 		if (entity instanceof TimeData) {
 			weekDayList = TextHelper.getDisplayWeekDayList(((TimeData) entity).getWeek().getStartDate());
 			isTimeEntry = true;
+		} else if (entity instanceof ProjectMetrics) {
+			isMetricEntry = true;
+			propertyMap = AuditHelper.AuditableEntityField.METRICS.getFieldMap();
+		} else if (entity instanceof Project) {
+			isProject = true;
+			propertyMap = AuditHelper.AuditableEntityField.PROJECT.getFieldMap();
 		}
 
+		//TODO: AG
 		for (String property : propertyNames) {
 
 			if (auditPropertyNames.contains(property)) {
@@ -204,8 +218,17 @@ public class AuditInterceptor extends EmptyInterceptor {
 					} else if (type instanceof TimestampType) {
 
 						// time / date type
+						
+						if (isProject) {
+							newVal = AuditHelper.getNullSafeWeekDay((Date) currentState[counter]);
+							prevVal = AuditHelper.getNullSafeWeekDay((Date) previousState[counter]);
+							
+							property = propertyMap.get(property);
+							
+						} else {
 						newVal = AuditHelper.getNullSafeTimestamp((Date) currentState[counter]);
 						prevVal = AuditHelper.getNullSafeTimestamp((Date) previousState[counter]);
+						}
 
 					} else if (type instanceof BigDecimalType) {
 
@@ -220,6 +243,15 @@ public class AuditInterceptor extends EmptyInterceptor {
 							if ((weekDayNum > 0) && (weekDayNum <= 7)) {
 								property = weekDayList.get(weekDayNum - 1);
 							}
+						} else if(isMetricEntry) {
+						
+							//metric data type
+							property = propertyMap.get(property);
+							
+						} else if(isProject) {
+							
+							//estimate data
+							property = propertyMap.get(property);
 						}
 
 					} else {
