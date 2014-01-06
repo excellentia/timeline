@@ -245,6 +245,11 @@ function checkValidText(text) {
 	return retVal;
 }
 
+function getPreciseValue(num, precision) {
+	var val = num.toFixed(precision);
+	return val;
+}
+
 /**
  * Utility Method - Trims an incoming String to null.
  * 

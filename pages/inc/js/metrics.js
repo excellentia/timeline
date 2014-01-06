@@ -53,9 +53,15 @@ function editMetricDetails(rowHtmlId, prevRowHtmlId, projectDbId, metricDbId, ba
 					+ trimToNull(selectedRow.cells[5].innerHTML) + "'/>";
 			selectedRow.cells[6].innerHTML = "<input type='text' class='metricEntry timeEntry' id='defects' value='"
 					+ trimToNull(selectedRow.cells[6].innerHTML) + "'/>";
+					
+			var prevRowHtmlIdVal = trimToNull(prevRowHtmlId);
+			
+			if(prevRowHtmlIdVal == null) {
+				prevRowHtmlIdVal = "";
+			}
 
 			var saveHtml = "<img alt='Save' align='middle' class='icon' title='Save' src='" + saveIcon
-					+ "' onclick=\"saveModifiedMetrics('" + rowHtmlId + "','" + trimToNull(prevRowHtmlId) + "',"
+					+ "' onclick=\"saveModifiedMetrics('" + rowHtmlId + "','" + prevRowHtmlIdVal + "',"
 					+ projectDbId + ", " + metricDbId + ", " + bac + ")\"/>";
 			selectedRow.cells[17].innerHTML = saveHtml;
 		}
@@ -82,11 +88,11 @@ function saveModifiedMetrics(rowHtmlId, prevRowHtmlId, projectDbId, metricDbId, 
 
 		if (selectedRow != null) {
 
-			var pv = getValidFloat(selectedRow.cells[1].children[0].value);
-			var ev = getValidFloat(selectedRow.cells[2].children[0].value);
-			var ac = getValidFloat(selectedRow.cells[3].children[0].value);
-			var atd = getValidFloat(selectedRow.cells[4].children[0].value);
-			var spe = getValidFloat(selectedRow.cells[5].children[0].value);
+			var pv = getPreciseValue(getValidFloat(selectedRow.cells[1].children[0].value), 1);
+			var ev = getPreciseValue(getValidFloat(selectedRow.cells[2].children[0].value), 1);
+			var ac = getPreciseValue(getValidFloat(selectedRow.cells[3].children[0].value), 1);
+			var atd = getPreciseValue(getValidFloat(selectedRow.cells[4].children[0].value), 1);
+			var spe = getPreciseValue(getValidFloat(selectedRow.cells[5].children[0].value), 1);
 			var defects = getValidInt(selectedRow.cells[6].children[0].value);
 
 			var cumlPV = 0;
@@ -101,13 +107,13 @@ function saveModifiedMetrics(rowHtmlId, prevRowHtmlId, projectDbId, metricDbId, 
 			var spi = 0;
 			var ratio = 0;
 
-			if (prevRowHtmlId == null) {
+			if (trimToNull(prevRowHtmlId) == null) {
 
-				cumlPV = pv;
-				cumlEV = ev;
-				cumlAC = ac;
-				cumlATD = atd;
-				cumlSPE = spe;
+				cumlPV = getPreciseValue(pv, 1);
+				cumlEV = getPreciseValue(ev, 1);
+				cumlAC = getPreciseValue(ac, 1);
+				cumlATD = getPreciseValue(atd, 1);
+				cumlSPE = getPreciseValue(spe, 1);
 				cumlDefects = defects;
 
 			} else {
@@ -116,19 +122,19 @@ function saveModifiedMetrics(rowHtmlId, prevRowHtmlId, projectDbId, metricDbId, 
 
 				if (prevRow != null) {
 
-					cumlPV = pv + trimToNull(prevRow.cells[1].innerHTML);
-					cumlEV = ev + trimToNull(prevRow.cells[2].innerHTML);
-					cumlAC = ac + trimToNull(prevRow.cells[3].innerHTML);
-					cumlATD = atd + trimToNull(prevRow.cells[4].innerHTML);
-					cumlSPE = spe + trimToNull(prevRow.cells[5].innerHTML);
+					cumlPV = getPreciseValue(pv + trimToNull(prevRow.cells[1].innerHTML), 1);
+					cumlEV = getPreciseValue(ev + trimToNull(prevRow.cells[2].innerHTML), 1);
+					cumlAC = getPreciseValue(ac + trimToNull(prevRow.cells[3].innerHTML), 1);
+					cumlATD = getPreciseValue(atd + trimToNull(prevRow.cells[4].innerHTML), 1);
+					cumlSPE = getPreciseValue(spe + trimToNull(prevRow.cells[5].innerHTML), 1);
 					cumlDefects = defects + trimToNull(prevRow.cells[6].innerHTML);
 				}
 			}
 
-			etc = bac - ev;
-			cpi = ev / ac;
-			spi = ac / pv;
-			ratio = defects / spe;
+			etc = getPreciseValue(bac - ev, 1);
+			cpi = getPreciseValue(ev / ac, 3);
+			spi = getPreciseValue(ac / pv, 3);
+			ratio = getPreciseValue(defects / spe, 3);
 
 			//update the modified row
 			selectedRow.cells[1].innerHTML = pv;
@@ -393,7 +399,7 @@ function getNewMetricHtml() {
 
 	var htmlText = "<div class='tableSpacing' id='metricEntryTable'>";
 
-	htmlText = htmlText + "<table style='width: 50%;'>";
+	htmlText = htmlText + "<table style='width: 70%;'>";
 	htmlText = htmlText + "<colgroup><col style='width: 32%' /><col style='width: 10%' /><col style='width: 10%' />";
 	htmlText = htmlText
 			+ "<col style='width: 10%' /><col style='width: 10%' /><col style='width: 10%' /><col style='width: 10%' />";
@@ -675,28 +681,14 @@ function isDateInRange(estimateData, enteredMetrics) {
 	var projEndDate = estimateData.endDate;
 	var enteredDate = enteredMetrics.metricDate;
 
-	var start = projStartDate.getFullYear();
-	var end = projEndDate.getFullYear();
-	var enteredValue = enteredDate.getFullYear();
-
-	if ((start <= enteredValue) && (enteredValue <= end)) {
-
-		start = projStartDate.getMonth();
-		end = projEndDate.getMonth();
-		enteredValue = enteredDate.getMonth();
-
-		if ((start <= enteredValue) && (enteredValue <= end)) {
-
-			start = projStartDate.getDate();
-			end = projEndDate.getDate();
-			enteredValue = enteredDate.getDate();
-
-			if ((start <= enteredValue) && (enteredValue <= end)) {
-				isValid = true;
-			}
-		}
+	var start = projStartDate.setHours(0,0,0,0);
+	var end = projEndDate.setHours(0,0,0,0);
+	var diff = end-start;
+	
+	if(diff >= 0) {
+		isValid = true;
 	}
-
+	
 	return isValid;
 }
 
