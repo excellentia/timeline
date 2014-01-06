@@ -2,6 +2,7 @@ package org.ag.timeline.business.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,7 +16,9 @@ import org.ag.timeline.business.model.Activity;
 import org.ag.timeline.business.model.AuditRecord;
 import org.ag.timeline.business.model.AuditRecordDetail;
 import org.ag.timeline.business.model.Project;
+import org.ag.timeline.business.model.ProjectMetrics;
 import org.ag.timeline.business.model.SystemSettings;
+import org.ag.timeline.business.model.Task;
 import org.ag.timeline.business.model.TimeData;
 import org.ag.timeline.business.model.User;
 import org.ag.timeline.business.model.UserPreferences;
@@ -25,10 +28,13 @@ import org.ag.timeline.business.util.HibernateUtil;
 import org.ag.timeline.business.util.audit.AuditInterceptor;
 import org.ag.timeline.common.TextHelper;
 import org.ag.timeline.common.TimelineConstants;
+import org.ag.timeline.common.UserComparator;
 import org.ag.timeline.presentation.transferobject.common.CodeValue;
 import org.ag.timeline.presentation.transferobject.input.AuthenticationInput;
 import org.ag.timeline.presentation.transferobject.input.CodeValueInput;
+import org.ag.timeline.presentation.transferobject.input.ProjectEstimatesInput;
 import org.ag.timeline.presentation.transferobject.input.ProjectInput;
+import org.ag.timeline.presentation.transferobject.input.ProjectMetricsInput;
 import org.ag.timeline.presentation.transferobject.input.StatusInput;
 import org.ag.timeline.presentation.transferobject.input.TimeDataInput;
 import org.ag.timeline.presentation.transferobject.input.UserInput;
@@ -37,10 +43,18 @@ import org.ag.timeline.presentation.transferobject.reply.ActivityReply;
 import org.ag.timeline.presentation.transferobject.reply.AuditDataReply;
 import org.ag.timeline.presentation.transferobject.reply.AuditDetailRow;
 import org.ag.timeline.presentation.transferobject.reply.AuditRow;
+import org.ag.timeline.presentation.transferobject.reply.BasicProjectMetrics;
+import org.ag.timeline.presentation.transferobject.reply.CodeValueListReply;
 import org.ag.timeline.presentation.transferobject.reply.CodeValueReply;
 import org.ag.timeline.presentation.transferobject.reply.DetailedReportReply;
 import org.ag.timeline.presentation.transferobject.reply.DetailedReportRow;
 import org.ag.timeline.presentation.transferobject.reply.ProjectData;
+import org.ag.timeline.presentation.transferobject.reply.ProjectDetailMetrics;
+import org.ag.timeline.presentation.transferobject.reply.ProjectDetailMetricsReply;
+import org.ag.timeline.presentation.transferobject.reply.ProjectEstimateData;
+import org.ag.timeline.presentation.transferobject.reply.ProjectEstimatesReply;
+import org.ag.timeline.presentation.transferobject.reply.ProjectLevelMetrics;
+import org.ag.timeline.presentation.transferobject.reply.ProjectLevelMetricsReply;
 import org.ag.timeline.presentation.transferobject.reply.ProjectReply;
 import org.ag.timeline.presentation.transferobject.reply.ReportRow;
 import org.ag.timeline.presentation.transferobject.reply.SummaryReportReply;
@@ -53,6 +67,8 @@ import org.ag.timeline.presentation.transferobject.reply.WeekReply;
 import org.ag.timeline.presentation.transferobject.reply.WeeklyUserReply;
 import org.ag.timeline.presentation.transferobject.search.ActivitySearchParameter;
 import org.ag.timeline.presentation.transferobject.search.AuditDataSearchParameters;
+import org.ag.timeline.presentation.transferobject.search.ProjectDetailMetricsSearchParameters;
+import org.ag.timeline.presentation.transferobject.search.ProjectMetricsSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.ProjectSearchParameter;
 import org.ag.timeline.presentation.transferobject.search.ReportSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.TimeDataSearchParameters;
@@ -1830,6 +1846,7 @@ public class TimelineServiceImpl implements TimelineService {
 			final long userDbId = input.getUserDbId();
 			final String question = TextHelper.trimToNull(input.getQuestion());
 			final String answer = TextHelper.trimToNull(input.getAnswer());
+			final String email = TextHelper.trimToNull(input.getEmail());
 			final TimelineConstants.UserPrefDataFieldType type = input.getType();
 
 			if (userDbId > 0) {
@@ -1881,6 +1898,9 @@ public class TimelineServiceImpl implements TimelineService {
 									break;
 								case ANSWER:
 									preferences.setAnswer(answer);
+									break;
+								case EMAIL:
+									preferences.setEmail(email);
 									break;
 								default:
 									break;
@@ -3210,19 +3230,23 @@ public class TimelineServiceImpl implements TimelineService {
 								missingUserList.removeAll(userList);
 							}
 
+							Collections.sort(missingUserList, new UserComparator());
+
 							reply.setWeeklyUserList(week, missingUserList);
 						}
 					} else {
 
 						// if no entries in a given period
 						Criteria weekCriteria = session.createCriteria(Week.class);
-						weekCriteria.add(Restrictions.and(Restrictions.ge("week.startDate", startDate),
-								Restrictions.le("week.endDate", endDate)));
+						weekCriteria.add(Restrictions.and(Restrictions.ge("startDate", startDate),
+								Restrictions.le("endDate", endDate)));
 						weekCriteria.addOrder(Order.asc("id"));
 						weekCriteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 						@SuppressWarnings("unchecked")
 						List<Week> allWeekList = weekCriteria.list();
+
+						Collections.sort(activeUsers, new UserComparator());
 
 						for (Week week : allWeekList) {
 							reply.setWeeklyUserList(week, activeUsers);
@@ -3260,5 +3284,1022 @@ public class TimelineServiceImpl implements TimelineService {
 			}
 		}
 		return reply;
+	}
+
+	@Override
+	public CodeValueReply createProjectDetailMetrics(ProjectMetricsInput input) throws TimelineException {
+
+		Session session = null;
+		Transaction transaction = null;
+		final CodeValueReply reply = new CodeValueReply();
+
+		if (input != null) {
+
+			final long projectId = input.getProjectId();
+
+			if (projectId > 0) {
+
+				try {
+
+					// create data, hence using AuditableSession()
+					session = getAuditableSession();
+					transaction = session.beginTransaction();
+
+					long time = System.nanoTime();
+					final Long id = projectId;
+					Date date = input.getDate();
+					Long year = TextHelper.getYear(date);
+					Long weekNum = TextHelper.getWeekNumber(date);
+					ProjectMetrics metrics = null;
+
+					Criteria criteria = session.createCriteria(ProjectMetrics.class);
+					criteria.createAlias("project", "pr");
+					criteria.createAlias("week", "wk");
+					criteria.add(Restrictions.and(Restrictions.eq("pr.id", id), Restrictions.eq("wk.year", year),
+							Restrictions.eq("wk.weekNumber", weekNum)));
+					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+					@SuppressWarnings("unchecked")
+					List<ProjectMetrics> list = criteria.list();
+
+					if ((list != null) && (list.size() > 0)) {
+
+						// already a project metric exists with given week &
+						// project.
+						reply.setErrorMessage("Metrics for this week is already present in project.");
+
+					} else {
+
+						// get project
+						Project project = (Project) session.get(Project.class, id);
+
+						if (project != null) {
+
+							// get Week
+							criteria = session.createCriteria(Week.class);
+							criteria.add(Restrictions.and(Restrictions.eq("year", year),
+									Restrictions.eq("weekNumber", weekNum)));
+							criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+							@SuppressWarnings("unchecked")
+							List<Week> weekList = criteria.list();
+
+							if ((weekList != null) && (weekList.size() > 0)) {
+
+								Week week = weekList.get(0);
+
+								if (week != null) {
+
+									// final double bac =
+									// TextHelper.getScaledDouble(project.getBudgetAtCompletion());
+
+									metrics = new ProjectMetrics();
+
+									// relationships
+									metrics.setProject(project);
+									metrics.setWeek(week);
+
+									// user entered values
+									metrics.setPlannedValue(TextHelper.getScaledBigDecimal(input.getPlannedValue()));
+									metrics.setEarnedValue(TextHelper.getScaledBigDecimal(input.getEarnedValue()));
+									metrics.setActualCost(TextHelper.getScaledBigDecimal(input.getActualCost()));
+									metrics.setActualsToDate(TextHelper.getScaledBigDecimal(input.getActualsToDate()));
+									metrics.setSoftwareProgrammingEffort(TextHelper.getScaledBigDecimal(input
+											.getSoftwareProgrammingEffort()));
+									metrics.setDefects(input.getDefects());
+
+									// calculated values
+									// metrics.setExpectedToComplete(TextHelper.getScaledBigDecimal(bac
+									// - input.getEarnedValue()));
+									// metrics.setCostPerformanceIndex(TextHelper.getScaledBigDecimal(input
+									// .getEarnedValue() /
+									// input.getActualCost()));
+									// metrics.setSchedulePerformanceIndex(TextHelper.getScaledBigDecimal(input
+									// .getEarnedValue() /
+									// input.getPlannedValue()));
+									// metrics.setDefectRatio(TextHelper.getScaledBigDecimal(input.getDefects()
+									// / input.getSoftwareProgrammingEffort()));
+
+									// save the metric data
+									session.saveOrUpdate(metrics);
+
+									reply.setSuccessMessage("Created successfully.");
+
+								} else {
+									reply.setErrorMessage("Specified week not present in system.");
+								}
+
+							} else {
+								reply.setErrorMessage("No week data present in system.");
+							}
+
+						} else {
+							reply.setErrorMessage("Specified project not present in system.");
+						}
+					}
+
+					TextHelper.logMessage("createProjectDetailMetrics() > Time taken : "
+							+ ((System.nanoTime() - time) / 1000000));
+
+					// commit the transaction
+					transaction.commit();
+
+					if (metrics != null) {
+						reply.setCodeValue(new CodeValue(metrics.getId(), metrics.getWeek().getDescription()));
+					}
+
+				} catch (HibernateException hibernateException) {
+
+					// rollback transaction
+					if (transaction != null) {
+						transaction.rollback();
+					}
+
+					hibernateException.printStackTrace();
+
+					// create a reply for error message
+					reply.setErrorMessage("Create failed due to Technical Reasons.");
+
+				} finally {
+					// close the session
+					if (session != null) {
+						session.close();
+					}
+				}
+			} else {
+				reply.setErrorMessage("Invalid project specified.");
+			}
+		}
+
+		return reply;
+	}
+
+	@Override
+	public CodeValueReply deleteProjectMetrics(CodeValueInput input) throws TimelineException {
+
+		Session session = null;
+		Transaction transaction = null;
+		final CodeValueReply reply = new CodeValueReply();
+
+		if ((input != null) && (input.getCodeValue() != null)) {
+
+			final long projectId = input.getCodeValue().getCode();
+
+			if (projectId > 0) {
+
+				try {
+
+					// create data, hence using AuditableSession()
+					session = getAuditableSession();
+					transaction = session.beginTransaction();
+
+					long time = System.nanoTime();
+
+					// delete entries
+					StringBuilder builder = new StringBuilder("DELETE FROM ProjectMetrics WHERE project.id = ");
+					builder.append(projectId);
+
+					Query query = session.createQuery(builder.toString());
+					int deleteCount = query.executeUpdate();
+
+					StringBuilder msg = new StringBuilder(TimelineConstants.EMPTY);
+
+					if (deleteCount > 0) {
+						msg.append(deleteCount).append(" Metric entries deleted successfully. ");
+					}
+
+					// delete project estimates
+					Project project = (Project) session.get(Project.class, projectId);
+
+					project.setBudgetAtCompletion(TextHelper.getScaledBigDecimal(0));
+					project.setStartDate(null);
+					project.setEndDate(null);
+
+					session.saveOrUpdate(project);
+
+					msg.append("Project Estimates deleted successfully.");
+
+					reply.setCodeValue(new CodeValue(projectId, project.getName()));
+					reply.setSuccessMessage(msg.toString());
+
+					TextHelper.logMessage("deleteProjectMetrics() > Time taken : "
+							+ ((System.nanoTime() - time) / 1000000));
+
+					// commit the transaction
+					transaction.commit();
+
+				} catch (HibernateException hibernateException) {
+
+					// rollback transaction
+					if (transaction != null) {
+						transaction.rollback();
+					}
+
+					hibernateException.printStackTrace();
+
+					// create a reply for error message
+					reply.setErrorMessage("Delete failed due to Technical Reasons.");
+
+				} finally {
+					// close the session
+					if (session != null) {
+						session.close();
+					}
+				}
+			} else {
+				if (projectId <= 0) {
+					reply.setErrorMessage("Invalid project specified.");
+				}
+			}
+		}
+
+		return reply;
+
+	}
+
+	@Override
+	public CodeValueReply deleteProjectDetailMetrics(CodeValueInput input) throws TimelineException {
+
+		Session session = null;
+		Transaction transaction = null;
+		final CodeValueReply reply = new CodeValueReply();
+
+		if ((input != null) && (input.getCodeValue() != null)) {
+
+			final long metricId = input.getCodeValue().getCode();
+
+			if (metricId > 0) {
+
+				try {
+
+					// create data, hence using AuditableSession()
+					session = getAuditableSession();
+					transaction = session.beginTransaction();
+
+					long time = System.nanoTime();
+					ProjectMetrics metrics = (ProjectMetrics) session.get(ProjectMetrics.class, metricId);
+
+					if (metrics != null) {
+
+						session.delete(metrics);
+						reply.setMessage("Deleted Successfully.");
+
+					} else {
+						reply.setErrorMessage("Specified project metrics entry not present in System.");
+					}
+
+					TextHelper.logMessage("deleteProjectDetailMetrics() > Time taken : "
+							+ ((System.nanoTime() - time) / 1000000));
+
+					// commit the transaction
+					transaction.commit();
+
+				} catch (HibernateException hibernateException) {
+
+					// rollback transaction
+					if (transaction != null) {
+						transaction.rollback();
+					}
+
+					hibernateException.printStackTrace();
+
+					// create a reply for error message
+					reply.setErrorMessage("Delete failed due to Technical Reasons.");
+
+				} finally {
+					// close the session
+					if (session != null) {
+						session.close();
+					}
+				}
+			} else {
+				if (metricId <= 0) {
+					reply.setErrorMessage("Invalid project metric entry specified.");
+				}
+			}
+		}
+
+		return reply;
+	}
+
+	@Override
+	public CodeValueReply modifyProjectDetailMetrics(ProjectMetricsInput input) throws TimelineException {
+
+		Session session = null;
+		Transaction transaction = null;
+		final CodeValueReply reply = new CodeValueReply();
+
+		if (input != null) {
+
+			final long metricId = input.getMetricId();
+
+			if (metricId > 0) {
+
+				try {
+
+					// create data, hence using AuditableSession()
+					session = getAuditableSession();
+					transaction = session.beginTransaction();
+
+					long time = System.nanoTime();
+					final Long id = metricId;
+					ProjectMetrics metrics = (ProjectMetrics) session.get(ProjectMetrics.class, id);
+
+					if (metrics == null) {
+
+						// non-existent metric entry
+						reply.setErrorMessage("Specified metrics entry not present in System.");
+
+					} else {
+
+						// final double bac =
+						// TextHelper.getScaledDouble(metrics.getProject().getBudgetAtCompletion());
+
+						// user entered values
+						metrics.setPlannedValue(TextHelper.getScaledBigDecimal(input.getPlannedValue()));
+						metrics.setEarnedValue(TextHelper.getScaledBigDecimal(input.getEarnedValue()));
+						metrics.setActualCost(TextHelper.getScaledBigDecimal(input.getActualCost()));
+						metrics.setActualsToDate(TextHelper.getScaledBigDecimal(input.getActualsToDate()));
+						metrics.setSoftwareProgrammingEffort(TextHelper.getScaledBigDecimal(input
+								.getSoftwareProgrammingEffort()));
+						metrics.setDefects(input.getDefects());
+
+						// calculated values
+						// metrics.setExpectedToComplete(TextHelper.getScaledBigDecimal(bac
+						// - input.getEarnedValue()));
+						// metrics.setCostPerformanceIndex(TextHelper.getScaledBigDecimal(input.getEarnedValue()
+						// / input.getActualCost()));
+						// metrics.setSchedulePerformanceIndex(TextHelper.getScaledBigDecimal(input.getEarnedValue()
+						// / input.getPlannedValue()));
+						// metrics.setDefectRatio(TextHelper.getScaledBigDecimal(input.getDefects()
+						// / input.getSoftwareProgrammingEffort()));
+
+						// save the metric data
+						session.saveOrUpdate(metrics);
+
+						reply.setSuccessMessage("Modified successfully.");
+					}
+
+					TextHelper.logMessage("modifyProjectDetailMetrics() > Time taken : "
+							+ ((System.nanoTime() - time) / 1000000));
+
+					// commit the transaction
+					transaction.commit();
+
+					if (metrics != null) {
+						reply.setCodeValue(new CodeValue(metrics.getId(), metrics.getWeek().getDescription()));
+					}
+
+				} catch (HibernateException hibernateException) {
+
+					// rollback transaction
+					if (transaction != null) {
+						transaction.rollback();
+					}
+
+					hibernateException.printStackTrace();
+
+					// create a reply for error message
+					reply.setErrorMessage("Create failed due to Technical Reasons.");
+
+				} finally {
+					// close the session
+					if (session != null) {
+						session.close();
+					}
+				}
+			} else {
+				reply.setErrorMessage("Invalid project metric entry specified.");
+			}
+		}
+
+		return reply;
+
+	}
+
+	@Override
+	public CodeValueReply saveProjectEstimates(ProjectEstimatesInput input) throws TimelineException {
+
+		Session session = null;
+		Transaction transaction = null;
+		final CodeValueReply reply = new CodeValueReply();
+
+		if ((input != null) && (input.getEstimateData() != null) && (input.getEstimateData().getProjectData() != null)) {
+
+			final long projectId = input.getEstimateData().getProjectData().getCode();
+			final double bac = input.getEstimateData().getBudgetAtCompletion();
+			final Date startDate = input.getEstimateData().getStartDate();
+			final Date endDate = input.getEstimateData().getEndDate();
+
+			if ((projectId > 0) && (bac > 0) && (startDate != null) && (endDate != null)) {
+
+				try {
+
+					// create data, hence using AuditableSession()
+					session = getAuditableSession();
+					transaction = session.beginTransaction();
+
+					long time = System.nanoTime();
+					final Long id = projectId;
+					Project project = (Project) session.get(Project.class, id);
+
+					if (project == null) {
+
+						// already a project exists with given name.
+						reply.setErrorMessage("Specified project is not present in System.");
+
+					} else {
+
+						// populate values
+						project.setBudgetAtCompletion(TextHelper.getScaledBigDecimal(bac));
+						project.setStartDate(startDate);
+						project.setEndDate(endDate);
+
+						// save project
+						session.saveOrUpdate(project);
+						reply.setCodeValue(new CodeValue(projectId, project.getName()));
+						reply.setSuccessMessage("Saved successfully.");
+
+					}
+
+					TextHelper.logMessage("saveProjectEstimates() > Time taken : "
+							+ ((System.nanoTime() - time) / 1000000));
+
+					// commit the transaction
+					transaction.commit();
+
+				} catch (HibernateException hibernateException) {
+
+					// rollback transaction
+					if (transaction != null) {
+						transaction.rollback();
+					}
+
+					hibernateException.printStackTrace();
+
+					// create a reply for error message
+					reply.setErrorMessage("Save failed due to Technical Reasons.");
+
+				} finally {
+					// close the session
+					if (session != null) {
+						session.close();
+					}
+				}
+			} else {
+				if (projectId <= 0) {
+					reply.setErrorMessage("Invalid project specified.");
+				} else {
+					reply.setErrorMessage("Invalid value(s) specified.");
+				}
+			}
+		}
+
+		return reply;
+
+	}
+
+	@Override
+	public ProjectEstimatesReply searchProjectEstimates(ProjectSearchParameter searchParameters)
+			throws TimelineException {
+		Session session = null;
+		Transaction transaction = null;
+		final ProjectEstimatesReply reply = new ProjectEstimatesReply();
+
+		try {
+			// read data, hence using normal session()
+			session = getNormalSession();
+			transaction = session.beginTransaction();
+
+			long time = System.nanoTime();
+			Long projectId = 0l;
+			String projectName = null;
+
+			Criteria criteria = session.createCriteria(Project.class);
+
+			if (searchParameters != null) {
+				projectId = searchParameters.getProjectId();
+				projectName = TextHelper.trimToNull(searchParameters.getProjectName());
+			}
+
+			if (projectId > 0) {
+				criteria.add(Restrictions.eq("id", projectId));
+			}
+
+			if (projectName != null) {
+				criteria.add(Restrictions.ilike("name", projectName.toLowerCase(), MatchMode.ANYWHERE));
+			}
+
+			// add order
+			criteria.addOrder(Order.asc("name"));
+
+			criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+			@SuppressWarnings("unchecked")
+			List<Project> dbList = criteria.list();
+
+			if ((dbList != null) && (dbList.size() > 0)) {
+
+				ProjectData projectData = null;
+				ProjectEstimateData estimate = null;
+				StringBuilder builder = new StringBuilder(
+						" FROM Week as wk where wk.id = (SELECT max(week.id) FROM ProjectMetrics WHERE project.id = ?)");
+				Query query = null;
+				Week lastSubmittedWeek = null;
+
+				for (Project project : dbList) {
+					projectData = new ProjectData();
+					projectData.setCode(project.getId());
+					projectData.setValue(project.getName());
+
+					if (project.getLead() != null) {
+						projectData.setLeadName(project.getLead().getUserName());
+					}
+
+					estimate = new ProjectEstimateData();
+					estimate.setProjectData(projectData);
+
+					estimate.setBudgetAtCompletion(TextHelper.getScaledDouble(project.getBudgetAtCompletion()));
+					estimate.setStartDate(project.getStartDate());
+					estimate.setEndDate(project.getEndDate());
+
+					try {
+						query = session.createQuery(builder.toString()).setLong(0, project.getId());
+						lastSubmittedWeek = (Week) query.uniqueResult();
+
+						if (lastSubmittedWeek != null) {
+							estimate.setLastSubmittedPeriod(TextHelper.getDisplayWeek(lastSubmittedWeek.getStartDate(),
+									lastSubmittedWeek.getEndDate()));
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+					reply.addEstimates(estimate);
+				}
+
+			} else {
+				// No results found
+				reply.setErrorMessage("No results found.");
+			}
+
+			TextHelper.logMessage("searchProjectEstimates() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+
+			// commit the transaction
+			transaction.commit();
+
+		} catch (HibernateException hibernateException) {
+
+			// rollback transaction
+			if (transaction != null) {
+				transaction.rollback();
+			}
+
+			hibernateException.printStackTrace();
+
+			// create a reply for error message
+			reply.setErrorMessage("Search failed due to Technical Reasons.");
+
+		} finally {
+			// close the session
+			if (session != null) {
+				session.close();
+			}
+		}
+		return reply;
+	}
+
+	@Override
+	public CodeValueListReply searchTasks(ProjectSearchParameter searchParameters) throws TimelineException {
+		Session session = null;
+		Transaction transaction = null;
+		final CodeValueListReply reply = new CodeValueListReply();
+
+		try {
+			Long projectId = 0l;
+
+			if (searchParameters != null) {
+				projectId = searchParameters.getProjectId();
+
+				if (projectId > 0) {
+
+					// read data, hence using normal session()
+					session = getNormalSession();
+					transaction = session.beginTransaction();
+
+					long time = System.nanoTime();
+
+					Criteria criteria = session.createCriteria(Task.class);
+					criteria.createAlias("project", "p");
+					criteria.add(Restrictions.eq("p.id", projectId));
+
+					// add order
+					criteria.addOrder(Order.asc("taskText"));
+
+					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+					@SuppressWarnings("unchecked")
+					List<Task> dbList = criteria.list();
+
+					if ((dbList != null) && (dbList.size() > 0)) {
+
+						for (Task task : dbList) {
+							reply.addCodeValue(new CodeValue(task.getId(), task.getTaskText()));
+						}
+
+					} else {
+						// No results found
+						reply.setErrorMessage("No results found.");
+					}
+
+					TextHelper.logMessage("searchTasks() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+
+					// commit the transaction
+					transaction.commit();
+				}
+			}
+
+		} catch (HibernateException hibernateException) {
+
+			// rollback transaction
+			if (transaction != null) {
+				transaction.rollback();
+			}
+
+			hibernateException.printStackTrace();
+
+			// create a reply for error message
+			reply.setErrorMessage("Search failed due to Technical Reasons.");
+
+		} finally {
+			// close the session
+			if (session != null) {
+				session.close();
+			}
+		}
+		return reply;
+	}
+
+	@Override
+	public ProjectLevelMetricsReply getProjectLevelMetricsReport(ProjectMetricsSearchParameters searchParameters)
+			throws TimelineException {
+
+		final ProjectLevelMetricsReply reply = new ProjectLevelMetricsReply();
+
+		Session session = null;
+		Transaction transaction = null;
+
+		try {
+
+			// read data, hence using normal session()
+			session = getNormalSession();
+			transaction = session.beginTransaction();
+
+			long time = System.nanoTime();
+			long searchProjectId = searchParameters.getProjectDbId();
+
+			// get cumulative metrics
+			StringBuilder builder = new StringBuilder(" SELECT project.id ");
+			builder.append(" , sum(plannedValue) , sum(earnedValue) , sum(actualCost) , sum(actualsToDate) , sum(softwareProgrammingEffort), sum(defects), max(week.id) ");
+			builder.append(" FROM ProjectMetrics ");
+
+			if (!searchParameters.isSearchAllData() && (searchProjectId > 0)) {
+
+				if (searchProjectId > 0) {
+					builder.append(" WHERE ");
+					builder.append(" project.id = ").append(searchProjectId);
+				}
+
+			}
+
+			builder.append(" GROUP BY ");
+			builder.append(" project.id ");
+
+			builder.append(" ORDER BY ");
+			builder.append(" project.id ");
+
+			Query query = session.createQuery(builder.toString());
+
+			@SuppressWarnings("rawtypes")
+			List list = query.list();
+
+			ProjectLevelMetrics reportRow = null;
+			ProjectData projectData = null;
+			ProjectEstimateData estimateData = null;
+			BasicProjectMetrics basicMetrics = null;
+			List<Long> projectsWithMetrics = new ArrayList<Long>();
+
+			if ((list != null) && (list.size() > 0)) {
+
+				Object[] values = null;
+				long projId = 0;
+				long weekId = 0;
+				Week week = null;
+				Project project = null;
+
+				for (int i = 0; i < list.size(); i++) {
+
+					values = (Object[]) list.get(i);
+
+					// get values
+					projId = (Long) values[0];
+
+					projectsWithMetrics.add(projId);
+
+					// get project
+					project = (Project) session.get(Project.class, new Long(projId));
+
+					reportRow = new ProjectLevelMetrics();
+
+					// create basic data
+					{
+						projectData = new ProjectData();
+						projectData.setCode(project.getId());
+						projectData.setValue(project.getName());
+						projectData.setLeadName(project.getLeadName());
+
+						estimateData = new ProjectEstimateData();
+						estimateData.setBudgetAtCompletion(TextHelper.getScaledDouble(project.getBudgetAtCompletion()));
+						estimateData.setStartDate(project.getStartDate());
+						estimateData.setEndDate(project.getEndDate());
+						estimateData.setProjectData(projectData);
+
+						weekId = (Long) values[7];
+
+						if (weekId > 0) {
+							week = (Week) session.get(Week.class, Long.valueOf(weekId));
+
+							if (week != null) {
+								estimateData.setLastSubmittedPeriod(TextHelper.getDisplayWeek(week.getStartDate(),
+										week.getEndDate()));
+							}
+						}
+
+						// populate the row
+						reportRow.setBasicData(estimateData);
+					}
+
+					// create metric data
+					{
+						basicMetrics = new BasicProjectMetrics();
+						basicMetrics.setPlannedValue(TextHelper.getScaledDouble((BigDecimal) values[1]));
+						basicMetrics.setEarnedValue(TextHelper.getScaledDouble((BigDecimal) values[2]));
+						basicMetrics.setActualCost(TextHelper.getScaledDouble((BigDecimal) values[3]));
+						basicMetrics.setActualsToDate(TextHelper.getScaledDouble((BigDecimal) values[4]));
+						basicMetrics.setSoftwareProgrammingEffort(TextHelper.getScaledDouble((BigDecimal) values[5]));
+						basicMetrics.setDefects((Long) values[6]);
+
+						// populate the row
+						reportRow.setCumulativeMetrics(basicMetrics);
+					}
+
+					// populate the calculated metrics
+					reportRow.populateCalculatedMetrics();
+
+					// populate reply
+					reply.addProjectLevelMetrics(reportRow);
+				}
+			}
+
+			// populate projects without metrics
+			{
+				// populate basic project data
+
+				Criteria criteria = session.createCriteria(Project.class);
+				criteria.add(Restrictions.eq("active", Boolean.TRUE));
+
+				if (!searchParameters.isSearchAllData() && (searchProjectId > 0)) {
+
+					if (searchProjectId > 0) {
+						criteria.add(Restrictions.eq("id", Long.valueOf(searchProjectId)));
+					}
+				}
+
+				criteria.addOrder(Order.asc("name"));
+				criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+				@SuppressWarnings("unchecked")
+				List<Project> projectList = criteria.list();
+
+				if ((projectList != null) && (projectList.size() > 0)) {
+
+					long projId = 0;
+
+					for (Project proj : projectList) {
+
+						projId = proj.getId();
+
+						// ignore ones that have metrics
+						if (!projectsWithMetrics.contains(projId)) {
+
+							reportRow = new ProjectLevelMetrics();
+
+							// create basic data
+							{
+								projectData = new ProjectData();
+								projectData.setCode(projId);
+								projectData.setValue(proj.getName());
+								projectData.setLeadName(proj.getLeadName());
+
+								estimateData = new ProjectEstimateData();
+								estimateData.setBudgetAtCompletion(TextHelper.getScaledDouble(proj
+										.getBudgetAtCompletion()));
+								estimateData.setStartDate(proj.getStartDate());
+								estimateData.setEndDate(proj.getEndDate());
+
+								estimateData.setProjectData(projectData);
+
+								// populate the row
+								reportRow.setBasicData(estimateData);
+							}
+
+							// create metric data
+							{
+								basicMetrics = new BasicProjectMetrics();
+								basicMetrics.setPlannedValue(0);
+								basicMetrics.setEarnedValue(0);
+								basicMetrics.setActualCost(0);
+								basicMetrics.setActualsToDate(0);
+								basicMetrics.setSoftwareProgrammingEffort(0);
+								basicMetrics.setDefects(0);
+
+								// populate the row
+								reportRow.setCumulativeMetrics(basicMetrics);
+							}
+
+							// populate reply
+							reply.addProjectLevelMetrics(reportRow);
+						}
+					}
+				} else {
+
+					// No results found
+					reply.setErrorMessage("No results found.");
+				}
+
+			}
+
+			TextHelper.logMessage("getProjectLevelMetricsReport() > Time taken : "
+					+ ((System.nanoTime() - time) / 1000000));
+
+			// commit the transaction
+			transaction.commit();
+		} catch (HibernateException hibernateException) {
+
+			// rollback transaction
+			if (transaction != null) {
+				transaction.rollback();
+			}
+
+			hibernateException.printStackTrace();
+
+			// create a reply for error message
+			reply.setErrorMessage("Search failed due to Technical Reasons.");
+
+		} finally {
+			// close the session
+			if (session != null) {
+				session.close();
+			}
+		}
+
+		return reply;
+
+	}
+
+	@Override
+	public ProjectDetailMetricsReply getProjectDetailMetricsReport(ProjectDetailMetricsSearchParameters searchParameters)
+			throws TimelineException {
+
+		final ProjectDetailMetricsReply reply = new ProjectDetailMetricsReply();
+
+		Session session = null;
+		Transaction transaction = null;
+
+		try {
+
+			// read data, hence using normal session()
+			session = getNormalSession();
+			transaction = session.beginTransaction();
+
+			long time = System.nanoTime();
+			long searchProjectId = searchParameters.getProjectDbId();
+			Project project = null;
+
+			if (searchProjectId <= 0) {
+
+				// create a reply for error message
+				reply.setErrorMessage("Invalid project specified.");
+
+			} else {
+
+				// get project
+				project = (Project) session.get(Project.class, new Long(searchProjectId));
+
+				if (project == null) {
+
+					// create a reply for error message
+					reply.setErrorMessage("Specified project not present in System.");
+
+				} else {
+
+					// create basic data
+					{
+						ProjectData projectData = new ProjectData();
+						projectData.setCode(project.getId());
+						projectData.setValue(project.getName());
+						projectData.setLeadName(project.getLeadName());
+
+						ProjectEstimateData extimateData = new ProjectEstimateData();
+						extimateData.setBudgetAtCompletion(TextHelper.getScaledDouble(project.getBudgetAtCompletion()));
+						extimateData.setStartDate(project.getStartDate());
+						extimateData.setEndDate(project.getEndDate());
+						extimateData.setProjectData(projectData);
+
+						// populate the row
+						reply.setBasicData(extimateData);
+					}
+
+					// get detailed metrics
+					Criteria criteria = session.createCriteria(ProjectMetrics.class);
+					criteria.createAlias("project", "pr");
+					criteria.add(Restrictions.eq("pr.id", new Long(searchProjectId)));
+					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+					@SuppressWarnings("unchecked")
+					List<ProjectMetrics> list = criteria.list();
+
+					if ((list != null) && (list.size() > 0)) {
+
+						BasicProjectMetrics basicMetrics = null;
+						ProjectDetailMetrics reportRow = null;
+						Date lastSaved = null;
+
+						for (ProjectMetrics metrics : list) {
+
+							reportRow = new ProjectDetailMetrics();
+
+							// create metric data
+							basicMetrics = new BasicProjectMetrics();
+							basicMetrics.setPlannedValue(TextHelper.getScaledDouble(metrics.getPlannedValue()));
+							basicMetrics.setEarnedValue(TextHelper.getScaledDouble(metrics.getEarnedValue()));
+							basicMetrics.setActualCost(TextHelper.getScaledDouble(metrics.getActualCost()));
+							basicMetrics.setActualsToDate(TextHelper.getScaledDouble(metrics.getActualsToDate()));
+							basicMetrics.setSoftwareProgrammingEffort(TextHelper.getScaledDouble(metrics
+									.getSoftwareProgrammingEffort()));
+							basicMetrics.setDefects(metrics.getDefects());
+
+							// populate the row
+							reportRow.setWeeklyMetrics(basicMetrics);
+
+							// set metric week
+							reportRow.setMetricWeek(TextHelper.getDisplayWeek(metrics.getWeek().getStartDate(), metrics
+									.getWeek().getEndDate()));
+
+							lastSaved = metrics.getModifyDate();
+
+							if (lastSaved == null) {
+								lastSaved = metrics.getCreateDate();
+							}
+
+							reportRow.setLastSaved(lastSaved);
+							reportRow.setMetricId(metrics.getId());
+
+							// populate reply
+							reply.addProjectDetailMetrics(reportRow);
+						}
+					} else {
+						// No results found
+						reply.setErrorMessage("No results found.");
+					}
+				}
+			}
+
+			TextHelper.logMessage("getProjectDetailMetricsReport() > Time taken : "
+					+ ((System.nanoTime() - time) / 1000000));
+
+			// commit the transaction
+			transaction.commit();
+		} catch (HibernateException hibernateException) {
+
+			// rollback transaction
+			if (transaction != null) {
+				transaction.rollback();
+			}
+
+			hibernateException.printStackTrace();
+
+			// create a reply for error message
+			reply.setErrorMessage("Search failed due to Technical Reasons.");
+
+		} finally {
+			// close the session
+			if (session != null) {
+				session.close();
+			}
+		}
+
+		return reply;
+
 	}
 }
