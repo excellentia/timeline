@@ -2,8 +2,8 @@
 <!DOCTYPE hibernate-mapping PUBLIC 
 "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<hibernate-mapping schema="TIMELINE_SCHEMA">
-	<class name="org.ag.timeline.business.model.Project" table="PROJECT_T" dynamic-update="true" dynamic-insert="true">
+<hibernate-mapping schema="TIMELINE_SCHEMA" package="org.ag.timeline.business.model">
+	<class name="Project" table="PROJECT_T" dynamic-update="true" dynamic-insert="true">
 
 		<id name="id" type="java.lang.Long" column="ID">
 			<generator class="sequence">
@@ -11,20 +11,19 @@
 			</generator>
 		</id>
 
-		<property name="name" type="string" not-null="true">
-			<column name="NAME" />
-		</property>
+		<property name="name" type="string" not-null="true" column="NAME" />
+		<property name="active" type="boolean" column="ACTIVE" />
 
-		<property name="active" type="boolean">
-			<column name="ACTIVE" />
-		</property>
-
-		<many-to-one name="lead" class="org.ag.timeline.business.model.User" column="LEAD_ID" cascade="none" />
+		<many-to-one name="lead" class="User" column="LEAD_ID" cascade="none" />
 
 		<set name="activities" cascade="all" inverse="true">
-			<key column="PROJECT_ID" />
-			<one-to-many class="org.ag.timeline.business.model.Activity" />
+			<key column="PROJECT_ID" not-null="true"/>
+			<one-to-many class="Activity" />
 		</set>
+		
+		<property name="budgetAtCompletion" type="java.math.BigDecimal" column="BAC" />
+		<property name="startDate" type="java.util.Date" not-null="true" column="START_DATE" />
+		<property name="endDate" type="java.util.Date" not-null="true" column="END_DATE" />
 
 		<property name="createUserId" type="java.lang.Long" column="CREATE_USER" not-null="true" />
 		<property name="createDate" type="java.util.Date" not-null="true" column="CREATE_DATE" />
