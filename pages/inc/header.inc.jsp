@@ -10,6 +10,7 @@
 		<script type="text/javascript"  src="./pages/inc/jquery/jquery-1.8.2.min.js" ></script>
 		<script type="text/javascript" src="./pages/inc/jquery/jquery-ui-1.8.24.custom.min.js" ></script>
 		<script type="text/javascript" src="./pages/inc/js/timeline.js" ></script>
+		<script type="text/javascript" src="./pages/inc/js/${pageScriptName}.js" ></script>
 		<title>${pageTitle}</title>
 	</head>
 	<body>
