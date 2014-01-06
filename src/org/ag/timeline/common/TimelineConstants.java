@@ -6,7 +6,7 @@ package org.ag.timeline.common;
  * @author Abhishek Gaurav
  */
 public interface TimelineConstants {
-	
+
 	public String DOT = ".";
 
 	public String EMPTY = "";
@@ -39,7 +39,6 @@ public interface TimelineConstants {
 		}
 	}
 
-	
 	public static enum RequestType {
 		GET, POST;
 
@@ -57,7 +56,11 @@ public interface TimelineConstants {
 	}
 
 	public static enum AuditDataType {
-		PROJECT(1, "Project Data"), ACTIVITY(2, "Activity Data"), TIME_DATA(3, "Time Entry Data"), USER(4, "User Data");
+		PROJECT(1, "Project Data"),
+		ACTIVITY(2, "Activity Data"),
+		TIME_DATA(3, "Time Entry Data"),
+		USER(4, "User Data"),
+		METRICS(5, "Metrics");
 
 		private final int typeId;
 
@@ -137,6 +140,8 @@ public interface TimelineConstants {
 		activityId,
 		weekStartDate,
 		weekEndDate,
+		weekStartYear,
+		weekEndYear,
 		startYear,
 		endYear,
 		startWeekNum,
@@ -149,7 +154,19 @@ public interface TimelineConstants {
 		day4,
 		day5,
 		day6,
-		day7;
+		day7,
+		metricId,
+		bac,
+		startDate,
+		endDate,
+		pv,
+		ev,
+		ac,
+		atd,
+		spe,
+		bug,
+		taskId,
+		note;
 
 		public static final AjaxRequestParam getParam(String text) {
 			AjaxRequestParam type = null;
@@ -177,6 +194,7 @@ public interface TimelineConstants {
 		PROJECT(false),
 		ACTIVTIES(false),
 		LEAD(false),
+		TASKS(false),
 		SAVE_PROJECT(true),
 		SAVE_PROJECT_STATUS(true),
 		SAVE_ACTIVITY(true),
@@ -193,7 +211,14 @@ public interface TimelineConstants {
 		MODIFY_USER_PREF(false),
 		SEARCH_ENTRIES(false),
 		REPORT_DETAIL(false),
-		SEARCH_USERS_WITHOUT_ENTRIES(false);
+		SEARCH_USERS_WITHOUT_ENTRIES(false),
+		SEARCH_PROJECT_METRICS(true),
+		SEARCH_PROJECT_DETAIL_METRICS(true),
+		SAVE_METRIC_DETAILS(true),
+		DELETE_METRIC_DETAILS(true),
+		SEARCH_ESTIMATES(true),
+		SAVE_ESTIMATES(true),
+		DELETE_ALL_METRICS(true);
 
 		/**
 		 * Denotes if an operation can be done by admin only.
@@ -267,7 +292,7 @@ public interface TimelineConstants {
 
 	public static enum UserPrefDataFieldType {
 
-		QUESTION, ANSWER;
+		QUESTION, ANSWER, EMAIL;
 
 		public static final UserPrefDataFieldType getType(String text) {
 			UserPrefDataFieldType type = null;
