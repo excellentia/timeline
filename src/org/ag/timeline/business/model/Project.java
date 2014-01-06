@@ -3,6 +3,8 @@
  */
 package org.ag.timeline.business.model;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,6 +22,12 @@ public class Project extends AbstractModel {
 	private Set<Activity> activities = null;
 
 	private boolean active = false;
+
+	private BigDecimal budgetAtCompletion = null;
+
+	private Date startDate = null;
+
+	private Date endDate = null;
 
 	/**
 	 * Getter for name.
@@ -128,6 +136,76 @@ public class Project extends AbstractModel {
 		this.active = active;
 	}
 
+	/**
+	 * Getter for budgetAtCompletion.
+	 * 
+	 * @return the budgetAtCompletion.
+	 */
+	public BigDecimal getBudgetAtCompletion() {
+		return this.budgetAtCompletion;
+	}
+
+	/**
+	 * Setter for budgetAtCompletion.
+	 * 
+	 * @param budgetAtCompletion the budgetAtCompletion to set.
+	 */
+	public void setBudgetAtCompletion(BigDecimal budgetAtCompletion) {
+		this.budgetAtCompletion = budgetAtCompletion;
+	}
+
+	/**
+	 * Getter for startDate.
+	 * 
+	 * @return the startDate.
+	 */
+	public Date getStartDate() {
+		return this.startDate;
+	}
+
+	/**
+	 * Setter for startDate.
+	 * 
+	 * @param startDate the startDate to set.
+	 */
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+
+	/**
+	 * Getter for endDate.
+	 * 
+	 * @return the endDate.
+	 */
+	public Date getEndDate() {
+		return this.endDate;
+	}
+
+	/**
+	 * Setter for endDate.
+	 * 
+	 * @param endDate the endDate to set.
+	 */
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+	
+	/**
+	 * Business method for lead name.
+	 * 
+	 * @return Lead name, Null if not set.
+	 */
+	public String getLeadName() {
+		
+		String leadName = null;
+		
+		if (this.lead != null) {
+			leadName = this.lead.getUserName();
+		}
+		
+		return leadName;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -140,6 +218,12 @@ public class Project extends AbstractModel {
 		builder.append(", name=");
 		builder.append(name);
 		builder.append(", leadName=");
+		builder.append(", budgetAtCompletion=");
+		builder.append(budgetAtCompletion);
+		builder.append(", startDate=");
+		builder.append(startDate);
+		builder.append(", endDate=");
+		builder.append(endDate);
 
 		if (this.lead != null) {
 			builder.append(lead.getUserName());
