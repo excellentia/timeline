@@ -566,9 +566,9 @@ function editUser(userElmId, userDbId) {
 	row.cells[2].innerHTML = field;
 	row.cells[2].children[0].value = oldValue;
 
-	var adminHTML = "<input type='checkbox' ";
+	var adminHTML = "<input type='checkbox' title='Toggle Admin Status'";
 	row.cells[3].align = "center";
-
+	
 	if (row.cells[3].children[0] != null) {
 		adminHTML = adminHTML + "checked ='true'";
 	}
@@ -579,7 +579,7 @@ function editUser(userElmId, userDbId) {
 	var saveHTML = "<img alt='Save' align='middle' class='icon' title='Save This Text' src='" + saveIcon
 	        + "' onclick=\"saveUser('" + userElmId + "'," + userDbId + ")\" />";
 
-	row.cells[4].innerHTML = saveHTML;
+	row.cells[5].innerHTML = saveHTML;
 }
 
 /**
@@ -601,7 +601,8 @@ function saveUser(userElmId, userDbId) {
 		var userId = userRow.children[0].children[0].value;
 		var fName = userRow.children[1].children[0].value;
 		var lName = userRow.children[2].children[0].value;
-
+		var userStatus = userRow.children[4].children[0].value;
+		
 		if ((userId != "") && (fName != "") && (lName != "")) {
 			$.post(JSON_URL, {
 				operation : "SAVE_USER",
@@ -638,7 +639,15 @@ function saveUser(userElmId, userDbId) {
 					
 					
 					var userStatusId = "user_status_"+jsonData.id; 
-					var statusHTML = "<input id='"+userStatusId+"' type='checkbox' checked='checked' onchange=\"toggleUserStatus(" +jsonData.id+"'"+userStatusId+ "')\" />";
+					var statusHTML = "<input id='"+userStatusId+"' type='checkbox'";
+					
+					if (userStatus == true) {
+						statusHTML = statusHTML + " checked='checked' onchange=\"toggleUserStatus(" +jsonData.id+"'"+userStatusId+ "')\" />";
+					} else {
+						statusHTML = statusHTML + " onchange=\"toggleUserStatus(" +jsonData.id+"'"+userStatusId+ "')\" />";
+					}
+					
+					
 					userRow.children[4].innerHTML = statusHTML;
 
 					var editHTML = "<img alt='Edit' align='middle' class='icon' title='" + editTitle + "' src='"
