@@ -8,9 +8,16 @@ package org.ag.timeline.presentation.transferobject.search;
 public class ReportSearchParameters {
 
 	private long userDbId = 0;
+
 	private long projectDbId = 0;
+
 	private long activityDbId = 0;
+
 	private boolean searchAllData = false;
+
+	private boolean searchOnlyActiveProjects = false;
+
+	private boolean searchOnlyActiveUsers = false;
 
 	/**
 	 * Getter for userDbId.
@@ -84,17 +91,63 @@ public class ReportSearchParameters {
 		this.searchAllData = searchAllData;
 	}
 
+	/**
+	 * Getter for searchOnlyActiveProjects.
+	 * 
+	 * @return the searchOnlyActiveProjects.
+	 */
+	public boolean isSearchOnlyActiveProjects() {
+		return this.searchOnlyActiveProjects;
+	}
+
+	/**
+	 * Setter for searchOnlyActiveProjects.
+	 * 
+	 * @param searchOnlyActiveProjects the searchOnlyActiveProjects to set.
+	 */
+	public void setSearchOnlyActiveProjects(boolean searchOnlyActiveProjects) {
+		this.searchOnlyActiveProjects = searchOnlyActiveProjects;
+	}
+
+	/**
+	 * Getter for searchOnlyActiveUsers.
+	 * 
+	 * @return the searchOnlyActiveUsers.
+	 */
+	public boolean isSearchOnlyActiveUsers() {
+		return this.searchOnlyActiveUsers;
+	}
+
+	/**
+	 * Setter for searchOnlyActiveUsers.
+	 * 
+	 * @param searchOnlyActiveUsers the searchOnlyActiveUsers to set.
+	 */
+	public void setSearchOnlyActiveUsers(boolean searchOnlyActiveUsers) {
+		this.searchOnlyActiveUsers = searchOnlyActiveUsers;
+	}
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("ReportSearchParameters [userDbId=").append(userDbId).append(", projectDbId=")
-				.append(projectDbId).append(", activityDbId=").append(activityDbId).append(", searchAllData=")
-				.append(searchAllData).append("]");
+		builder.append("ReportSearchParameters [userDbId=");
+		builder.append(userDbId);
+		builder.append(", projectDbId=");
+		builder.append(projectDbId);
+		builder.append(", activityDbId=");
+		builder.append(activityDbId);
+		builder.append(", searchAllData=");
+		builder.append(searchAllData);
+		builder.append(", searchOnlyActiveProjects=");
+		builder.append(searchOnlyActiveProjects);
+		builder.append(", searchOnlyActiveUsers=");
+		builder.append(searchOnlyActiveUsers);
+		builder.append("]");
 		return builder.toString();
 	}
+
 }
