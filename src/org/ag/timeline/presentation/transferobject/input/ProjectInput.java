@@ -7,6 +7,8 @@ public class ProjectInput extends AbstractTimelineInput {
 
 	private Project project = null;
 
+	private long copyProjectId = 0;
+
 	/**
 	 * Default Constructor.
 	 */
@@ -27,7 +29,8 @@ public class ProjectInput extends AbstractTimelineInput {
 	/**
 	 * Setter for projectId.
 	 * 
-	 * @param id the projectId to set.
+	 * @param id
+	 *            the projectId to set.
 	 */
 	public void setProjectId(long id) {
 		this.project.setId(id);
@@ -45,7 +48,8 @@ public class ProjectInput extends AbstractTimelineInput {
 	/**
 	 * Setter for leadId.
 	 * 
-	 * @param leadId the leadId to set
+	 * @param leadId
+	 *            the leadId to set
 	 */
 	public void setLeadId(long leadId) {
 		this.project.getLead().setId(leadId);
@@ -63,7 +67,8 @@ public class ProjectInput extends AbstractTimelineInput {
 	/**
 	 * Setter for newLabelText.
 	 * 
-	 * @param newLabelText the newLabelText to set
+	 * @param newLabelText
+	 *            the newLabelText to set
 	 */
 	public void setNewLabelText(String newLabelText) {
 		this.project.setName(newLabelText);
@@ -81,20 +86,37 @@ public class ProjectInput extends AbstractTimelineInput {
 	/**
 	 * Setter for active.
 	 * 
-	 * @param active the active to set.
+	 * @param active
+	 *            the active to set.
 	 */
 	public void setActive(boolean active) {
 		this.project.setActive(active);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	/**
+	 * @return the copyProjectId
 	 */
+	public long getCopyProjectId() {
+		return copyProjectId;
+	}
+
+	/**
+	 * @param copyProjectId
+	 *            the copyProjectId to set
+	 */
+	public void setCopyProjectId(long copyProjectId) {
+		this.copyProjectId = copyProjectId;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("ProjectInput [").append(project).append("]");
+		builder.append("ProjectInput [project=");
+		builder.append(project);
+		builder.append(", copyProjectId=");
+		builder.append(copyProjectId);
+		builder.append("]");
 		return builder.toString();
 	}
+
 }
