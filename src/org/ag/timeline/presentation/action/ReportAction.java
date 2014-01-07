@@ -30,6 +30,8 @@ public class ReportAction extends SecureBaseAction {
 			searchParameters.setProjectDbId(projectId);
 			searchParameters.setActivityDbId(activityId);
 			searchParameters.setUserDbId(userId);
+			searchParameters.setSearchOnlyActiveProjects(true);
+			searchParameters.setSearchOnlyActiveUsers(true);
 
 			if ((projectId <= 0) && (activityId <= 0) && (userId <= 0)) {
 				searchParameters.setSearchAllData(Boolean.TRUE);
