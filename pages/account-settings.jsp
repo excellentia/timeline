@@ -55,7 +55,7 @@
 					<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" onclick="editAccountSettings('ANSWER',${userId})" /></td>
 				</tr>
 				<tr id="EMAIL">
-					<td class="label">Email</td>
+					<td class="label">Enterprise Id</td>
 					<td class="data">${preferences.email}</td>
 					<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}" onclick="editAccountSettings('EMAIL',${userId})" /></td>
 				</tr>
