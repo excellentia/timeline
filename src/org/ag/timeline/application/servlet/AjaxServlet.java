@@ -453,9 +453,9 @@ public class AjaxServlet extends HttpServlet {
 
 	private void saveProject(HttpServletRequest request, HttpServletResponse response) {
 
-		long id = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.id.getParamText()));
-		String projectText = TextHelper.trimToNull(request.getParameter(TimelineConstants.AjaxRequestParam.text
-				.getParamText()));
+		final long id = getLongRequestValue(TimelineConstants.AjaxRequestParam.id, request);
+		final long copyProjectId  = getLongRequestValue(TimelineConstants.AjaxRequestParam.refId, request);
+		final String projectText = getStringRequestValue(TimelineConstants.AjaxRequestParam.text, request);
 		PrintWriter out = null;
 
 		if (projectText != null) {
@@ -463,6 +463,7 @@ public class AjaxServlet extends HttpServlet {
 			ProjectInput input = new ProjectInput();
 			input.setNewLabelText(projectText);
 			input.setProjectId(id);
+			input.setCopyProjectId(copyProjectId);
 
 			// set the status as Active by default
 			input.setActive(Boolean.TRUE);
@@ -493,9 +494,8 @@ public class AjaxServlet extends HttpServlet {
 	private void saveEntityStatus(HttpServletRequest request, HttpServletResponse response,
 			final TimelineConstants.StatusEntity entity) {
 
-		long id = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.id.getParamText()));
-		final String statusText = TextHelper.trimToNull(request.getParameter(TimelineConstants.AjaxRequestParam.status
-				.getParamText()));
+		long id = getLongRequestValue(TimelineConstants.AjaxRequestParam.id, request);
+		final String statusText = getStringRequestValue(TimelineConstants.AjaxRequestParam.status,request);
 
 		PrintWriter out = null;
 
@@ -849,8 +849,7 @@ public class AjaxServlet extends HttpServlet {
 
 	private void saveUser(HttpServletRequest request, HttpServletResponse response) {
 
-		final long id = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.id
-				.getParamText()));
+		final long id = getLongRequestValue(TimelineConstants.AjaxRequestParam.id, request);
 		PrintWriter out = null;
 		UserReply reply = null;
 
@@ -959,15 +958,12 @@ public class AjaxServlet extends HttpServlet {
 
 	private void saveTimeEntry(HttpServletRequest request, HttpServletResponse response) {
 
-		long projectId = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.projectId
-				.getParamText()));
-		long activityId = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.activityId
-				.getParamText()));
+		long projectId = getLongRequestValue(TimelineConstants.AjaxRequestParam.projectId, request);
+		long activityId = getLongRequestValue(TimelineConstants.AjaxRequestParam.activityId, request);
 
 		if ((projectId > 0) && (activityId > 0)) {
 
-			long entryId = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.entryId
-					.getParamText()));
+			long entryId = getLongRequestValue(TimelineConstants.AjaxRequestParam.entryId, request);
 
 			long userId = 0;
 			User user = getSessionUser(request);
@@ -976,26 +972,17 @@ public class AjaxServlet extends HttpServlet {
 				userId = user.getId();
 			}
 
-			long proxiedUserDbId = TextHelper.getLongValue(request
-					.getParameter(TimelineConstants.AjaxRequestParam.proxiedUserDbId.getParamText()));
+			long proxiedUserDbId = getLongRequestValue(TimelineConstants.AjaxRequestParam.proxiedUserDbId, request);
 
-			Date weekStartDate = TextHelper.getValidDate(request
-					.getParameter(TimelineConstants.AjaxRequestParam.weekStartDate.getParamText()));
+			Date weekStartDate = getDateRequestValue(TimelineConstants.AjaxRequestParam.weekStartDate, request);
 
-			double day1 = TextHelper.getDoubleValue(request.getParameter(TimelineConstants.AjaxRequestParam.day1
-					.getParamText()));
-			double day2 = TextHelper.getDoubleValue(request.getParameter(TimelineConstants.AjaxRequestParam.day2
-					.getParamText()));
-			double day3 = TextHelper.getDoubleValue(request.getParameter(TimelineConstants.AjaxRequestParam.day3
-					.getParamText()));
-			double day4 = TextHelper.getDoubleValue(request.getParameter(TimelineConstants.AjaxRequestParam.day4
-					.getParamText()));
-			double day5 = TextHelper.getDoubleValue(request.getParameter(TimelineConstants.AjaxRequestParam.day5
-					.getParamText()));
-			double day6 = TextHelper.getDoubleValue(request.getParameter(TimelineConstants.AjaxRequestParam.day6
-					.getParamText()));
-			double day7 = TextHelper.getDoubleValue(request.getParameter(TimelineConstants.AjaxRequestParam.day7
-					.getParamText()));
+			double day1 = getDoubleRequestValue(TimelineConstants.AjaxRequestParam.day1, request);
+			double day2 = getDoubleRequestValue(TimelineConstants.AjaxRequestParam.day2, request);
+			double day3 = getDoubleRequestValue(TimelineConstants.AjaxRequestParam.day3, request);
+			double day4 = getDoubleRequestValue(TimelineConstants.AjaxRequestParam.day4, request);
+			double day5 = getDoubleRequestValue(TimelineConstants.AjaxRequestParam.day5, request);
+			double day6 = getDoubleRequestValue(TimelineConstants.AjaxRequestParam.day6, request);
+			double day7 = getDoubleRequestValue(TimelineConstants.AjaxRequestParam.day7, request);
 
 			TimeDataInput myTimeData = new TimeDataInput();
 
@@ -1055,26 +1042,17 @@ public class AjaxServlet extends HttpServlet {
 
 		// populate search parameters
 		{
-			weekStartDate = TextHelper.getValidDate(request
-					.getParameter(TimelineConstants.AjaxRequestParam.weekStartDate.getParamText()));
-			weekEndDate = TextHelper.getValidDate(request.getParameter(TimelineConstants.AjaxRequestParam.weekEndDate
-					.getParamText()));
-			projectId = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.projectId
-					.getParamText()));
-			activityId = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.activityId
-					.getParamText()));
-			userDbId = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.userDbId
-					.getParamText()));
+			weekStartDate = getDateRequestValue(TimelineConstants.AjaxRequestParam.weekStartDate, request);
+			weekEndDate = getDateRequestValue(TimelineConstants.AjaxRequestParam.weekEndDate, request);
+			projectId = getLongRequestValue(TimelineConstants.AjaxRequestParam.projectId, request);
+			activityId = getLongRequestValue(TimelineConstants.AjaxRequestParam.activityId, request);
+			userDbId = getLongRequestValue(TimelineConstants.AjaxRequestParam.userDbId, request);
 
-			startWeekNum = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.startWeekNum
-					.getParamText()));
-			startYear = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.startYear
-					.getParamText()));
+			startWeekNum = getLongRequestValue(TimelineConstants.AjaxRequestParam.startWeekNum, request);
+			startYear = getLongRequestValue(TimelineConstants.AjaxRequestParam.startYear, request);
 
-			endWeekNum = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.endWeekNum
-					.getParamText()));
-			endYear = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.endYear
-					.getParamText()));
+			endWeekNum = getLongRequestValue(TimelineConstants.AjaxRequestParam.endWeekNum, request);
+			endYear = getLongRequestValue(TimelineConstants.AjaxRequestParam.endYear, request);
 
 			User user = getSessionUser(request);
 
@@ -1144,10 +1122,8 @@ public class AjaxServlet extends HttpServlet {
 	private void searchUsersWithoutEntries(HttpServletRequest request, HttpServletResponse response) {
 
 		// populate search parameters
-		Date startDate = TextHelper.getValidDate(request
-				.getParameter(TimelineConstants.AjaxRequestParam.weekStartDate.getParamText()));
-		Date endDate = TextHelper.getValidDate(request.getParameter(TimelineConstants.AjaxRequestParam.weekEndDate
-				.getParamText()));
+		Date startDate = getDateRequestValue(TimelineConstants.AjaxRequestParam.weekStartDate, request);
+		Date endDate = getDateRequestValue(TimelineConstants.AjaxRequestParam.weekEndDate, request);
 
 		// start search
 
@@ -1187,8 +1163,7 @@ public class AjaxServlet extends HttpServlet {
 	 */
 	private void getReportDetails(HttpServletRequest request, HttpServletResponse response) {
 
-		long projectId = TextHelper.getLongValue(request.getParameter(TimelineConstants.AjaxRequestParam.projectId
-				.getParamText()));
+		long projectId = getLongRequestValue(TimelineConstants.AjaxRequestParam.projectId, request);
 
 		if (projectId > 0) {
 
