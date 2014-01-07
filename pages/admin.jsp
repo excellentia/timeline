@@ -76,8 +76,15 @@
 		</h3>
 		<div>
 			<div id="searchBar">
-				<input type="text" class="projectSearch" id="newProject" name="newProject" title="Enter New Project Name" maxlength="20" /> 
-				<input type="button" value="Create Project" class="button"	onclick="saveProject('projectSection',0, 'newProject')" />
+				<input type="text" class="projectSearch" id="newProject" name="newProject" title="Enter New Project Name" maxlength="20" />
+				&nbsp;&nbsp;Copy From
+				<select id="copyProjId" size="1" class="dateSearch" title="Copy Activities From Project">
+					<option value="0" selected="selected">Select A Project</option>
+					<c:forEach var="project" items="${PROJECT_LIST.projects}">
+						<option value="${project.code}">${project.value}</option>
+					</c:forEach>
+				</select> 
+				<input type="button" value="Create Project" class="button"	onclick="saveProject('projectSection',0, 'newProject','copyProjId')" />
 			</div>
 			<div id="projectSection">
 				<c:if test="${(projectReply != null) && (projectReply.projects != null) && (projectReply.projects.size() > 0)}">
