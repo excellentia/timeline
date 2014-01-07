@@ -35,7 +35,8 @@
 						<th>First Name</th>
 						<th>Last Name</th>
 						<th>Admin</th>
-						<th colspan="4">&nbsp;</th>
+						<th>Active</th>
+						<th colspan="3">&nbsp;</th>
 					</tr>
 				</thead>
 				<c:if test="${(userReply!= null) && (userReply.users != null) && (userReply.users.size() > 0)}">
@@ -118,7 +119,7 @@
 							<tfoot>
 								<tr>
 									<c:set var="statusId" value= "project_status_${project.code}" />
-									<td align="left">
+									<td align="left" title="Toggle Project Status">
 										&nbsp;Active&nbsp;<input id="${statusId}" type='checkbox' value='${project.active}' <c:if test="${project.active}">checked="checked"</c:if> onchange="toggleProjectStatus(${project.code},'${statusId}','${projTitleId}')" />
 									</td>
 									<c:remove var="statusId"/>
