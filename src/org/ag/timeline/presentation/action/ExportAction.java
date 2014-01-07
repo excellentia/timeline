@@ -207,16 +207,21 @@ public class ExportAction extends SecureBaseAction {
 	private void exportTimeEntries() throws Exception {
 
 		TimeDataSearchParameters searchParameters = new TimeDataSearchParameters();
-		
+
 		Date startDate = TextHelper.getValidDate(this.exportStartDate);
 		Date endDate = TextHelper.getValidDate(this.exportEndDate);
-		
+
 		if (startDate == null) {
 			startDate = TextHelper.getFirstDayOfWeek(new Date());
 		}
-		
+
 		if (endDate == null) {
 			endDate = TextHelper.getFirstDayOfWeek(new Date());
+		}
+
+		// rows for current user, if not admin
+		if (!super.isSessionUserAdmin()) {
+			this.exportUserDbId = super.getSessionUserId();
 		}
 
 		searchParameters.setActivityid(this.exportActivityId);
