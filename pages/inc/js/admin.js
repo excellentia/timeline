@@ -332,19 +332,30 @@ function toggleUserStatus(userDbId, inputId, userRowId) {
  * @param projDbId
  * @param projNameId
  */
-function saveProject(divID, projDbId, projNameId) {
+function saveProject(divID, projDbId, projNameId, copyProjElmId) {
 
 	var projText = $("#" + projNameId).val();
 
 	if (projText != "") {
 		var jsonData = null;
+		
+		var copyProj = document.getElementById(copyProjElmId);
+		var copyProjId = 0;
+
+		for ( var i = 0; i < copyProj.options.length; i++) {
+			if (copyProj.options[i].selected) {
+				copyProjId = copyProj.options[i].value;
+				break;
+			}
+		}
 
 	$.post(
 		JSON_URL,
 		{
 			operation : "SAVE_PROJECT",
 			id : projDbId,
-			text : projText
+			text : projText,
+			refId : copyProjId
 		},
 		function(data) {
 		jsonData = data;
@@ -396,6 +407,8 @@ function saveProject(divID, projDbId, projNameId) {
 					+ "' onclick=\"editProject('" + divID + "'," + projectId + ")\" />";
 				row.cells[1].innerHTML = editHTML;
 			}
+			
+			displayAlert("Project Created");
 		}
 	 }, JSON_RESULT_TYPE);
 	} else {
