@@ -1087,9 +1087,11 @@ public class TimelineServiceImpl implements TimelineService {
 			Set<Long> activityIdSet = new HashSet<Long>();
 			Set<Long> userIdSet = new HashSet<Long>();
 
-			long searchProjectId = searchParameters.getProjectDbId();
-			long searchActivityId = searchParameters.getActivityDbId();
-			long searchUserId = searchParameters.getUserDbId();
+			final long searchProjectId = searchParameters.getProjectDbId();
+			final long searchActivityId = searchParameters.getActivityDbId();
+			final long searchUserId = searchParameters.getUserDbId();
+			final boolean searchActiveProjects = searchParameters.isSearchOnlyActiveProjects();
+			final boolean searchActiveUsers = searchParameters.isSearchOnlyActiveUsers();
 
 			// get activity aggregates
 			{
@@ -1097,12 +1099,25 @@ public class TimelineServiceImpl implements TimelineService {
 				builder.append(" , sum(data_weekday_1+data_weekday_2+data_weekday_3+data_weekday_4+data_weekday_5+data_weekday_6+data_weekday_7) ");
 				builder.append(" FROM TimeData ");
 
+				boolean whereUsed = false;
+
+				if (searchActiveProjects) {
+					builder.append(" WHERE ");
+					builder.append(" project.active = ").append(true);
+					whereUsed = true;
+				}
+
 				if (!searchParameters.isSearchAllData()) {
 
-					boolean whereUsed = false;
-
 					if (searchProjectId > 0) {
-						builder.append(" WHERE ");
+
+						if (whereUsed) {
+							builder.append(" AND ");
+						} else {
+							builder.append(" WHERE ");
+							whereUsed = true;
+						}
+
 						builder.append(" project.id = ").append(searchProjectId);
 						whereUsed = true;
 					}
@@ -1182,11 +1197,24 @@ public class TimelineServiceImpl implements TimelineService {
 				builder.append(" , sum(data_weekday_1+data_weekday_2+data_weekday_3+data_weekday_4+data_weekday_5+data_weekday_6+data_weekday_7) ");
 				builder.append(" FROM TimeData ");
 
+				boolean whereUsed = false;
+
+				if (searchActiveProjects) {
+					builder.append(" WHERE ");
+					builder.append(" project.active = ").append(true);
+					whereUsed = true;
+				}
+
 				if (!searchParameters.isSearchAllData()) {
-					boolean whereUsed = false;
 
 					if (searchProjectId > 0) {
-						builder.append(" WHERE ");
+
+						if (whereUsed) {
+							builder.append(" AND ");
+						} else {
+							builder.append(" WHERE ");
+						}
+
 						builder.append(" project.id = ").append(searchProjectId);
 						whereUsed = true;
 					}
@@ -1269,6 +1297,11 @@ public class TimelineServiceImpl implements TimelineService {
 				// fetch all project & activity names
 				{
 					Criteria criteria = session.createCriteria(Project.class);
+
+					if (searchActiveProjects) {
+						criteria.add(Restrictions.eq("active", Boolean.TRUE));
+					}
+
 					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 					@SuppressWarnings("unchecked")
@@ -1291,6 +1324,11 @@ public class TimelineServiceImpl implements TimelineService {
 				// fetch all user names
 				{
 					Criteria criteria = session.createCriteria(User.class);
+
+					if (searchActiveUsers) {
+						criteria.add(Restrictions.eq("active", Boolean.TRUE));
+					}
+
 					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 					@SuppressWarnings("unchecked")
