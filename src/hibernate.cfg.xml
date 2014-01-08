@@ -24,8 +24,11 @@
 		<mapping resource="org/ag/timeline/business/model/Project.hbm.xml" />
 		<mapping resource="org/ag/timeline/business/model/Activity.hbm.xml" />
 		<mapping resource="org/ag/timeline/business/model/TimeData.hbm.xml" />
-		<mapping resource="org/ag/timeline/business/model/ProjectMetrics.hbm.xml" />
 		<mapping resource="org/ag/timeline/business/model/Task.hbm.xml" />
+		<mapping resource="org/ag/timeline/business/model/Stage.hbm.xml" />
+		<mapping resource="org/ag/timeline/business/model/ProjectStage.hbm.xml" />
+		<mapping resource="org/ag/timeline/business/model/ProjectStageTask.hbm.xml" />
+		<mapping resource="org/ag/timeline/business/model/ProjectMetrics.hbm.xml" />
 		<mapping resource="org/ag/timeline/business/model/AuditRecord.hbm.xml" />
 		<mapping resource="org/ag/timeline/business/model/AuditRecordDetail.hbm.xml" />
 

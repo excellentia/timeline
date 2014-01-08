@@ -62,6 +62,52 @@ public class ModelTest {
 		return project;
 	}
 
+	protected Task createTask(Project project, String text, Session session) {
+		Task task = new Task();
+		task.setProject(project);
+		task.setTaskText(text);
+
+		populateCreationInfo(task);
+		saveOrUpdate(session, task);
+
+		return task;
+	}
+
+	protected Stage createStage(String name, Session session) {
+		Stage stage = new Stage();
+		stage.setName(name);
+		populateCreationInfo(stage);
+		saveOrUpdate(session, stage);
+
+		return stage;
+	}
+
+	protected ProjectStage createProjectStage(Project project, Stage stage, long position, Session session) {
+
+		ProjectStage projectStage = new ProjectStage();
+		projectStage.setPosition(position);
+		projectStage.setProject(project);
+		projectStage.setStage(stage);
+
+		populateCreationInfo(projectStage);
+		saveOrUpdate(session, projectStage);
+
+		return projectStage;
+	}
+	
+	protected ProjectStageTask createProjectStageTask(ProjectStage projectStage, Task task, long position, Session session) {
+
+		ProjectStageTask projectStageTask = new ProjectStageTask();
+		projectStageTask.setPosition(position);
+		projectStageTask.setProjectStage(projectStage);
+		projectStageTask.setTask(task);
+
+		populateCreationInfo(projectStageTask);
+		saveOrUpdate(session, projectStageTask);
+
+		return projectStageTask;
+	}
+
 	protected Activity createActivity(String text, Project project, Session session) {
 		Activity activity = new Activity();
 		activity.setName(text);
@@ -213,7 +259,7 @@ public class ModelTest {
 
 		User user = createUser("Abhishek", "Gaurav", session);
 		UserPreferences preferences = createUserPreferences(user, "Company", "Accenture", session);
-		
+
 		transaction.commit();
 
 		Assert.assertTrue(preferences.getId() > 0);
@@ -248,7 +294,6 @@ public class ModelTest {
 	}
 
 	@Test
-	@Ignore
 	public void ProjectMetricsTest() {
 		transaction = session.beginTransaction();
 
@@ -273,5 +318,56 @@ public class ModelTest {
 
 		Assert.assertTrue(metrics.getId() > 0);
 		System.out.println(metrics);
+	}
+
+	@Test
+	public void stageTest() {
+
+		transaction = session.beginTransaction();
+
+		Stage stage = createStage("Test", session);
+		session.saveOrUpdate(stage);
+
+		transaction.commit();
+
+		Assert.assertTrue(stage.getId() > 0);
+
+	}
+
+	@Test
+	public void projectStageTest() {
+
+		transaction = session.beginTransaction();
+
+		Stage stage = createStage("Test", session);
+		Project project = createProject("Project", session);
+
+		ProjectStage projectStage = createProjectStage(project, stage, 1, session);
+		session.saveOrUpdate(projectStage);
+
+		transaction.commit();
+
+		Assert.assertTrue(projectStage.getId() > 0);
+
+	}
+
+	@Test
+	public void projectStageTaskTest() {
+
+		transaction = session.beginTransaction();
+
+		Stage stage = createStage("Stage", session);
+		Project project = createProject("Project", session);
+		ProjectStage projectStage = createProjectStage(project, stage, 1, session);
+		
+		Task task = createTask(project, "Task", session);
+
+		ProjectStageTask projectStageTask = createProjectStageTask(projectStage, task, 1, session);
+
+		session.saveOrUpdate(projectStageTask);
+		transaction.commit();
+
+		Assert.assertTrue(projectStageTask.getId() > 0);
+
 	}
 }

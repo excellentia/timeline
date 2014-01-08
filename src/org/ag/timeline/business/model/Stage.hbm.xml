@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping schema="TIMELINE_SCHEMA" package="org.ag.timeline.business.model">
+	<class name="Stage" table="STAGE_T" dynamic-update="true" dynamic-insert="true">
+
+		<id name="id" type="java.lang.Long" column="ID">
+			<generator class="sequence">
+				<param name="sequence">STAGE_S</param>
+			</generator>
+		</id>
+
+		<property name="name" type="string" not-null="true" column="NAME" />
+
+		<property name="createUserId" type="java.lang.Long" column="CREATE_USER" not-null="true" />
+		<property name="createDate" type="java.util.Date" not-null="true" column="CREATE_DATE" />
+		<property name="modifyUserId" type="java.lang.Long" column="MODIFY_USER" />
+		<property name="modifyDate" type="java.util.Date" column="MODIFY_DATE" />
+
+	</class>
+</hibernate-mapping>
