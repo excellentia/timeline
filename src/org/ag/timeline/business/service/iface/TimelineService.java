@@ -9,6 +9,8 @@ import org.ag.timeline.presentation.transferobject.input.CodeValueInput;
 import org.ag.timeline.presentation.transferobject.input.ProjectEstimatesInput;
 import org.ag.timeline.presentation.transferobject.input.ProjectInput;
 import org.ag.timeline.presentation.transferobject.input.ProjectMetricsInput;
+import org.ag.timeline.presentation.transferobject.input.ProjectStageInput;
+import org.ag.timeline.presentation.transferobject.input.ProjectStageTaskInput;
 import org.ag.timeline.presentation.transferobject.input.StatusInput;
 import org.ag.timeline.presentation.transferobject.input.TimeDataInput;
 import org.ag.timeline.presentation.transferobject.input.UserInput;
@@ -35,7 +37,9 @@ import org.ag.timeline.presentation.transferobject.search.AuditDataSearchParamet
 import org.ag.timeline.presentation.transferobject.search.ProjectDetailMetricsSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.ProjectMetricsSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.ProjectSearchParameter;
+import org.ag.timeline.presentation.transferobject.search.ProjectStageSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.ReportSearchParameters;
+import org.ag.timeline.presentation.transferobject.search.StageSearchParameter;
 import org.ag.timeline.presentation.transferobject.search.TimeDataSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.UserPreferenceSearchParameter;
 import org.ag.timeline.presentation.transferobject.search.UserSearchParameter;
@@ -56,6 +60,8 @@ public interface TimelineService {
 	public UserReply createUser(UserInput input) throws TimelineException;
 	public CodeValueReply createTimeData(final TimeDataInput myTimeData) throws TimelineException;
 	public CodeValueReply createProjectDetailMetrics(final ProjectMetricsInput input) throws TimelineException;
+	public CodeValueReply createStage(final CodeValueInput input) throws TimelineException;
+	public CodeValueReply createProjectStage(final ProjectStageInput input) throws TimelineException;
 	
 	public CodeValueReply deleteProject(CodeValueInput input) throws TimelineException;
 	public CodeValueReply deleteActivity(CodeValueInput input) throws TimelineException;
@@ -64,6 +70,8 @@ public interface TimelineService {
 	public CodeValueReply deleteUserPreferences(CodeValueInput input) throws TimelineException;
 	public CodeValueReply deleteProjectMetrics(final CodeValueInput input) throws TimelineException;
 	public CodeValueReply deleteProjectDetailMetrics(final CodeValueInput input) throws TimelineException;
+	public CodeValueReply deleteStage(final CodeValueInput input) throws TimelineException;
+	public CodeValueReply deleteProjectStage(final CodeValueInput input) throws TimelineException;
 		
 	public CodeValueReply modifyActivity(CodeValueInput input) throws TimelineException;
 	public CodeValueReply modifyProject(ProjectInput input) throws TimelineException;
@@ -71,6 +79,7 @@ public interface TimelineService {
 	public CodeValueReply modifyTimeData(final TimeDataInput myTimeData) throws TimelineException;
 	public CodeValueReply modifyStatus(final StatusInput input) throws TimelineException;
 	public CodeValueReply modifyProjectDetailMetrics(final ProjectMetricsInput input) throws TimelineException;
+	public CodeValueReply modifyProjectStageTask(final ProjectStageTaskInput input) throws TimelineException;
 	
 	public UserPreferenceReply saveUserPreferences(final UserPreferencesInput input) throws TimelineException;
 	public CodeValueReply saveProjectEstimates(final ProjectEstimatesInput input) throws TimelineException;
@@ -85,6 +94,8 @@ public interface TimelineService {
 	public WeeklyUserReply searchUsersWithoutEntries(final WeekSearchParameter searchParameters) throws TimelineException;
 	public ProjectEstimatesReply searchProjectEstimates(final ProjectSearchParameter searchParameters) throws TimelineException;
 	public CodeValueListReply searchTasks(final ProjectSearchParameter searchParameters) throws TimelineException;
+	public CodeValueListReply searchStages(final StageSearchParameter searchParameters) throws TimelineException;
+	public CodeValueListReply searchProjectStage(final ProjectStageSearchParameters searchParameters) throws TimelineException;
 	
 	public SummaryReportReply getSummaryReport(final ReportSearchParameters searchParameters) throws TimelineException;
 	public DetailedReportReply getDetailedReport(final ReportSearchParameters searchParameters) throws TimelineException;

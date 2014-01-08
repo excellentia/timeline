@@ -17,6 +17,9 @@ import org.ag.timeline.business.model.AuditRecord;
 import org.ag.timeline.business.model.AuditRecordDetail;
 import org.ag.timeline.business.model.Project;
 import org.ag.timeline.business.model.ProjectMetrics;
+import org.ag.timeline.business.model.ProjectStage;
+import org.ag.timeline.business.model.ProjectStageTask;
+import org.ag.timeline.business.model.Stage;
 import org.ag.timeline.business.model.SystemSettings;
 import org.ag.timeline.business.model.Task;
 import org.ag.timeline.business.model.TimeData;
@@ -35,6 +38,8 @@ import org.ag.timeline.presentation.transferobject.input.CodeValueInput;
 import org.ag.timeline.presentation.transferobject.input.ProjectEstimatesInput;
 import org.ag.timeline.presentation.transferobject.input.ProjectInput;
 import org.ag.timeline.presentation.transferobject.input.ProjectMetricsInput;
+import org.ag.timeline.presentation.transferobject.input.ProjectStageInput;
+import org.ag.timeline.presentation.transferobject.input.ProjectStageTaskInput;
 import org.ag.timeline.presentation.transferobject.input.StatusInput;
 import org.ag.timeline.presentation.transferobject.input.TimeDataInput;
 import org.ag.timeline.presentation.transferobject.input.UserInput;
@@ -70,7 +75,9 @@ import org.ag.timeline.presentation.transferobject.search.AuditDataSearchParamet
 import org.ag.timeline.presentation.transferobject.search.ProjectDetailMetricsSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.ProjectMetricsSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.ProjectSearchParameter;
+import org.ag.timeline.presentation.transferobject.search.ProjectStageSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.ReportSearchParameters;
+import org.ag.timeline.presentation.transferobject.search.StageSearchParameter;
 import org.ag.timeline.presentation.transferobject.search.TimeDataSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.UserPreferenceSearchParameter;
 import org.ag.timeline.presentation.transferobject.search.UserSearchParameter;
@@ -97,8 +104,7 @@ public class TimelineServiceImpl implements TimelineService {
 	/**
 	 * Hibernate Session Factory.
 	 */
-	private static final SessionFactory SESSION_FACTORY = HibernateUtil
-			.getSessionFactory();
+	private static final SessionFactory SESSION_FACTORY = HibernateUtil.getSessionFactory();
 
 	/**
 	 * Opens a session with an attached Audit Interceptor.
@@ -106,8 +112,7 @@ public class TimelineServiceImpl implements TimelineService {
 	 * @return {@link Session} with interceptor.
 	 */
 	protected final Session getAuditableSession() {
-		return SESSION_FACTORY.withOptions()
-				.interceptor(new AuditInterceptor()).openSession();
+		return SESSION_FACTORY.withOptions().interceptor(new AuditInterceptor()).openSession();
 	}
 
 	/**
@@ -121,13 +126,11 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#autheticateUser(
 	 * org.ag.timeline.presentation.transferobject.input.AuthenticationInput)
 	 */
-	public UserReply autheticateUser(AuthenticationInput input)
-			throws TimelineException {
+	public UserReply autheticateUser(AuthenticationInput input) throws TimelineException {
 		Session session = null;
 		Transaction transaction = null;
 		UserReply reply = null;
@@ -150,10 +153,8 @@ public class TimelineServiceImpl implements TimelineService {
 					if (pwd != null) {
 
 						Criteria criteria = session.createCriteria(User.class);
-						criteria.add(Restrictions.and(
-								Restrictions.eq("userId", usrId),
-								Restrictions.eq("password", pwd),
-								Restrictions.eq("active", Boolean.TRUE)));
+						criteria.add(Restrictions.and(Restrictions.eq("userId", usrId),
+								Restrictions.eq("password", pwd), Restrictions.eq("active", Boolean.TRUE)));
 						criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 						@SuppressWarnings("unchecked")
@@ -166,13 +167,10 @@ public class TimelineServiceImpl implements TimelineService {
 
 					if ((question != null) && (answer != null)) {
 
-						Criteria criteria = session
-								.createCriteria(UserPreferences.class);
+						Criteria criteria = session.createCriteria(UserPreferences.class);
 						criteria.createAlias("user", "usr");
-						criteria.add(Restrictions.and(
-								Restrictions.eq("usr.userId", usrId),
-								Restrictions.eq("usr.active", Boolean.TRUE),
-								Restrictions.eq("question", question),
+						criteria.add(Restrictions.and(Restrictions.eq("usr.userId", usrId),
+								Restrictions.eq("usr.active", Boolean.TRUE), Restrictions.eq("question", question),
 								Restrictions.eq("answer", answer)));
 						criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
@@ -193,8 +191,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setUser(user);
 					}
 
-					TextHelper.logMessage("autheticateUser() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("autheticateUser() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -222,13 +219,11 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#createActivity(org
 	 * .ag.timeline.presentation.transferobject.input.CodeValueInput)
 	 */
-	public CodeValueReply createActivity(CodeValueInput input)
-			throws TimelineException {
+	public CodeValueReply createActivity(CodeValueInput input) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -237,8 +232,7 @@ public class TimelineServiceImpl implements TimelineService {
 		if ((input != null) && (input.getCodeValue() != null)) {
 
 			final long projectId = input.getCodeValue().getCode();
-			final String text = TextHelper.trimToNull(input.getCodeValue()
-					.getValue());
+			final String text = TextHelper.trimToNull(input.getCodeValue().getValue());
 
 			if ((projectId > 0) && (text != null)) {
 
@@ -253,8 +247,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 					Criteria criteria = session.createCriteria(Activity.class);
 					criteria.createAlias("project", "pr");
-					criteria.add(Restrictions.and(Restrictions.eq("pr.id", id),
-							Restrictions.eq("name", text)));
+					criteria.add(Restrictions.and(Restrictions.eq("pr.id", id), Restrictions.eq("name", text)));
 					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 					@SuppressWarnings("unchecked")
@@ -267,8 +260,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 					} else {
 
-						Project project = (Project) session.get(Project.class,
-								id);
+						Project project = (Project) session.get(Project.class, id);
 
 						if (project != null) {
 
@@ -285,15 +277,13 @@ public class TimelineServiceImpl implements TimelineService {
 						}
 					}
 
-					TextHelper.logMessage("createActivity() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("createActivity() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
 
 					if (activity != null) {
-						reply.setCodeValue(new CodeValue(activity.getId(),
-								activity.getName()));
+						reply.setCodeValue(new CodeValue(activity.getId(), activity.getName()));
 					}
 
 				} catch (HibernateException hibernateException) {
@@ -328,14 +318,12 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#createProject(java
 	 * .lang.String)
 	 */
 
-	public CodeValueReply createProject(ProjectInput input)
-			throws TimelineException {
+	public CodeValueReply createProject(ProjectInput input) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -374,15 +362,13 @@ public class TimelineServiceImpl implements TimelineService {
 
 						if (copyProjId > 0) {
 
-							Project srcProj = (Project) session.get(
-									Project.class, Long.valueOf(copyProjId));
+							Project srcProj = (Project) session.get(Project.class, Long.valueOf(copyProjId));
 
 							if ((srcProj != null) && (srcProj.hasActivities())) {
 
 								Activity copy = null;
 
-								for (Activity original : srcProj
-										.getActivities()) {
+								for (Activity original : srcProj.getActivities()) {
 									copy = new Activity();
 									copy.setName(original.getName());
 									copy.setProject(project);
@@ -392,14 +378,12 @@ public class TimelineServiceImpl implements TimelineService {
 						}
 
 						session.save(project);
-						reply.setCodeValue(new CodeValue(project.getId(),
-								project.getName()));
+						reply.setCodeValue(new CodeValue(project.getId(), project.getName()));
 
 						reply.setSuccessMessage("Created successfully.");
 					}
 
-					TextHelper.logMessage("createProject() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("createProject() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -434,20 +418,17 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#deleteProject(long)
 	 */
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#createTimeData(org
 	 * .ag.timeline.presentation.transferobject.input.TimeDataInput)
 	 */
-	public CodeValueReply createTimeData(TimeDataInput myTimeData)
-			throws TimelineException {
+	public CodeValueReply createTimeData(TimeDataInput myTimeData) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -467,10 +448,8 @@ public class TimelineServiceImpl implements TimelineService {
 
 					long time = System.nanoTime();
 
-					Activity activity = (Activity) session.get(Activity.class,
-							new Long(myTimeData.getActivityId()));
-					User currentUser = (User) session.get(User.class,
-							myTimeData.getUserId());
+					Activity activity = (Activity) session.get(Activity.class, new Long(myTimeData.getActivityId()));
+					User currentUser = (User) session.get(User.class, myTimeData.getUserId());
 					Date startDate = myTimeData.getDate();
 					Long year = TextHelper.getYearForWeekDay(startDate);
 					User proxiedUser = null;
@@ -479,8 +458,7 @@ public class TimelineServiceImpl implements TimelineService {
 					User user = currentUser;
 
 					if (myTimeData.getProxiedUserDbId() > 0) {
-						proxiedUser = (User) session.get(User.class,
-								myTimeData.getProxiedUserDbId());
+						proxiedUser = (User) session.get(User.class, myTimeData.getProxiedUserDbId());
 
 						if (proxiedUser != null) {
 
@@ -491,24 +469,20 @@ public class TimelineServiceImpl implements TimelineService {
 
 							// throw exception as user being proxied is not
 							// present in system
-							throw new TimelineException(
-									"Proxied User does not exist in system.");
+							throw new TimelineException("Proxied User does not exist in system.");
 
 						}
 					}
 
-					if ((activity != null) && (user != null)
-							&& (startDate != null) && (user.getId() > 0)) {
+					if ((activity != null) && (user != null) && (startDate != null) && (user.getId() > 0)) {
 
 						// week handling
 						Week week = null;
 						TimeData data = null;
 
 						if (week == null) {
-							Criteria criteria = session
-									.createCriteria(Week.class);
-							criteria.add(Restrictions.and(
-									Restrictions.eq("year", year),
+							Criteria criteria = session.createCriteria(Week.class);
+							criteria.add(Restrictions.and(Restrictions.eq("year", year),
 									Restrictions.eq("startDate", startDate)));
 							criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
@@ -523,12 +497,9 @@ public class TimelineServiceImpl implements TimelineService {
 								week = new Week();
 
 								week.setYear(year);
-								week.setWeekNumber(TextHelper
-										.getWeekNumber(startDate));
-								week.setStartDate(TextHelper
-										.getFirstDayOfWeek(startDate));
-								week.setEndDate(TextHelper
-										.getLastDayOfWeek(startDate));
+								week.setWeekNumber(TextHelper.getWeekNumber(startDate));
+								week.setStartDate(TextHelper.getFirstDayOfWeek(startDate));
+								week.setEndDate(TextHelper.getLastDayOfWeek(startDate));
 
 								// save the week
 								session.saveOrUpdate(week);
@@ -539,22 +510,17 @@ public class TimelineServiceImpl implements TimelineService {
 						// project, same activity) is being requested
 						{
 							// search for existing activities
-							Criteria criteria = session
-									.createCriteria(TimeData.class);
+							Criteria criteria = session.createCriteria(TimeData.class);
 							criteria.createAlias("user", "usr");
 							criteria.createAlias("activity", "act");
 							criteria.createAlias("project", "proj");
 							criteria.createAlias("week", "wk");
-							criteria.add(Restrictions.and(Restrictions.eq(
-									"wk.weekNumber",
-									new Long(week.getWeekNumber())),
+							criteria.add(Restrictions.and(
+									Restrictions.eq("wk.weekNumber", new Long(week.getWeekNumber())),
 									Restrictions.eq("wk.year", new Long(year)),
-									Restrictions.eq("usr.id",
-											new Long(user.getId())),
-									Restrictions.eq("act.id",
-											new Long(activity.getId())),
-									Restrictions.eq("proj.id", new Long(
-											activity.getProject().getId()))));
+									Restrictions.eq("usr.id", new Long(user.getId())),
+									Restrictions.eq("act.id", new Long(activity.getId())),
+									Restrictions.eq("proj.id", new Long(activity.getProject().getId()))));
 
 							criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
@@ -574,27 +540,13 @@ public class TimelineServiceImpl implements TimelineService {
 								data.setUser(user);
 								data.setWeek(week);
 
-								data.setData_weekday_1(TextHelper
-										.getScaledBigDecimal(myTimeData
-												.getDay_1_time()));
-								data.setData_weekday_2(TextHelper
-										.getScaledBigDecimal(myTimeData
-												.getDay_2_time()));
-								data.setData_weekday_3(TextHelper
-										.getScaledBigDecimal(myTimeData
-												.getDay_3_time()));
-								data.setData_weekday_4(TextHelper
-										.getScaledBigDecimal(myTimeData
-												.getDay_4_time()));
-								data.setData_weekday_5(TextHelper
-										.getScaledBigDecimal(myTimeData
-												.getDay_5_time()));
-								data.setData_weekday_6(TextHelper
-										.getScaledBigDecimal(myTimeData
-												.getDay_6_time()));
-								data.setData_weekday_7(TextHelper
-										.getScaledBigDecimal(myTimeData
-												.getDay_7_time()));
+								data.setData_weekday_1(TextHelper.getScaledBigDecimal(myTimeData.getDay_1_time()));
+								data.setData_weekday_2(TextHelper.getScaledBigDecimal(myTimeData.getDay_2_time()));
+								data.setData_weekday_3(TextHelper.getScaledBigDecimal(myTimeData.getDay_3_time()));
+								data.setData_weekday_4(TextHelper.getScaledBigDecimal(myTimeData.getDay_4_time()));
+								data.setData_weekday_5(TextHelper.getScaledBigDecimal(myTimeData.getDay_5_time()));
+								data.setData_weekday_6(TextHelper.getScaledBigDecimal(myTimeData.getDay_6_time()));
+								data.setData_weekday_7(TextHelper.getScaledBigDecimal(myTimeData.getDay_7_time()));
 
 								// save the data
 								session.saveOrUpdate(data);
@@ -607,8 +559,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setErrorMessage("Mandatory data is missing.");
 					}
 
-					TextHelper.logMessage("createTimeData() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("createTimeData() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -646,7 +597,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#modifyProject(long,
 	 * java.lang.String)
@@ -708,8 +658,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setSuccessMessage("Created successfully.");
 					}
 
-					TextHelper.logMessage("createUser() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("createUser() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -744,13 +693,11 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#deleteActivity(long)
 	 */
 
-	public CodeValueReply deleteActivity(CodeValueInput input)
-			throws TimelineException {
+	public CodeValueReply deleteActivity(CodeValueInput input) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -785,23 +732,20 @@ public class TimelineServiceImpl implements TimelineService {
 
 					} else {
 
-						Activity activity = (Activity) session.get(
-								Activity.class, activityId);
+						Activity activity = (Activity) session.get(Activity.class, activityId);
 
 						if (activity != null) {
 
 							session.delete(activity);
 							reply.setSuccessMessage("Deleted successfully.");
-							reply.setCodeValue(new CodeValue(activity.getId(),
-									activity.getName()));
+							reply.setCodeValue(new CodeValue(activity.getId(), activity.getName()));
 
 						} else {
 							reply.setErrorMessage("Specified activity not present in system.");
 						}
 					}
 
-					TextHelper.logMessage("deleteActivity() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("deleteActivity() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -836,14 +780,12 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#modifyActivity(long,
 	 * long, java.lang.String)
 	 */
 
-	public CodeValueReply deleteProject(CodeValueInput input)
-			throws TimelineException {
+	public CodeValueReply deleteProject(CodeValueInput input) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -878,21 +820,18 @@ public class TimelineServiceImpl implements TimelineService {
 
 					} else {
 
-						Project project = (Project) session.get(Project.class,
-								projectId);
+						Project project = (Project) session.get(Project.class, projectId);
 
 						if (project != null) {
 							session.delete(project);
 							reply.setSuccessMessage("Deleted successfully.");
-							reply.setCodeValue(new CodeValue(project.getId(),
-									project.getName()));
+							reply.setCodeValue(new CodeValue(project.getId(), project.getName()));
 						} else {
 							reply.setErrorMessage("Specified project not present in system.");
 						}
 					}
 
-					TextHelper.logMessage("deleteProject() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("deleteProject() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -927,14 +866,12 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#createUser(java.
 	 * lang.String, java.lang.String)
 	 */
 
-	public CodeValueReply deleteTimeData(CodeValueInput input)
-			throws TimelineException {
+	public CodeValueReply deleteTimeData(CodeValueInput input) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -954,8 +891,7 @@ public class TimelineServiceImpl implements TimelineService {
 					long time = System.nanoTime();
 					final Long timeDataId = id;
 
-					TimeData data = (TimeData) session.get(TimeData.class,
-							timeDataId);
+					TimeData data = (TimeData) session.get(TimeData.class, timeDataId);
 
 					if (data == null) {
 
@@ -968,8 +904,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setSuccessMessage("Deleted successfully.");
 					}
 
-					TextHelper.logMessage("deleteTimeData() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("deleteTimeData() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -1005,7 +940,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#modifyUser(long,
 	 * java.lang.String, java.lang.String)
@@ -1058,8 +992,7 @@ public class TimelineServiceImpl implements TimelineService {
 						}
 					}
 
-					TextHelper.logMessage("deleteUser() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("deleteUser() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -1094,13 +1027,11 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#deleteUser(long)
 	 */
 
-	public CodeValueReply deleteUserPreferences(CodeValueInput input)
-			throws TimelineException {
+	public CodeValueReply deleteUserPreferences(CodeValueInput input) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -1119,8 +1050,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 					long time = System.nanoTime();
 					final Long prefId = id;
-					UserPreferences preferences = (UserPreferences) session
-							.get(UserPreferences.class, prefId);
+					UserPreferences preferences = (UserPreferences) session.get(UserPreferences.class, prefId);
 
 					if (preferences != null) {
 						session.delete(preferences);
@@ -1130,9 +1060,8 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setErrorMessage("Specified user preference not present in system.");
 					}
 
-					TextHelper
-							.logMessage("deleteUserPreferences() > Time taken : "
-									+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("deleteUserPreferences() > Time taken : "
+							+ ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -1167,13 +1096,11 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#resetUserCredentials
 	 * (long)
 	 */
-	public SummaryReportReply getSummaryReport(
-			ReportSearchParameters searchParameters) throws TimelineException {
+	public SummaryReportReply getSummaryReport(ReportSearchParameters searchParameters) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -1192,15 +1119,12 @@ public class TimelineServiceImpl implements TimelineService {
 			final long searchProjectId = searchParameters.getProjectDbId();
 			final long searchActivityId = searchParameters.getActivityDbId();
 			final long searchUserId = searchParameters.getUserDbId();
-			final boolean searchActiveProjects = searchParameters
-					.isSearchOnlyActiveProjects();
-			final boolean searchActiveUsers = searchParameters
-					.isSearchOnlyActiveUsers();
+			final boolean searchActiveProjects = searchParameters.isSearchOnlyActiveProjects();
+			final boolean searchActiveUsers = searchParameters.isSearchOnlyActiveUsers();
 
 			// get activity aggregates
 			{
-				StringBuilder builder = new StringBuilder(
-						" SELECT project.id,  activity.id  ");
+				StringBuilder builder = new StringBuilder(" SELECT project.id,  activity.id  ");
 				builder.append(" , sum(data_weekday_1+data_weekday_2+data_weekday_3+data_weekday_4+data_weekday_5+data_weekday_6+data_weekday_7) ");
 				builder.append(" FROM TimeData ");
 
@@ -1223,8 +1147,7 @@ public class TimelineServiceImpl implements TimelineService {
 							whereUsed = true;
 						}
 
-						builder.append(" project.id = ")
-								.append(searchProjectId);
+						builder.append(" project.id = ").append(searchProjectId);
 						whereUsed = true;
 					}
 
@@ -1237,8 +1160,7 @@ public class TimelineServiceImpl implements TimelineService {
 							whereUsed = true;
 						}
 
-						builder.append(" activity.id = ").append(
-								searchActivityId);
+						builder.append(" activity.id = ").append(searchActivityId);
 					}
 
 					if (searchUserId > 0) {
@@ -1285,8 +1207,7 @@ public class TimelineServiceImpl implements TimelineService {
 						// populate row
 						row.setProjectId(projId);
 						row.setRowId(actId);
-						row.setRowTime(TextHelper
-								.getScaledDouble((BigDecimal) values[2]));
+						row.setRowTime(TextHelper.getScaledDouble((BigDecimal) values[2]));
 
 						// update the activities in reply
 						reply.addActivityRow(row);
@@ -1301,8 +1222,7 @@ public class TimelineServiceImpl implements TimelineService {
 			// get user aggregates
 			{
 
-				StringBuilder builder = new StringBuilder(
-						" SELECT project.id, user.id ");
+				StringBuilder builder = new StringBuilder(" SELECT project.id, user.id ");
 				builder.append(" , sum(data_weekday_1+data_weekday_2+data_weekday_3+data_weekday_4+data_weekday_5+data_weekday_6+data_weekday_7) ");
 				builder.append(" FROM TimeData ");
 
@@ -1324,8 +1244,7 @@ public class TimelineServiceImpl implements TimelineService {
 							builder.append(" WHERE ");
 						}
 
-						builder.append(" project.id = ")
-								.append(searchProjectId);
+						builder.append(" project.id = ").append(searchProjectId);
 						whereUsed = true;
 					}
 
@@ -1338,8 +1257,7 @@ public class TimelineServiceImpl implements TimelineService {
 							whereUsed = true;
 						}
 
-						builder.append(" activity.id = ").append(
-								searchActivityId);
+						builder.append(" activity.id = ").append(searchActivityId);
 					}
 
 					if (searchUserId > 0) {
@@ -1387,8 +1305,7 @@ public class TimelineServiceImpl implements TimelineService {
 						// populate row
 						row.setProjectId(projId);
 						row.setRowId(userId);
-						row.setRowTime(TextHelper
-								.getScaledDouble((BigDecimal) values[2]));
+						row.setRowTime(TextHelper.getScaledDouble((BigDecimal) values[2]));
 
 						// update the users in reply
 						reply.addUserRow(row);
@@ -1425,10 +1342,8 @@ public class TimelineServiceImpl implements TimelineService {
 							projMap.put(project.getId(), project.getName());
 
 							if (project.hasActivities()) {
-								for (Activity activity : project
-										.getActivities()) {
-									actMap.put(activity.getId(),
-											activity.getName());
+								for (Activity activity : project.getActivities()) {
+									actMap.put(activity.getId(), activity.getName());
 								}
 							}
 						}
@@ -1461,16 +1376,13 @@ public class TimelineServiceImpl implements TimelineService {
 
 					// activity names
 					{
-						List<ReportRow> activities = reply
-								.getActivityRowList(projectId);
+						List<ReportRow> activities = reply.getActivityRowList(projectId);
 
 						if ((activities != null) && (activities.size() > 0)) {
 
 							for (ReportRow reportRow : activities) {
-								reportRow
-										.setProjectName(projMap.get(projectId));
-								reportRow.setRowName(actMap.get(reportRow
-										.getRowId()));
+								reportRow.setProjectName(projMap.get(projectId));
+								reportRow.setRowName(actMap.get(reportRow.getRowId()));
 							}
 						}
 					}
@@ -1482,10 +1394,8 @@ public class TimelineServiceImpl implements TimelineService {
 						if ((users != null) && (users.size() > 0)) {
 
 							for (ReportRow reportRow : users) {
-								reportRow
-										.setProjectName(projMap.get(projectId));
-								reportRow.setRowName(usrMap.get(reportRow
-										.getRowId()));
+								reportRow.setProjectName(projMap.get(projectId));
+								reportRow.setRowName(usrMap.get(reportRow.getRowId()));
 							}
 						}
 					}
@@ -1496,8 +1406,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("getReport() > Time taken : "
-					+ ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("getReport() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 			// commit the transaction
 			transaction.commit();
@@ -1524,13 +1433,11 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#deleteTimeData(long)
 	 */
 
-	public CodeValueReply modifyActivity(CodeValueInput input)
-			throws TimelineException {
+	public CodeValueReply modifyActivity(CodeValueInput input) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -1553,22 +1460,19 @@ public class TimelineServiceImpl implements TimelineService {
 					long time = System.nanoTime();
 					final Long activityId = id;
 
-					Project activity = (Project) session.get(Project.class,
-							activityId);
+					Project activity = (Project) session.get(Project.class, activityId);
 
 					if (activity != null) {
 						activity.setName(newText);
 						session.update(activity);
 						reply.setSuccessMessage("Updated successfully.");
-						reply.setCodeValue(new CodeValue(activity.getId(),
-								activity.getName()));
+						reply.setCodeValue(new CodeValue(activity.getId(), activity.getName()));
 
 					} else {
 						reply.setErrorMessage("Specified activity not present in system.");
 					}
 
-					TextHelper.logMessage("modifyActivity() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("modifyActivity() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -1605,14 +1509,12 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#createUserPreferences
 	 * (long, long)
 	 */
 
-	public CodeValueReply modifyProject(ProjectInput input)
-			throws TimelineException {
+	public CodeValueReply modifyProject(ProjectInput input) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -1634,8 +1536,7 @@ public class TimelineServiceImpl implements TimelineService {
 				Project project = null;
 
 				Criteria criteria = session.createCriteria(Project.class);
-				criteria.add(Restrictions.and(Restrictions.eq("name", newText),
-						Restrictions.ne("id", projectId)));
+				criteria.add(Restrictions.and(Restrictions.eq("name", newText), Restrictions.ne("id", projectId)));
 				criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 				@SuppressWarnings("unchecked")
@@ -1676,8 +1577,7 @@ public class TimelineServiceImpl implements TimelineService {
 							CodeValue codeValue = new CodeValue(project.getId());
 
 							if (leadSaved) {
-								codeValue.setValue(project.getLead()
-										.getUserName());
+								codeValue.setValue(project.getLead().getUserName());
 							} else {
 								codeValue.setValue(project.getName());
 							}
@@ -1690,8 +1590,7 @@ public class TimelineServiceImpl implements TimelineService {
 					}
 				}
 
-				TextHelper.logMessage("modifyProject() > Time taken : "
-						+ ((System.nanoTime() - time) / 1000000));
+				TextHelper.logMessage("modifyProject() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 				// commit the transaction
 				transaction.commit();
@@ -1726,7 +1625,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#deleteUserPreferences
 	 * (long)
@@ -1734,13 +1632,11 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#modifyTimeData(org
 	 * .ag.timeline.presentation.transferobject.input.TimeDataInput)
 	 */
-	public CodeValueReply modifyTimeData(TimeDataInput myTimeData)
-			throws TimelineException {
+	public CodeValueReply modifyTimeData(TimeDataInput myTimeData) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -1760,10 +1656,8 @@ public class TimelineServiceImpl implements TimelineService {
 
 					long time = System.nanoTime();
 
-					TimeData data = (TimeData) session.get(TimeData.class,
-							new Long(entryId));
-					Activity activity = (Activity) session.get(Activity.class,
-							new Long(myTimeData.getActivityId()));
+					TimeData data = (TimeData) session.get(TimeData.class, new Long(entryId));
+					Activity activity = (Activity) session.get(Activity.class, new Long(myTimeData.getActivityId()));
 
 					if ((data != null) && (activity != null)) {
 
@@ -1776,23 +1670,17 @@ public class TimelineServiceImpl implements TimelineService {
 							if (data.getActivity().getId() != activity.getId()) {
 
 								// search for existing activities
-								Criteria criteria = session
-										.createCriteria(TimeData.class);
+								Criteria criteria = session.createCriteria(TimeData.class);
 								criteria.createAlias("user", "usr");
 								criteria.createAlias("activity", "act");
 								criteria.createAlias("project", "proj");
 								criteria.createAlias("week", "wk");
-								criteria.add(Restrictions.and(Restrictions.eq(
-										"wk.weekNumber", new Long(data
-												.getWeek().getWeekNumber())),
-										Restrictions.eq("wk.year", new Long(
-												data.getWeek().getYear())),
-										Restrictions.eq("usr.id", new Long(data
-												.getUser().getId())),
-										Restrictions.eq("act.id", new Long(
-												activity.getId())),
-										Restrictions.eq("proj.id", new Long(
-												activity.getProject().getId()))));
+								criteria.add(Restrictions.and(
+										Restrictions.eq("wk.weekNumber", new Long(data.getWeek().getWeekNumber())),
+										Restrictions.eq("wk.year", new Long(data.getWeek().getYear())),
+										Restrictions.eq("usr.id", new Long(data.getUser().getId())),
+										Restrictions.eq("act.id", new Long(activity.getId())),
+										Restrictions.eq("proj.id", new Long(activity.getProject().getId()))));
 
 								criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
@@ -1817,27 +1705,13 @@ public class TimelineServiceImpl implements TimelineService {
 								data.setActivity(activity);
 								data.setProject(activity.getProject());
 
-								data.setData_weekday_1(TextHelper
-										.getScaledBigDecimal(myTimeData
-												.getDay_1_time()));
-								data.setData_weekday_2(TextHelper
-										.getScaledBigDecimal(myTimeData
-												.getDay_2_time()));
-								data.setData_weekday_3(TextHelper
-										.getScaledBigDecimal(myTimeData
-												.getDay_3_time()));
-								data.setData_weekday_4(TextHelper
-										.getScaledBigDecimal(myTimeData
-												.getDay_4_time()));
-								data.setData_weekday_5(TextHelper
-										.getScaledBigDecimal(myTimeData
-												.getDay_5_time()));
-								data.setData_weekday_6(TextHelper
-										.getScaledBigDecimal(myTimeData
-												.getDay_6_time()));
-								data.setData_weekday_7(TextHelper
-										.getScaledBigDecimal(myTimeData
-												.getDay_7_time()));
+								data.setData_weekday_1(TextHelper.getScaledBigDecimal(myTimeData.getDay_1_time()));
+								data.setData_weekday_2(TextHelper.getScaledBigDecimal(myTimeData.getDay_2_time()));
+								data.setData_weekday_3(TextHelper.getScaledBigDecimal(myTimeData.getDay_3_time()));
+								data.setData_weekday_4(TextHelper.getScaledBigDecimal(myTimeData.getDay_4_time()));
+								data.setData_weekday_5(TextHelper.getScaledBigDecimal(myTimeData.getDay_5_time()));
+								data.setData_weekday_6(TextHelper.getScaledBigDecimal(myTimeData.getDay_6_time()));
+								data.setData_weekday_7(TextHelper.getScaledBigDecimal(myTimeData.getDay_7_time()));
 
 								// save the data
 								session.saveOrUpdate(data);
@@ -1850,8 +1724,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setErrorMessage("Mandatory data is missing.");
 					}
 
-					TextHelper.logMessage("modifyTimeData() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("modifyTimeData() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -1889,7 +1762,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#modifyUser(org.ag
 	 * .timeline.presentation.transferobject.input.UserInput)
@@ -1931,11 +1803,8 @@ public class TimelineServiceImpl implements TimelineService {
 						List<User> list = null;
 
 						if (userId != null) {
-							Criteria criteria = session
-									.createCriteria(User.class);
-							criteria.add(Restrictions.and(
-									Restrictions.ne("id", id),
-									Restrictions.eq("userId", userId)));
+							Criteria criteria = session.createCriteria(User.class);
+							criteria.add(Restrictions.and(Restrictions.ne("id", id), Restrictions.eq("userId", userId)));
 							criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 							@SuppressWarnings("unchecked")
@@ -1952,26 +1821,26 @@ public class TimelineServiceImpl implements TimelineService {
 
 							if (type != null) {
 								switch (type) {
-								case ADMIN:
-									user.setAdmin(adminFlag);
-									break;
-								case FIRST_NAME:
-									user.setFirstName(first);
-									break;
-								case LAST_NAME:
-									user.setLastName(last);
-									break;
-								case PASSWORD:
-									user.setPassword(password);
-									break;
-								case USER_ID:
-									user.setUserId(userId);
-									break;
-								case ACTIVE:
-									user.setActive(activeFlag);
-									break;
-								default:
-									break;
+									case ADMIN:
+										user.setAdmin(adminFlag);
+										break;
+									case FIRST_NAME:
+										user.setFirstName(first);
+										break;
+									case LAST_NAME:
+										user.setLastName(last);
+										break;
+									case PASSWORD:
+										user.setPassword(password);
+										break;
+									case USER_ID:
+										user.setUserId(userId);
+										break;
+									case ACTIVE:
+										user.setActive(activeFlag);
+										break;
+									default:
+										break;
 								}
 							} else {
 								user.setFirstName(first);
@@ -1987,8 +1856,7 @@ public class TimelineServiceImpl implements TimelineService {
 						}
 					}
 
-					TextHelper.logMessage("modifyUser() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("modifyUser() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -2030,13 +1898,11 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#saveUserPreferences
 	 * (org.ag.timeline.presentation.transferobject.input.UserPreferencesInput)
 	 */
-	public UserPreferenceReply saveUserPreferences(
-			final UserPreferencesInput input) throws TimelineException {
+	public UserPreferenceReply saveUserPreferences(final UserPreferencesInput input) throws TimelineException {
 
 		final UserPreferenceReply reply = new UserPreferenceReply();
 
@@ -2048,8 +1914,7 @@ public class TimelineServiceImpl implements TimelineService {
 			final String question = TextHelper.trimToNull(input.getQuestion());
 			final String answer = TextHelper.trimToNull(input.getAnswer());
 			final String email = TextHelper.trimToNull(input.getEmail());
-			final TimelineConstants.UserPrefDataFieldType type = input
-					.getType();
+			final TimelineConstants.UserPrefDataFieldType type = input.getType();
 
 			if (userDbId > 0) {
 
@@ -2069,8 +1934,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 					} else {
 
-						Criteria criteria = session
-								.createCriteria(UserPreferences.class);
+						Criteria criteria = session.createCriteria(UserPreferences.class);
 						criteria.createAlias("user", "usr");
 						criteria.add(Restrictions.eq("usr.id", userId));
 						criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
@@ -2096,17 +1960,17 @@ public class TimelineServiceImpl implements TimelineService {
 
 						} else {
 							switch (type) {
-							case QUESTION:
-								preferences.setQuestion(question);
-								break;
-							case ANSWER:
-								preferences.setAnswer(answer);
-								break;
-							case EMAIL:
-								preferences.setEmail(email);
-								break;
-							default:
-								break;
+								case QUESTION:
+									preferences.setQuestion(question);
+									break;
+								case ANSWER:
+									preferences.setAnswer(answer);
+									break;
+								case EMAIL:
+									preferences.setEmail(email);
+									break;
+								default:
+									break;
 							}
 						}
 
@@ -2115,9 +1979,8 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setPreference(preferences);
 					}
 
-					TextHelper
-							.logMessage("modifyUserPreferences() > Time taken : "
-									+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("modifyUserPreferences() > Time taken : "
+							+ ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -2159,13 +2022,11 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#resetUserCredentials
 	 * (org.ag.timeline.presentation.transferobject.input.CodeValueInput)
 	 */
-	public UserReply resetUserCredentials(CodeValueInput input)
-			throws TimelineException {
+	public UserReply resetUserCredentials(CodeValueInput input) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -2197,9 +2058,8 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setErrorMessage("Specified user not present in system.");
 					}
 
-					TextHelper
-							.logMessage("resetUserCredentials() > Time taken : "
-									+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("resetUserCredentials() > Time taken : "
+							+ ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -2234,14 +2094,12 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchActivities
 	 * (org.
 	 * ag.timeline.presentation.transferobject.search.ActivitySearchParameter)
 	 */
-	public ActivityReply searchActivities(
-			ActivitySearchParameter searchParameters) throws TimelineException {
+	public ActivityReply searchActivities(ActivitySearchParameter searchParameters) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -2263,11 +2121,9 @@ public class TimelineServiceImpl implements TimelineService {
 
 			if (searchParameters != null) {
 				projectId = searchParameters.getProjectId();
-				projectName = TextHelper.trimToNull(searchParameters
-						.getProjectName());
+				projectName = TextHelper.trimToNull(searchParameters.getProjectName());
 				activityId = searchParameters.getActivityId();
-				activityName = TextHelper.trimToNull(searchParameters
-						.getActivityName());
+				activityName = TextHelper.trimToNull(searchParameters.getActivityName());
 			}
 
 			if (activityId > 0) {
@@ -2275,8 +2131,7 @@ public class TimelineServiceImpl implements TimelineService {
 			}
 
 			if (activityName != null) {
-				criteria.add(Restrictions.ilike("name",
-						activityName.toLowerCase(), MatchMode.ANYWHERE));
+				criteria.add(Restrictions.ilike("name", activityName.toLowerCase(), MatchMode.ANYWHERE));
 			}
 
 			if (projectId > 0) {
@@ -2286,8 +2141,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 			if (projectName != null) {
 				criteria.createAlias("project", "p");
-				criteria.add(Restrictions.ilike("p.name",
-						projectName.toLowerCase(), MatchMode.ANYWHERE));
+				criteria.add(Restrictions.ilike("p.name", projectName.toLowerCase(), MatchMode.ANYWHERE));
 			}
 
 			// add order
@@ -2301,9 +2155,8 @@ public class TimelineServiceImpl implements TimelineService {
 			if ((dbList != null) && (dbList.size() > 0)) {
 
 				for (Activity label : dbList) {
-					reply.addActivity(label.getProject().getId(), label
-							.getProject().getName(), label.getId(), label
-							.getName());
+					reply.addActivity(label.getProject().getId(), label.getProject().getName(), label.getId(),
+							label.getName());
 				}
 
 			} else {
@@ -2311,8 +2164,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("searchProjects() > Time taken : "
-					+ ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("searchProjects() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 			// commit the transaction
 			transaction.commit();
@@ -2340,13 +2192,11 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchProjects(org
 	 * .ag.timeline.presentation.transferobject.search.ProjectSearchParameter)
 	 */
-	public ProjectReply searchProjects(ProjectSearchParameter searchParameters)
-			throws TimelineException {
+	public ProjectReply searchProjects(ProjectSearchParameter searchParameters) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -2366,10 +2216,8 @@ public class TimelineServiceImpl implements TimelineService {
 
 			if (searchParameters != null) {
 				projectId = searchParameters.getProjectId();
-				projectName = TextHelper.trimToNull(searchParameters
-						.getProjectName());
-				searchActiveProjects = searchParameters
-						.isSearchActiveProjects();
+				projectName = TextHelper.trimToNull(searchParameters.getProjectName());
+				searchActiveProjects = searchParameters.isSearchActiveProjects();
 			}
 
 			if (projectId > 0) {
@@ -2377,8 +2225,7 @@ public class TimelineServiceImpl implements TimelineService {
 			}
 
 			if (projectName != null) {
-				criteria.add(Restrictions.ilike("name",
-						projectName.toLowerCase(), MatchMode.ANYWHERE));
+				criteria.add(Restrictions.ilike("name", projectName.toLowerCase(), MatchMode.ANYWHERE));
 			}
 
 			if (searchActiveProjects) {
@@ -2405,8 +2252,7 @@ public class TimelineServiceImpl implements TimelineService {
 					projectData.setActive(project.isActive());
 
 					if (project.getLead() != null) {
-						projectData
-								.setLeadName(project.getLead().getUserName());
+						projectData.setLeadName(project.getLead().getUserName());
 						projectData.setLeadDbId(project.getLead().getId());
 					}
 
@@ -2418,8 +2264,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("searchProjects() > Time taken : "
-					+ ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("searchProjects() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 			// commit the transaction
 			transaction.commit();
@@ -2447,13 +2292,11 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchTimeData(org
 	 * .ag.timeline.presentation.transferobject.search.TimeDataSearchParameters)
 	 */
-	public TimeDataReply searchTimeData(
-			TimeDataSearchParameters searchParameters) throws TimelineException {
+	public TimeDataReply searchTimeData(TimeDataSearchParameters searchParameters) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -2524,16 +2367,13 @@ public class TimelineServiceImpl implements TimelineService {
 			}
 
 			// add date restrictions
-			if ((startWeekNum > 0) && (startYear > 0) && (endWeekNum > 0)
-					&& (endYear > 0)) {
+			if ((startWeekNum > 0) && (startYear > 0) && (endWeekNum > 0) && (endYear > 0)) {
 
 				{
 					Criteria subCriteria = session.createCriteria(Week.class);
-					subCriteria.add(Restrictions.and(
-							Restrictions.eq("year", startYear),
+					subCriteria.add(Restrictions.and(Restrictions.eq("year", startYear),
 							Restrictions.eq("weekNumber", startWeekNum)));
-					subCriteria
-							.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+					subCriteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 					@SuppressWarnings("unchecked")
 					List<Week> list = subCriteria.list();
@@ -2545,11 +2385,9 @@ public class TimelineServiceImpl implements TimelineService {
 
 				{
 					Criteria subCriteria = session.createCriteria(Week.class);
-					subCriteria.add(Restrictions.and(
-							Restrictions.eq("year", endYear),
+					subCriteria.add(Restrictions.and(Restrictions.eq("year", endYear),
 							Restrictions.eq("weekNumber", endWeekNum)));
-					subCriteria
-							.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+					subCriteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 					@SuppressWarnings("unchecked")
 					List<Week> list = subCriteria.list();
@@ -2559,22 +2397,17 @@ public class TimelineServiceImpl implements TimelineService {
 					}
 				}
 
-				criteria.add(Restrictions.and(
-						Restrictions.between("wk.year", startYear, endYear),
+				criteria.add(Restrictions.and(Restrictions.between("wk.year", startYear, endYear),
 						Restrictions.between("wk.id", startWeekId, endWeekId)));
 
-			} else if ((startWeekNum > 0) && (startYear > 0)
-					&& ((endWeekNum <= 0) || ((endYear <= 0)))) {
+			} else if ((startWeekNum > 0) && (startYear > 0) && ((endWeekNum <= 0) || ((endYear <= 0)))) {
 
-				criteria.add(Restrictions.and(
-						Restrictions.ge("wk.year", startYear),
+				criteria.add(Restrictions.and(Restrictions.ge("wk.year", startYear),
 						Restrictions.ge("wk.weekNumber", startWeekNum)));
 
-			} else if ((endWeekNum > 0) && (endYear > 0)
-					&& ((startWeekNum <= 0) || ((startYear <= 0)))) {
+			} else if ((endWeekNum > 0) && (endYear > 0) && ((startWeekNum <= 0) || ((startYear <= 0)))) {
 
-				criteria.add(Restrictions.and(
-						Restrictions.le("wk.year", endYear),
+				criteria.add(Restrictions.and(Restrictions.le("wk.year", endYear),
 						Restrictions.le("wk.weekNumber", endWeekNum)));
 
 			}
@@ -2601,8 +2434,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("searchTimeData() > Time taken : "
-					+ ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("searchTimeData() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 			// commit the transaction
 			transaction.commit();
@@ -2629,14 +2461,12 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchUserPreferences
 	 * (org.ag.timeline.presentation.transferobject.search.
 	 * UserPreferenceSearchParameter)
 	 */
-	public UserPreferenceSearchReply searchUserPreferences(
-			UserPreferenceSearchParameter searchParameters)
+	public UserPreferenceSearchReply searchUserPreferences(UserPreferenceSearchParameter searchParameters)
 			throws TimelineException {
 
 		Session session = null;
@@ -2685,8 +2515,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("searchUserPreferences() > Time taken : "
-					+ ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("searchUserPreferences() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 			// commit the transaction
 			transaction.commit();
@@ -2714,13 +2543,11 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchUsers(org.
 	 * ag.timeline.presentation.transferobject.search.UserSearchParameter)
 	 */
-	public UserSearchReply searchUsers(UserSearchParameter searchParameters)
-			throws TimelineException {
+	public UserSearchReply searchUsers(UserSearchParameter searchParameters) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -2742,10 +2569,8 @@ public class TimelineServiceImpl implements TimelineService {
 
 			if (searchParameters != null) {
 				userId = searchParameters.getId();
-				firstName = TextHelper.trimToNull(searchParameters
-						.getFirstName());
-				lastName = TextHelper
-						.trimToNull(searchParameters.getLastName());
+				firstName = TextHelper.trimToNull(searchParameters.getFirstName());
+				lastName = TextHelper.trimToNull(searchParameters.getLastName());
 				admin = searchParameters.getOnlyAdmin();
 				active = searchParameters.getOnlyActive();
 			}
@@ -2755,13 +2580,11 @@ public class TimelineServiceImpl implements TimelineService {
 			}
 
 			if (firstName != null) {
-				criteria.add(Restrictions.ilike("firstName", firstName,
-						MatchMode.ANYWHERE));
+				criteria.add(Restrictions.ilike("firstName", firstName, MatchMode.ANYWHERE));
 			}
 
 			if (lastName != null) {
-				criteria.add(Restrictions.ilike("lastName", lastName,
-						MatchMode.ANYWHERE));
+				criteria.add(Restrictions.ilike("lastName", lastName, MatchMode.ANYWHERE));
 			}
 
 			if (admin) {
@@ -2795,8 +2618,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("searchUsers() > Time taken : "
-					+ ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("searchUsers() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 			// commit the transaction
 			transaction.commit();
@@ -2824,13 +2646,11 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchWeeks(org.
 	 * ag.timeline.presentation.transferobject.search.WeekSearchParameter)
 	 */
-	public WeekReply searchWeeks(WeekSearchParameter searchParameters)
-			throws TimelineException {
+	public WeekReply searchWeeks(WeekSearchParameter searchParameters) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -2886,8 +2706,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("searchWeeks() > Time taken : "
-					+ ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("searchWeeks() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 			// commit the transaction
 			transaction.commit();
@@ -2915,7 +2734,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#systemManagement()
 	 */
@@ -2947,10 +2765,8 @@ public class TimelineServiceImpl implements TimelineService {
 					// installed first time with empty database)
 					if (weekCount == 0) {
 						criteria = session.createCriteria(SystemSettings.class);
-						criteria.add(Restrictions.or(Restrictions.eq("name",
-								SystemSettings.Type.START_DATE.getText()),
-								Restrictions.eq("name",
-										SystemSettings.Type.END_DATE.getText())));
+						criteria.add(Restrictions.or(Restrictions.eq("name", SystemSettings.Type.START_DATE.getText()),
+								Restrictions.eq("name", SystemSettings.Type.END_DATE.getText())));
 						criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 						@SuppressWarnings("unchecked")
@@ -2964,21 +2780,14 @@ public class TimelineServiceImpl implements TimelineService {
 							for (SystemSettings setting : list) {
 
 								if ((setting != null)
-										&& (SystemSettings.Type.START_DATE
-												.toString()
-												.equalsIgnoreCase(setting
-														.getName()))) {
-									startDate = TextHelper.getValidDate(setting
-											.getValue());
+										&& (SystemSettings.Type.START_DATE.toString().equalsIgnoreCase(setting
+												.getName()))) {
+									startDate = TextHelper.getValidDate(setting.getValue());
 								}
 
 								if ((setting != null)
-										&& (SystemSettings.Type.END_DATE
-												.toString()
-												.equalsIgnoreCase(setting
-														.getName()))) {
-									endDate = TextHelper.getValidDate(setting
-											.getValue());
+										&& (SystemSettings.Type.END_DATE.toString().equalsIgnoreCase(setting.getName()))) {
+									endDate = TextHelper.getValidDate(setting.getValue());
 								}
 							}
 
@@ -2993,16 +2802,12 @@ public class TimelineServiceImpl implements TimelineService {
 								long weekNum = 0;
 								long year = 0;
 								final Date createDate = new Date();
-								final long createUserId = RequestContext
-										.getTimelineContext()
-										.getContextUserId();
+								final long createUserId = RequestContext.getTimelineContext().getContextUserId();
 
 								while (start.before(endDate)) {
 
-									weekStartDate = TextHelper
-											.getFirstDayOfWeek(start);
-									weekEndDate = TextHelper
-											.getLastDayOfWeek(start);
+									weekStartDate = TextHelper.getFirstDayOfWeek(start);
+									weekEndDate = TextHelper.getLastDayOfWeek(start);
 									weekNum = TextHelper.getWeekNumber(start);
 
 									week = new Week();
@@ -3035,8 +2840,7 @@ public class TimelineServiceImpl implements TimelineService {
 									}
 
 									// get day a week later
-									start = TextHelper.getDateAfter(
-											weekStartDate, 7);
+									start = TextHelper.getDateAfter(weekStartDate, 7);
 
 								}
 							}
@@ -3045,8 +2849,7 @@ public class TimelineServiceImpl implements TimelineService {
 				}
 			}
 
-			TextHelper.logMessage("systemManagement() > Time taken : "
-					+ ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("systemManagement() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 			// commit the transaction
 			transaction.commit();
@@ -3071,15 +2874,12 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchAuditData(
 	 * org.ag
 	 * .timeline.presentation.transferobject.search.AuditDataSearchParameters)
 	 */
-	public AuditDataReply searchAuditData(
-			AuditDataSearchParameters searchParameters)
-			throws TimelineException {
+	public AuditDataReply searchAuditData(AuditDataSearchParameters searchParameters) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -3111,10 +2911,8 @@ public class TimelineServiceImpl implements TimelineService {
 					}
 				}
 
-				final TimelineConstants.AuditDataType type = searchParameters
-						.getType();
-				final TimelineConstants.EntityOperation operationType = searchParameters
-						.getOperationType();
+				final TimelineConstants.AuditDataType type = searchParameters.getType();
+				final TimelineConstants.EntityOperation operationType = searchParameters.getOperationType();
 				final long userDbId = searchParameters.getUserId();
 				Date fromDate = searchParameters.getFromDate();
 				Date toDate = searchParameters.getToDate();
@@ -3133,13 +2931,11 @@ public class TimelineServiceImpl implements TimelineService {
 					toDate = new Date();
 				}
 
-				criteria.add(Restrictions.between("operationDate",
-						TextHelper.getAuditDayStartTimestamp(fromDate),
+				criteria.add(Restrictions.between("operationDate", TextHelper.getAuditDayStartTimestamp(fromDate),
 						TextHelper.getAuditDayEndTimestamp(toDate)));
 
 				if (operationType != null) {
-					criteria.add(Restrictions.eq("operation",
-							operationType.getOpCode()));
+					criteria.add(Restrictions.eq("operation", operationType.getOpCode()));
 				}
 
 				if (userDbId > 0) {
@@ -3199,8 +2995,7 @@ public class TimelineServiceImpl implements TimelineService {
 				}
 			}
 
-			TextHelper.logMessage("searchAuditData() > Time taken : "
-					+ ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("searchAuditData() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 			// commit the transaction
 			transaction.commit();
@@ -3225,8 +3020,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	}
 
-	public DetailedReportReply getDetailedReport(
-			ReportSearchParameters searchParameters) throws TimelineException {
+	public DetailedReportReply getDetailedReport(ReportSearchParameters searchParameters) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -3283,8 +3077,7 @@ public class TimelineServiceImpl implements TimelineService {
 								row.setWeekEndDate((Date) values[3]);
 								row.setActivityId((Long) values[4]);
 								row.setActivityName((String) values[5]);
-								row.setWeeklySum(TextHelper
-										.getScaledDouble((BigDecimal) values[6]));
+								row.setWeeklySum(TextHelper.getScaledDouble((BigDecimal) values[6]));
 
 								// update the rows in reply
 								reply.addRow(row);
@@ -3299,8 +3092,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("Missing search data.");
 			}
 
-			TextHelper.logMessage("getDetailedReport() > Time taken : "
-					+ ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("getDetailedReport() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 			// commit the transaction
 			transaction.commit();
@@ -3328,8 +3120,7 @@ public class TimelineServiceImpl implements TimelineService {
 	}
 
 	@Override
-	public CodeValueReply modifyStatus(StatusInput input)
-			throws TimelineException {
+	public CodeValueReply modifyStatus(StatusInput input) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -3351,42 +3142,40 @@ public class TimelineServiceImpl implements TimelineService {
 					boolean hasError = false;
 
 					switch (entity) {
-					case PROJECT: {
-						Project project = (Project) session.get(Project.class,
-								id);
+						case PROJECT: {
+							Project project = (Project) session.get(Project.class, id);
 
-						if (project == null) {
-							hasError = true;
-							reply.setErrorMessage("Specified Project is not present in system.");
-						} else {
-							project.setActive(input.isActive());
-							session.update(project);
-							retVal = project.getName();
+							if (project == null) {
+								hasError = true;
+								reply.setErrorMessage("Specified Project is not present in system.");
+							} else {
+								project.setActive(input.isActive());
+								session.update(project);
+								retVal = project.getName();
+							}
 						}
-					}
-						break;
+							break;
 
-					case USER: {
-						User user = (User) session.get(User.class, id);
+						case USER: {
+							User user = (User) session.get(User.class, id);
 
-						if (user == null) {
-							hasError = true;
-							reply.setErrorMessage("Specified User is not present in system.");
-						} else if (id == RequestContext.getTimelineContext()
-								.getContextUserId()) {
-							hasError = true;
-							reply.setErrorMessage("User can not change own status.");
-						} else {
-							user.setActive(input.isActive());
-							session.update(user);
-							retVal = user.getUserName();
+							if (user == null) {
+								hasError = true;
+								reply.setErrorMessage("Specified User is not present in system.");
+							} else if (id == RequestContext.getTimelineContext().getContextUserId()) {
+								hasError = true;
+								reply.setErrorMessage("User can not change own status.");
+							} else {
+								user.setActive(input.isActive());
+								session.update(user);
+								retVal = user.getUserName();
+							}
 						}
-					}
-						break;
+							break;
 
-					default:
-						hasError = true;
-						break;
+						default:
+							hasError = true;
+							break;
 					}
 
 					if (!hasError) {
@@ -3398,8 +3187,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setCodeValue(codeValue);
 					}
 
-					TextHelper.logMessage("modifyStatus() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("modifyStatus() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -3435,8 +3223,7 @@ public class TimelineServiceImpl implements TimelineService {
 	}
 
 	@Override
-	public WeeklyUserReply searchUsersWithoutEntries(
-			WeekSearchParameter searchParameters) throws TimelineException {
+	public WeeklyUserReply searchUsersWithoutEntries(WeekSearchParameter searchParameters) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -3467,8 +3254,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 			{
 				Criteria criteria = session.createCriteria(User.class);
-				criteria.add(Restrictions.and(
-						Restrictions.eq("active", Boolean.TRUE),
+				criteria.add(Restrictions.and(Restrictions.eq("active", Boolean.TRUE),
 						Restrictions.gt("id", Long.valueOf(0))));
 				criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
@@ -3477,17 +3263,13 @@ public class TimelineServiceImpl implements TimelineService {
 
 				if ((activeUsers != null) && (activeUsers.size() > 0)) {
 
-					Criteria timeEntryCriteria = session
-							.createCriteria(TimeData.class);
+					Criteria timeEntryCriteria = session.createCriteria(TimeData.class);
 					timeEntryCriteria.createAlias("week", "week");
 					timeEntryCriteria.createAlias("user", "user");
-					timeEntryCriteria.add(Restrictions.and(
-							Restrictions.ge("week.startDate", startDate),
-							Restrictions.le("week.endDate", endDate),
-							Restrictions.eq("user.active", Boolean.TRUE)));
+					timeEntryCriteria.add(Restrictions.and(Restrictions.ge("week.startDate", startDate),
+							Restrictions.le("week.endDate", endDate), Restrictions.eq("user.active", Boolean.TRUE)));
 					timeEntryCriteria.addOrder(Order.asc("week"));
-					timeEntryCriteria
-							.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+					timeEntryCriteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 					@SuppressWarnings("unchecked")
 					List<TimeData> timeEntries = timeEntryCriteria.list();
@@ -3496,8 +3278,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 						// populate the existing entries
 						for (TimeData timeData : timeEntries) {
-							reply.addWeeklyUser(timeData.getWeek(),
-									timeData.getUser());
+							reply.addWeeklyUser(timeData.getWeek(), timeData.getUser());
 						}
 
 						// iterate over the collected users & replace
@@ -3516,22 +3297,18 @@ public class TimelineServiceImpl implements TimelineService {
 								missingUserList.removeAll(userList);
 							}
 
-							Collections.sort(missingUserList,
-									new UserComparator());
+							Collections.sort(missingUserList, new UserComparator());
 
 							reply.setWeeklyUserList(week, missingUserList);
 						}
 					} else {
 
 						// if no entries in a given period
-						Criteria weekCriteria = session
-								.createCriteria(Week.class);
-						weekCriteria.add(Restrictions.and(
-								Restrictions.ge("startDate", startDate),
+						Criteria weekCriteria = session.createCriteria(Week.class);
+						weekCriteria.add(Restrictions.and(Restrictions.ge("startDate", startDate),
 								Restrictions.le("endDate", endDate)));
 						weekCriteria.addOrder(Order.asc("id"));
-						weekCriteria
-								.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+						weekCriteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 						@SuppressWarnings("unchecked")
 						List<Week> allWeekList = weekCriteria.list();
@@ -3577,8 +3354,7 @@ public class TimelineServiceImpl implements TimelineService {
 	}
 
 	@Override
-	public CodeValueReply createProjectDetailMetrics(ProjectMetricsInput input)
-			throws TimelineException {
+	public CodeValueReply createProjectDetailMetrics(ProjectMetricsInput input) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -3603,12 +3379,10 @@ public class TimelineServiceImpl implements TimelineService {
 					Long weekNum = TextHelper.getWeekNumber(date);
 					ProjectMetrics metrics = null;
 
-					Criteria criteria = session
-							.createCriteria(ProjectMetrics.class);
+					Criteria criteria = session.createCriteria(ProjectMetrics.class);
 					criteria.createAlias("project", "pr");
 					criteria.createAlias("week", "wk");
-					criteria.add(Restrictions.and(Restrictions.eq("pr.id", id),
-							Restrictions.eq("wk.year", year),
+					criteria.add(Restrictions.and(Restrictions.eq("pr.id", id), Restrictions.eq("wk.year", year),
 							Restrictions.eq("wk.weekNumber", weekNum)));
 					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
@@ -3624,15 +3398,13 @@ public class TimelineServiceImpl implements TimelineService {
 					} else {
 
 						// get project
-						Project project = (Project) session.get(Project.class,
-								id);
+						Project project = (Project) session.get(Project.class, id);
 
 						if (project != null) {
 
 							// get Week
 							criteria = session.createCriteria(Week.class);
-							criteria.add(Restrictions.and(
-									Restrictions.eq("year", year),
+							criteria.add(Restrictions.and(Restrictions.eq("year", year),
 									Restrictions.eq("weekNumber", weekNum)));
 							criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
@@ -3655,18 +3427,10 @@ public class TimelineServiceImpl implements TimelineService {
 									metrics.setWeek(week);
 
 									// user entered values
-									metrics.setPlannedValue(TextHelper
-											.getScaledBigDecimal(input
-													.getPlannedValue()));
-									metrics.setEarnedValue(TextHelper
-											.getScaledBigDecimal(input
-													.getEarnedValue()));
-									metrics.setActualCost(TextHelper
-											.getScaledBigDecimal(input
-													.getActualCost()));
-									metrics.setActualsToDate(TextHelper
-											.getScaledBigDecimal(input
-													.getActualsToDate()));
+									metrics.setPlannedValue(TextHelper.getScaledBigDecimal(input.getPlannedValue()));
+									metrics.setEarnedValue(TextHelper.getScaledBigDecimal(input.getEarnedValue()));
+									metrics.setActualCost(TextHelper.getScaledBigDecimal(input.getActualCost()));
+									metrics.setActualsToDate(TextHelper.getScaledBigDecimal(input.getActualsToDate()));
 									metrics.setSoftwareProgrammingEffort(TextHelper.getScaledBigDecimal(input
 											.getSoftwareProgrammingEffort()));
 									metrics.setDefects(input.getDefects());
@@ -3701,16 +3465,14 @@ public class TimelineServiceImpl implements TimelineService {
 						}
 					}
 
-					TextHelper
-							.logMessage("createProjectDetailMetrics() > Time taken : "
-									+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("createProjectDetailMetrics() > Time taken : "
+							+ ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
 
 					if (metrics != null) {
-						reply.setCodeValue(new CodeValue(metrics.getId(),
-								metrics.getWeek().getDescription()));
+						reply.setCodeValue(new CodeValue(metrics.getId(), metrics.getWeek().getDescription()));
 					}
 
 				} catch (HibernateException hibernateException) {
@@ -3740,8 +3502,7 @@ public class TimelineServiceImpl implements TimelineService {
 	}
 
 	@Override
-	public CodeValueReply deleteProjectMetrics(CodeValueInput input)
-			throws TimelineException {
+	public CodeValueReply deleteProjectMetrics(CodeValueInput input) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -3762,27 +3523,22 @@ public class TimelineServiceImpl implements TimelineService {
 					long time = System.nanoTime();
 
 					// delete entries
-					StringBuilder builder = new StringBuilder(
-							"DELETE FROM ProjectMetrics WHERE project.id = ");
+					StringBuilder builder = new StringBuilder("DELETE FROM ProjectMetrics WHERE project.id = ");
 					builder.append(projectId);
 
 					Query query = session.createQuery(builder.toString());
 					int deleteCount = query.executeUpdate();
 
-					StringBuilder msg = new StringBuilder(
-							TimelineConstants.EMPTY);
+					StringBuilder msg = new StringBuilder(TimelineConstants.EMPTY);
 
 					if (deleteCount > 0) {
-						msg.append(deleteCount).append(
-								" Metric entries deleted successfully. ");
+						msg.append(deleteCount).append(" Metric entries deleted successfully. ");
 					}
 
 					// delete project estimates
-					Project project = (Project) session.get(Project.class,
-							projectId);
+					Project project = (Project) session.get(Project.class, projectId);
 
-					project.setBudgetAtCompletion(TextHelper
-							.getScaledBigDecimal(0));
+					project.setBudgetAtCompletion(TextHelper.getScaledBigDecimal(0));
 					project.setStartDate(null);
 					project.setEndDate(null);
 
@@ -3790,13 +3546,11 @@ public class TimelineServiceImpl implements TimelineService {
 
 					msg.append("Project Estimates deleted successfully.");
 
-					reply.setCodeValue(new CodeValue(projectId, project
-							.getName()));
+					reply.setCodeValue(new CodeValue(projectId, project.getName()));
 					reply.setSuccessMessage(msg.toString());
 
-					TextHelper
-							.logMessage("deleteProjectMetrics() > Time taken : "
-									+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("deleteProjectMetrics() > Time taken : "
+							+ ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -3831,8 +3585,7 @@ public class TimelineServiceImpl implements TimelineService {
 	}
 
 	@Override
-	public CodeValueReply deleteProjectDetailMetrics(CodeValueInput input)
-			throws TimelineException {
+	public CodeValueReply deleteProjectDetailMetrics(CodeValueInput input) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -3851,8 +3604,7 @@ public class TimelineServiceImpl implements TimelineService {
 					transaction = session.beginTransaction();
 
 					long time = System.nanoTime();
-					ProjectMetrics metrics = (ProjectMetrics) session.get(
-							ProjectMetrics.class, metricId);
+					ProjectMetrics metrics = (ProjectMetrics) session.get(ProjectMetrics.class, metricId);
 
 					if (metrics != null) {
 
@@ -3863,9 +3615,8 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setErrorMessage("Specified project metrics entry not present in System.");
 					}
 
-					TextHelper
-							.logMessage("deleteProjectDetailMetrics() > Time taken : "
-									+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("deleteProjectDetailMetrics() > Time taken : "
+							+ ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -3899,8 +3650,7 @@ public class TimelineServiceImpl implements TimelineService {
 	}
 
 	@Override
-	public CodeValueReply modifyProjectDetailMetrics(ProjectMetricsInput input)
-			throws TimelineException {
+	public CodeValueReply modifyProjectDetailMetrics(ProjectMetricsInput input) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
@@ -3920,8 +3670,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 					long time = System.nanoTime();
 					final Long id = metricId;
-					ProjectMetrics metrics = (ProjectMetrics) session.get(
-							ProjectMetrics.class, id);
+					ProjectMetrics metrics = (ProjectMetrics) session.get(ProjectMetrics.class, id);
 
 					if (metrics == null) {
 
@@ -3934,17 +3683,12 @@ public class TimelineServiceImpl implements TimelineService {
 						// TextHelper.getScaledDouble(metrics.getProject().getBudgetAtCompletion());
 
 						// user entered values
-						metrics.setPlannedValue(TextHelper
-								.getScaledBigDecimal(input.getPlannedValue()));
-						metrics.setEarnedValue(TextHelper
-								.getScaledBigDecimal(input.getEarnedValue()));
-						metrics.setActualCost(TextHelper
-								.getScaledBigDecimal(input.getActualCost()));
-						metrics.setActualsToDate(TextHelper
-								.getScaledBigDecimal(input.getActualsToDate()));
-						metrics.setSoftwareProgrammingEffort(TextHelper
-								.getScaledBigDecimal(input
-										.getSoftwareProgrammingEffort()));
+						metrics.setPlannedValue(TextHelper.getScaledBigDecimal(input.getPlannedValue()));
+						metrics.setEarnedValue(TextHelper.getScaledBigDecimal(input.getEarnedValue()));
+						metrics.setActualCost(TextHelper.getScaledBigDecimal(input.getActualCost()));
+						metrics.setActualsToDate(TextHelper.getScaledBigDecimal(input.getActualsToDate()));
+						metrics.setSoftwareProgrammingEffort(TextHelper.getScaledBigDecimal(input
+								.getSoftwareProgrammingEffort()));
 						metrics.setDefects(input.getDefects());
 
 						// calculated values
@@ -3963,16 +3707,14 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setSuccessMessage("Modified successfully.");
 					}
 
-					TextHelper
-							.logMessage("modifyProjectDetailMetrics() > Time taken : "
-									+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("modifyProjectDetailMetrics() > Time taken : "
+							+ ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
 
 					if (metrics != null) {
-						reply.setCodeValue(new CodeValue(metrics.getId(),
-								metrics.getWeek().getDescription()));
+						reply.setCodeValue(new CodeValue(metrics.getId(), metrics.getWeek().getDescription()));
 					}
 
 				} catch (HibernateException hibernateException) {
@@ -4003,24 +3745,20 @@ public class TimelineServiceImpl implements TimelineService {
 	}
 
 	@Override
-	public CodeValueReply saveProjectEstimates(ProjectEstimatesInput input)
-			throws TimelineException {
+	public CodeValueReply saveProjectEstimates(ProjectEstimatesInput input) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
 		final CodeValueReply reply = new CodeValueReply();
 
-		if ((input != null) && (input.getEstimateData() != null)
-				&& (input.getEstimateData().getProjectData() != null)) {
+		if ((input != null) && (input.getEstimateData() != null) && (input.getEstimateData().getProjectData() != null)) {
 
-			final long projectId = input.getEstimateData().getProjectData()
-					.getCode();
+			final long projectId = input.getEstimateData().getProjectData().getCode();
 			final double bac = input.getEstimateData().getBudgetAtCompletion();
 			final Date startDate = input.getEstimateData().getStartDate();
 			final Date endDate = input.getEstimateData().getEndDate();
 
-			if ((projectId > 0) && (bac > 0) && (startDate != null)
-					&& (endDate != null)) {
+			if ((projectId > 0) && (bac > 0) && (startDate != null) && (endDate != null)) {
 
 				try {
 
@@ -4040,22 +3778,19 @@ public class TimelineServiceImpl implements TimelineService {
 					} else {
 
 						// populate values
-						project.setBudgetAtCompletion(TextHelper
-								.getScaledBigDecimal(bac));
+						project.setBudgetAtCompletion(TextHelper.getScaledBigDecimal(bac));
 						project.setStartDate(startDate);
 						project.setEndDate(endDate);
 
 						// save project
 						session.saveOrUpdate(project);
-						reply.setCodeValue(new CodeValue(projectId, project
-								.getName()));
+						reply.setCodeValue(new CodeValue(projectId, project.getName()));
 						reply.setSuccessMessage("Saved successfully.");
 
 					}
 
-					TextHelper
-							.logMessage("saveProjectEstimates() > Time taken : "
-									+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("saveProjectEstimates() > Time taken : "
+							+ ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -4092,8 +3827,8 @@ public class TimelineServiceImpl implements TimelineService {
 	}
 
 	@Override
-	public ProjectEstimatesReply searchProjectEstimates(
-			ProjectSearchParameter searchParameters) throws TimelineException {
+	public ProjectEstimatesReply searchProjectEstimates(ProjectSearchParameter searchParameters)
+			throws TimelineException {
 		Session session = null;
 		Transaction transaction = null;
 		final ProjectEstimatesReply reply = new ProjectEstimatesReply();
@@ -4111,8 +3846,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 			if (searchParameters != null) {
 				projectId = searchParameters.getProjectId();
-				projectName = TextHelper.trimToNull(searchParameters
-						.getProjectName());
+				projectName = TextHelper.trimToNull(searchParameters.getProjectName());
 			}
 
 			if (projectId > 0) {
@@ -4120,8 +3854,7 @@ public class TimelineServiceImpl implements TimelineService {
 			}
 
 			if (projectName != null) {
-				criteria.add(Restrictions.ilike("name",
-						projectName.toLowerCase(), MatchMode.ANYWHERE));
+				criteria.add(Restrictions.ilike("name", projectName.toLowerCase(), MatchMode.ANYWHERE));
 			}
 
 			// add order
@@ -4147,28 +3880,23 @@ public class TimelineServiceImpl implements TimelineService {
 					projectData.setValue(project.getName());
 
 					if (project.getLead() != null) {
-						projectData
-								.setLeadName(project.getLead().getUserName());
+						projectData.setLeadName(project.getLead().getUserName());
 					}
 
 					estimate = new ProjectEstimateData();
 					estimate.setProjectData(projectData);
 
-					estimate.setBudgetAtCompletion(TextHelper
-							.getScaledDouble(project.getBudgetAtCompletion()));
+					estimate.setBudgetAtCompletion(TextHelper.getScaledDouble(project.getBudgetAtCompletion()));
 					estimate.setStartDate(project.getStartDate());
 					estimate.setEndDate(project.getEndDate());
 
 					try {
-						query = session.createQuery(builder.toString())
-								.setLong(0, project.getId());
+						query = session.createQuery(builder.toString()).setLong(0, project.getId());
 						lastSubmittedWeek = (Week) query.uniqueResult();
 
 						if (lastSubmittedWeek != null) {
-							estimate.setLastSubmittedPeriod(TextHelper
-									.getDisplayWeek(
-											lastSubmittedWeek.getStartDate(),
-											lastSubmittedWeek.getEndDate()));
+							estimate.setLastSubmittedPeriod(TextHelper.getDisplayWeek(lastSubmittedWeek.getStartDate(),
+									lastSubmittedWeek.getEndDate()));
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -4182,8 +3910,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("searchProjectEstimates() > Time taken : "
-					+ ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("searchProjectEstimates() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 			// commit the transaction
 			transaction.commit();
@@ -4210,8 +3937,7 @@ public class TimelineServiceImpl implements TimelineService {
 	}
 
 	@Override
-	public CodeValueListReply searchTasks(
-			ProjectSearchParameter searchParameters) throws TimelineException {
+	public CodeValueListReply searchTasks(ProjectSearchParameter searchParameters) throws TimelineException {
 		Session session = null;
 		Transaction transaction = null;
 		final CodeValueListReply reply = new CodeValueListReply();
@@ -4245,8 +3971,7 @@ public class TimelineServiceImpl implements TimelineService {
 					if ((dbList != null) && (dbList.size() > 0)) {
 
 						for (Task task : dbList) {
-							reply.addCodeValue(new CodeValue(task.getId(), task
-									.getTaskText()));
+							reply.addCodeValue(new CodeValue(task.getId(), task.getTaskText()));
 						}
 
 					} else {
@@ -4254,8 +3979,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setErrorMessage("No results found.");
 					}
 
-					TextHelper.logMessage("searchTasks() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("searchTasks() > Time taken : " + ((System.nanoTime() - time) / 1000000));
 
 					// commit the transaction
 					transaction.commit();
@@ -4284,8 +4008,7 @@ public class TimelineServiceImpl implements TimelineService {
 	}
 
 	@Override
-	public ProjectLevelMetricsReply getProjectLevelMetricsReport(
-			ProjectMetricsSearchParameters searchParameters)
+	public ProjectLevelMetricsReply getProjectLevelMetricsReport(ProjectMetricsSearchParameters searchParameters)
 			throws TimelineException {
 
 		final ProjectLevelMetricsReply reply = new ProjectLevelMetricsReply();
@@ -4351,8 +4074,7 @@ public class TimelineServiceImpl implements TimelineService {
 					projectsWithMetrics.add(projId);
 
 					// get project
-					project = (Project) session.get(Project.class, new Long(
-							projId));
+					project = (Project) session.get(Project.class, new Long(projId));
 
 					reportRow = new ProjectLevelMetrics();
 
@@ -4364,9 +4086,7 @@ public class TimelineServiceImpl implements TimelineService {
 						projectData.setLeadName(project.getLeadName());
 
 						estimateData = new ProjectEstimateData();
-						estimateData.setBudgetAtCompletion(TextHelper
-								.getScaledDouble(project
-										.getBudgetAtCompletion()));
+						estimateData.setBudgetAtCompletion(TextHelper.getScaledDouble(project.getBudgetAtCompletion()));
 						estimateData.setStartDate(project.getStartDate());
 						estimateData.setEndDate(project.getEndDate());
 						estimateData.setProjectData(projectData);
@@ -4374,13 +4094,11 @@ public class TimelineServiceImpl implements TimelineService {
 						weekId = (Long) values[7];
 
 						if (weekId > 0) {
-							week = (Week) session.get(Week.class,
-									Long.valueOf(weekId));
+							week = (Week) session.get(Week.class, Long.valueOf(weekId));
 
 							if (week != null) {
-								estimateData.setLastSubmittedPeriod(TextHelper
-										.getDisplayWeek(week.getStartDate(),
-												week.getEndDate()));
+								estimateData.setLastSubmittedPeriod(TextHelper.getDisplayWeek(week.getStartDate(),
+										week.getEndDate()));
 							}
 						}
 
@@ -4391,16 +4109,11 @@ public class TimelineServiceImpl implements TimelineService {
 					// create metric data
 					{
 						basicMetrics = new BasicProjectMetrics();
-						basicMetrics.setPlannedValue(TextHelper
-								.getScaledDouble((BigDecimal) values[1]));
-						basicMetrics.setEarnedValue(TextHelper
-								.getScaledDouble((BigDecimal) values[2]));
-						basicMetrics.setActualCost(TextHelper
-								.getScaledDouble((BigDecimal) values[3]));
-						basicMetrics.setActualsToDate(TextHelper
-								.getScaledDouble((BigDecimal) values[4]));
-						basicMetrics.setSoftwareProgrammingEffort(TextHelper
-								.getScaledDouble((BigDecimal) values[5]));
+						basicMetrics.setPlannedValue(TextHelper.getScaledDouble((BigDecimal) values[1]));
+						basicMetrics.setEarnedValue(TextHelper.getScaledDouble((BigDecimal) values[2]));
+						basicMetrics.setActualCost(TextHelper.getScaledDouble((BigDecimal) values[3]));
+						basicMetrics.setActualsToDate(TextHelper.getScaledDouble((BigDecimal) values[4]));
+						basicMetrics.setSoftwareProgrammingEffort(TextHelper.getScaledDouble((BigDecimal) values[5]));
 						basicMetrics.setDefects((Long) values[6]);
 
 						// populate the row
@@ -4422,12 +4135,10 @@ public class TimelineServiceImpl implements TimelineService {
 				Criteria criteria = session.createCriteria(Project.class);
 				criteria.add(Restrictions.eq("active", Boolean.TRUE));
 
-				if (!searchParameters.isSearchAllData()
-						&& (searchProjectId > 0)) {
+				if (!searchParameters.isSearchAllData() && (searchProjectId > 0)) {
 
 					if (searchProjectId > 0) {
-						criteria.add(Restrictions.eq("id",
-								Long.valueOf(searchProjectId)));
+						criteria.add(Restrictions.eq("id", Long.valueOf(searchProjectId)));
 					}
 				}
 
@@ -4458,9 +4169,8 @@ public class TimelineServiceImpl implements TimelineService {
 								projectData.setLeadName(proj.getLeadName());
 
 								estimateData = new ProjectEstimateData();
-								estimateData.setBudgetAtCompletion(TextHelper
-										.getScaledDouble(proj
-												.getBudgetAtCompletion()));
+								estimateData.setBudgetAtCompletion(TextHelper.getScaledDouble(proj
+										.getBudgetAtCompletion()));
 								estimateData.setStartDate(proj.getStartDate());
 								estimateData.setEndDate(proj.getEndDate());
 
@@ -4496,9 +4206,8 @@ public class TimelineServiceImpl implements TimelineService {
 
 			}
 
-			TextHelper
-					.logMessage("getProjectLevelMetricsReport() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("getProjectLevelMetricsReport() > Time taken : "
+					+ ((System.nanoTime() - time) / 1000000));
 
 			// commit the transaction
 			transaction.commit();
@@ -4526,8 +4235,7 @@ public class TimelineServiceImpl implements TimelineService {
 	}
 
 	@Override
-	public ProjectDetailMetricsReply getProjectDetailMetricsReport(
-			ProjectDetailMetricsSearchParameters searchParameters)
+	public ProjectDetailMetricsReply getProjectDetailMetricsReport(ProjectDetailMetricsSearchParameters searchParameters)
 			throws TimelineException {
 
 		final ProjectDetailMetricsReply reply = new ProjectDetailMetricsReply();
@@ -4553,8 +4261,7 @@ public class TimelineServiceImpl implements TimelineService {
 			} else {
 
 				// get project
-				project = (Project) session.get(Project.class, new Long(
-						searchProjectId));
+				project = (Project) session.get(Project.class, new Long(searchProjectId));
 
 				if (project == null) {
 
@@ -4571,9 +4278,7 @@ public class TimelineServiceImpl implements TimelineService {
 						projectData.setLeadName(project.getLeadName());
 
 						ProjectEstimateData extimateData = new ProjectEstimateData();
-						extimateData.setBudgetAtCompletion(TextHelper
-								.getScaledDouble(project
-										.getBudgetAtCompletion()));
+						extimateData.setBudgetAtCompletion(TextHelper.getScaledDouble(project.getBudgetAtCompletion()));
 						extimateData.setStartDate(project.getStartDate());
 						extimateData.setEndDate(project.getEndDate());
 						extimateData.setProjectData(projectData);
@@ -4583,11 +4288,9 @@ public class TimelineServiceImpl implements TimelineService {
 					}
 
 					// get detailed metrics
-					Criteria criteria = session
-							.createCriteria(ProjectMetrics.class);
+					Criteria criteria = session.createCriteria(ProjectMetrics.class);
 					criteria.createAlias("project", "pr");
-					criteria.add(Restrictions.eq("pr.id", new Long(
-							searchProjectId)));
+					criteria.add(Restrictions.eq("pr.id", new Long(searchProjectId)));
 					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
 					@SuppressWarnings("unchecked")
@@ -4605,30 +4308,20 @@ public class TimelineServiceImpl implements TimelineService {
 
 							// create metric data
 							basicMetrics = new BasicProjectMetrics();
-							basicMetrics
-									.setPlannedValue(TextHelper
-											.getScaledDouble(metrics
-													.getPlannedValue()));
-							basicMetrics.setEarnedValue(TextHelper
-									.getScaledDouble(metrics.getEarnedValue()));
-							basicMetrics.setActualCost(TextHelper
-									.getScaledDouble(metrics.getActualCost()));
-							basicMetrics
-									.setActualsToDate(TextHelper
-											.getScaledDouble(metrics
-													.getActualsToDate()));
-							basicMetrics
-									.setSoftwareProgrammingEffort(TextHelper.getScaledDouble(metrics
-											.getSoftwareProgrammingEffort()));
+							basicMetrics.setPlannedValue(TextHelper.getScaledDouble(metrics.getPlannedValue()));
+							basicMetrics.setEarnedValue(TextHelper.getScaledDouble(metrics.getEarnedValue()));
+							basicMetrics.setActualCost(TextHelper.getScaledDouble(metrics.getActualCost()));
+							basicMetrics.setActualsToDate(TextHelper.getScaledDouble(metrics.getActualsToDate()));
+							basicMetrics.setSoftwareProgrammingEffort(TextHelper.getScaledDouble(metrics
+									.getSoftwareProgrammingEffort()));
 							basicMetrics.setDefects(metrics.getDefects());
 
 							// populate the row
 							reportRow.setWeeklyMetrics(basicMetrics);
 
 							// set metric week
-							reportRow.setMetricWeek(TextHelper.getDisplayWeek(
-									metrics.getWeek().getStartDate(), metrics
-											.getWeek().getEndDate()));
+							reportRow.setMetricWeek(TextHelper.getDisplayWeek(metrics.getWeek().getStartDate(), metrics
+									.getWeek().getEndDate()));
 
 							lastSaved = metrics.getModifyDate();
 
@@ -4649,9 +4342,8 @@ public class TimelineServiceImpl implements TimelineService {
 				}
 			}
 
-			TextHelper
-					.logMessage("getProjectDetailMetricsReport() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("getProjectDetailMetricsReport() > Time taken : "
+					+ ((System.nanoTime() - time) / 1000000));
 
 			// commit the transaction
 			transaction.commit();
@@ -4676,5 +4368,350 @@ public class TimelineServiceImpl implements TimelineService {
 
 		return reply;
 
+	}
+
+	@Override
+	public CodeValueReply createStage(CodeValueInput input) throws TimelineException {
+		Session session = null;
+		Transaction transaction = null;
+		final CodeValueReply reply = new CodeValueReply();
+
+		if ((input != null) && (input.getCodeValue() != null)) {
+
+			final String text = TextHelper.trimToNull(input.getCodeValue().getValue());
+
+			if (text != null) {
+
+				try {
+					// create data, hence using AuditableSession()
+					session = getAuditableSession();
+					transaction = session.beginTransaction();
+
+					long time = System.nanoTime();
+					Stage stage = null;
+					Stage newStage = null;
+
+					Criteria criteria = session.createCriteria(Stage.class);
+					criteria.add(Restrictions.eq("name", text));
+					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+					@SuppressWarnings("unchecked")
+					List<Stage> list = criteria.list();
+
+					if ((list != null) && (list.size() > 0)) {
+
+						// already a project exists with given name.
+						reply.setErrorMessage("This stage name is already present in system.");
+
+					} else {
+
+						newStage = new Stage();
+						newStage.setName(text);
+						session.saveOrUpdate(newStage);
+
+						reply.setSuccessMessage("Created successfully.");
+
+					}
+
+					TextHelper.logMessage("createStage() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+
+					// commit the transaction
+					transaction.commit();
+
+					if (newStage != null) {
+						reply.setCodeValue(new CodeValue(newStage.getId(), newStage.getName()));
+					}
+
+				} catch (HibernateException hibernateException) {
+
+					// rollback transaction
+					if (transaction != null) {
+						transaction.rollback();
+					}
+
+					hibernateException.printStackTrace();
+
+					// create a reply for error message
+					reply.setErrorMessage("Create failed due to Technical Reasons.");
+
+				} finally {
+					// close the session
+					if (session != null) {
+						session.close();
+					}
+				}
+			} else {
+				reply.setErrorMessage("Invalid stage name specified.");
+			}
+		}
+
+		return reply;
+	}
+
+	@Override
+	public CodeValueReply createProjectStage(ProjectStageInput input) throws TimelineException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CodeValueReply deleteStage(CodeValueInput input) throws TimelineException {
+
+		Session session = null;
+		Transaction transaction = null;
+		final CodeValueReply reply = new CodeValueReply();
+
+		if ((input != null) && (input.getCodeValue() != null)) {
+			final long id = input.getCodeValue().getCode();
+
+			if (id > 0) {
+
+				try {
+					// create data, hence using AuditableSession()
+					session = getAuditableSession();
+					transaction = session.beginTransaction();
+
+					long time = System.nanoTime();
+
+					final Long stageId = id;
+
+					Criteria criteria = session.createCriteria(ProjectStageTask.class);
+					criteria.createAlias("projectStage", "projectStage");
+					criteria.createAlias("projectStage.stage", "stage");
+
+					criteria.add(Restrictions.eq("stage.id", stageId));
+					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+					@SuppressWarnings("unchecked")
+					List<ProjectStageTask> list = criteria.list();
+
+					if ((list != null) && (list.size() > 0)) {
+
+						// already a project exists with given name.
+						reply.setErrorMessage("There are already tasks present for this stage.");
+
+					} else {
+
+						Stage stage = (Stage) session.get(Stage.class, stageId);
+
+						if (stage != null) {
+							session.delete(stage);
+							reply.setSuccessMessage("Deleted successfully.");
+							reply.setCodeValue(new CodeValue(stage.getId(), stage.getName()));
+						} else {
+							reply.setErrorMessage("Specified stage not present in system.");
+						}
+					}
+
+					TextHelper.logMessage("deleteStage() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+
+					// commit the transaction
+					transaction.commit();
+
+				} catch (HibernateException hibernateException) {
+
+					// rollback transaction
+					if (transaction != null) {
+						transaction.rollback();
+					}
+
+					hibernateException.printStackTrace();
+
+					// create a reply for error message
+					reply.setErrorMessage("Delete failed due to Technical Reasons.");
+
+				} finally {
+					// close the session
+					if (session != null) {
+						session.close();
+					}
+				}
+			} else {
+				if (id <= 0) {
+					reply.setErrorMessage("Invalid stage specified.");
+				}
+			}
+		}
+
+		return reply;
+
+	}
+
+	@Override
+	public CodeValueReply deleteProjectStage(CodeValueInput input) throws TimelineException {
+
+		Session session = null;
+		Transaction transaction = null;
+		final CodeValueReply reply = new CodeValueReply();
+
+		if ((input != null) && (input.getCodeValue() != null)) {
+			final long id = input.getCodeValue().getCode();
+
+			if (id > 0) {
+
+				try {
+					// create data, hence using AuditableSession()
+					session = getAuditableSession();
+					transaction = session.beginTransaction();
+
+					long time = System.nanoTime();
+
+					final Long projectStageId = id;
+
+					Criteria criteria = session.createCriteria(ProjectStageTask.class);
+					criteria.createAlias("projectStage", "projectStage");
+
+					criteria.add(Restrictions.eq("projectStage.id", projectStageId));
+					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+					@SuppressWarnings("unchecked")
+					List<ProjectStageTask> list = criteria.list();
+
+					if ((list != null) && (list.size() > 0)) {
+
+						// already a project exists with given name.
+						reply.setErrorMessage("There are already tasks present for this project stage.");
+
+					} else {
+
+						ProjectStage projectStage = (ProjectStage) session.get(ProjectStage.class, projectStageId);
+
+						if (projectStage != null) {
+							session.delete(projectStage);
+							reply.setSuccessMessage("Deleted successfully.");
+							reply.setCodeValue(new CodeValue(projectStage.getId(), projectStage.getDescription()));
+						} else {
+							reply.setErrorMessage("Specified project stage not present in system.");
+						}
+					}
+
+					TextHelper.logMessage("deleteProjectStage() > Time taken : "
+							+ ((System.nanoTime() - time) / 1000000));
+
+					// commit the transaction
+					transaction.commit();
+
+				} catch (HibernateException hibernateException) {
+
+					// rollback transaction
+					if (transaction != null) {
+						transaction.rollback();
+					}
+
+					hibernateException.printStackTrace();
+
+					// create a reply for error message
+					reply.setErrorMessage("Delete failed due to Technical Reasons.");
+
+				} finally {
+					// close the session
+					if (session != null) {
+						session.close();
+					}
+				}
+			} else {
+				if (id <= 0) {
+					reply.setErrorMessage("Invalid project stage specified.");
+				}
+			}
+		}
+
+		return reply;
+
+	}
+
+	@Override
+	public CodeValueReply modifyProjectStageTask(ProjectStageTaskInput input) throws TimelineException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CodeValueListReply searchStages(StageSearchParameter searchParameters) throws TimelineException {
+
+		Session session = null;
+		Transaction transaction = null;
+		final CodeValueListReply reply = new CodeValueListReply();
+
+		try {
+			// read data, hence using normal session()
+			session = getNormalSession();
+			transaction = session.beginTransaction();
+
+			long time = System.nanoTime();
+			Long stageId = 0l;
+			String stageName = null;
+
+			Criteria criteria = session.createCriteria(Stage.class);
+
+			if (searchParameters != null) {
+				stageId = searchParameters.getStageId();
+				stageName = TextHelper.trimToNull(searchParameters.getStageName());
+			}
+
+			if (stageId > 0) {
+				criteria.add(Restrictions.eq("id", stageId));
+			}
+
+			if (stageName != null) {
+				criteria.add(Restrictions.ilike("name", stageName.toLowerCase(), MatchMode.ANYWHERE));
+			}
+
+			// add order
+			criteria.addOrder(Order.asc("name"));
+
+			criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+			@SuppressWarnings("unchecked")
+			List<Stage> dbList = criteria.list();
+
+			if ((dbList != null) && (dbList.size() > 0)) {
+
+				CodeValue codeValue = null;
+
+				for (Stage stage : dbList) {
+					codeValue = new CodeValue();
+					codeValue.setCode(stage.getId());
+					codeValue.setValue(stage.getName());
+
+					reply.addCodeValue(codeValue);
+				}
+
+			} else {
+				// No results found
+				reply.setErrorMessage("No results found.");
+			}
+
+			TextHelper.logMessage("searchStages() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+
+			// commit the transaction
+			transaction.commit();
+
+		} catch (HibernateException hibernateException) {
+
+			// rollback transaction
+			if (transaction != null) {
+				transaction.rollback();
+			}
+
+			hibernateException.printStackTrace();
+
+			// create a reply for error message
+			reply.setErrorMessage("Search failed due to Technical Reasons.");
+
+		} finally {
+			// close the session
+			if (session != null) {
+				session.close();
+			}
+		}
+		return reply;
+	}
+
+	@Override
+	public CodeValueListReply searchProjectStage(ProjectStageSearchParameters searchParameters)
+			throws TimelineException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
