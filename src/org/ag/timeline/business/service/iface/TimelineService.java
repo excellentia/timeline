@@ -62,6 +62,7 @@ public interface TimelineService {
 	public CodeValueReply createProjectDetailMetrics(final ProjectMetricsInput input) throws TimelineException;
 	public CodeValueReply createStage(final CodeValueInput input) throws TimelineException;
 	public CodeValueReply createProjectStage(final ProjectStageInput input) throws TimelineException;
+	public CodeValueReply createProjectStageTask(final ProjectStageTaskInput input) throws TimelineException;
 	
 	public CodeValueReply deleteProject(CodeValueInput input) throws TimelineException;
 	public CodeValueReply deleteActivity(CodeValueInput input) throws TimelineException;
@@ -72,6 +73,7 @@ public interface TimelineService {
 	public CodeValueReply deleteProjectDetailMetrics(final CodeValueInput input) throws TimelineException;
 	public CodeValueReply deleteStage(final CodeValueInput input) throws TimelineException;
 	public CodeValueReply deleteProjectStage(final CodeValueInput input) throws TimelineException;
+	public CodeValueReply deleteProjectStageTask(final CodeValueInput input) throws TimelineException;
 		
 	public CodeValueReply modifyActivity(CodeValueInput input) throws TimelineException;
 	public CodeValueReply modifyProject(ProjectInput input) throws TimelineException;

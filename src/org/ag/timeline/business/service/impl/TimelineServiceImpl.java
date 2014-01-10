@@ -4389,7 +4389,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 					long time = System.nanoTime();
 					Stage stage = null;
-					Stage newStage = null;
 
 					Criteria criteria = session.createCriteria(Stage.class);
 					criteria.add(Restrictions.eq("name", text));
@@ -4405,9 +4404,9 @@ public class TimelineServiceImpl implements TimelineService {
 
 					} else {
 
-						newStage = new Stage();
-						newStage.setName(text);
-						session.saveOrUpdate(newStage);
+						stage = new Stage();
+						stage.setName(text);
+						session.saveOrUpdate(stage);
 
 						reply.setSuccessMessage("Created successfully.");
 
@@ -4418,8 +4417,8 @@ public class TimelineServiceImpl implements TimelineService {
 					// commit the transaction
 					transaction.commit();
 
-					if (newStage != null) {
-						reply.setCodeValue(new CodeValue(newStage.getId(), newStage.getName()));
+					if (stage != null) {
+						reply.setCodeValue(new CodeValue(stage.getId(), stage.getName()));
 					}
 
 				} catch (HibernateException hibernateException) {
@@ -4450,8 +4449,98 @@ public class TimelineServiceImpl implements TimelineService {
 
 	@Override
 	public CodeValueReply createProjectStage(ProjectStageInput input) throws TimelineException {
-		// TODO Auto-generated method stub
-		return null;
+		Session session = null;
+		Transaction transaction = null;
+		final CodeValueReply reply = new CodeValueReply();
+
+		if (input != null) {
+
+			final Long projectId = input.getProjectId();
+			final Long stageId = input.getStageId();
+
+			if ((projectId > 0) && (stageId > 0)) {
+
+				try {
+					// create data, hence using AuditableSession()
+					session = getAuditableSession();
+					transaction = session.beginTransaction();
+
+					long time = System.nanoTime();
+
+					ProjectStage projectStage = null;
+
+					Criteria criteria = session.createCriteria(ProjectStage.class);
+					criteria.createAlias("project", "project");
+					criteria.createAlias("stage", "stage");
+
+					criteria.add(Restrictions.and(Restrictions.eq("project.id", projectId),
+							Restrictions.eq("stage.id", stageId)));
+
+					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+					@SuppressWarnings("unchecked")
+					List<ProjectStage> list = criteria.list();
+
+					if ((list != null) && (list.size() > 0)) {
+
+						// already a project stage exists
+						reply.setErrorMessage("This project stage is already present in system.");
+
+					} else {
+
+						Project project = (Project) session.get(Project.class, projectId);
+						Stage stage = (Stage) session.get(Stage.class, stageId);
+
+						final long position = input.getPosition();
+
+						if ((project != null) && (stage != null) && (position > 0)) {
+
+							projectStage = new ProjectStage();
+							projectStage.setPosition(position);
+							projectStage.setProject(project);
+							projectStage.setStage(stage);
+							session.saveOrUpdate(projectStage);
+							reply.setSuccessMessage("Created successfully.");
+
+						} else {
+							reply.setErrorMessage("Invalid data provided.");
+						}
+					}
+
+					TextHelper.logMessage("createProjectStage() > Time taken : "
+							+ ((System.nanoTime() - time) / 1000000));
+
+					// commit the transaction
+					transaction.commit();
+
+					if (projectStage != null) {
+						reply.setCodeValue(new CodeValue(projectStage.getId(), projectStage.getDescription()));
+					}
+
+				} catch (HibernateException hibernateException) {
+
+					// rollback transaction
+					if (transaction != null) {
+						transaction.rollback();
+					}
+
+					hibernateException.printStackTrace();
+
+					// create a reply for error message
+					reply.setErrorMessage("Create failed due to Technical Reasons.");
+
+				} finally {
+					// close the session
+					if (session != null) {
+						session.close();
+					}
+				}
+			} else {
+				reply.setErrorMessage("Invalid Project or Stage specified.");
+			}
+		}
+
+		return reply;
 	}
 
 	@Override
@@ -4711,6 +4800,138 @@ public class TimelineServiceImpl implements TimelineService {
 	@Override
 	public CodeValueListReply searchProjectStage(ProjectStageSearchParameters searchParameters)
 			throws TimelineException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CodeValueReply createProjectStageTask(ProjectStageTaskInput input) throws TimelineException {
+		Session session = null;
+		Transaction transaction = null;
+		final CodeValueReply reply = new CodeValueReply();
+
+		if (input != null) {
+
+			final Long projectId = input.getProjectId();
+			final Long stageId = input.getStageId();
+			final Long taskId = input.getTaskId();
+
+			if ((projectId > 0) && (stageId > 0) && (taskId > 0)) {
+
+				try {
+					// create data, hence using AuditableSession()
+					session = getAuditableSession();
+					transaction = session.beginTransaction();
+
+					long time = System.nanoTime();
+
+					ProjectStageTask projectStageTask = null;
+
+					Criteria criteria = session.createCriteria(ProjectStageTask.class);
+					criteria.createAlias("projectStage", "projectStage");
+					criteria.createAlias("projectStage.project", "project");
+					criteria.createAlias("projectStage.stage", "stage");
+					criteria.createAlias("task", "task");
+
+					criteria.add(Restrictions.and(Restrictions.eq("project.id", projectId),
+							Restrictions.eq("stage.id", stageId), Restrictions.eq("task.id", taskId)));
+
+					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+					@SuppressWarnings("unchecked")
+					List<ProjectStageTask> list = criteria.list();
+
+					if ((list != null) && (list.size() > 0)) {
+
+						// already a project stage task exists
+						reply.setErrorMessage("This combination of Task, Project & Stage already exists");
+
+					} else {
+
+						Project project = (Project) session.get(Project.class, projectId);
+						Stage stage = (Stage) session.get(Stage.class, stageId);
+						Task task = (Task) session.get(Task.class, taskId);
+
+						final long position = input.getPosition();
+
+						if ((project != null) && (stage != null) && (task != null) && (position > 0)) {
+
+							ProjectStage projectStage = null;
+
+							{
+								Criteria innerCtiteria = session.createCriteria(ProjectStage.class);
+								innerCtiteria.createAlias("project", "project");
+								innerCtiteria.createAlias("stage", "stage");
+
+								innerCtiteria.add(Restrictions.and(Restrictions.eq("project.id", projectId),
+										Restrictions.eq("stage.id", stageId)));
+
+								criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+								@SuppressWarnings("unchecked")
+								List<ProjectStage> innerList = criteria.list();
+
+								if (innerList != null) {
+									projectStage = innerList.get(0);
+								}
+
+								if (projectStage != null) {
+
+									projectStageTask = new ProjectStageTask();
+									projectStageTask.setPosition(position);
+									projectStageTask.setProjectStage(projectStage);
+									projectStageTask.setTask(task);
+									session.saveOrUpdate(projectStage);
+									reply.setSuccessMessage("Created successfully.");
+
+								} else {
+									reply.setErrorMessage("Specified ProjectStage not present in system.");
+								}
+							}
+
+						} else {
+							reply.setErrorMessage("Invalid data provided.");
+						}
+					}
+
+					TextHelper.logMessage("createProjectStageTask() > Time taken : "
+							+ ((System.nanoTime() - time) / 1000000));
+
+					// commit the transaction
+					transaction.commit();
+
+					if (projectStageTask != null) {
+						reply.setCodeValue(new CodeValue(projectStageTask.getId(), projectStageTask.getDescription()));
+					}
+
+				} catch (HibernateException hibernateException) {
+
+					// rollback transaction
+					if (transaction != null) {
+						transaction.rollback();
+					}
+
+					hibernateException.printStackTrace();
+
+					// create a reply for error message
+					reply.setErrorMessage("Create failed due to Technical Reasons.");
+
+				} finally {
+					// close the session
+					if (session != null) {
+						session.close();
+					}
+				}
+			} else {
+				reply.setErrorMessage("Invalid Project or Stage or Task specified.");
+			}
+		}
+
+		return reply;
+	}
+
+	@Override
+	public CodeValueReply deleteProjectStageTask(CodeValueInput input) throws TimelineException {
 		// TODO Auto-generated method stub
 		return null;
 	}
