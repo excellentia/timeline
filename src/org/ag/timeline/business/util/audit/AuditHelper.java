@@ -12,11 +12,12 @@ import org.ag.timeline.application.context.TimelineContext;
 import org.ag.timeline.business.model.AbstractModel;
 import org.ag.timeline.business.model.Activity;
 import org.ag.timeline.business.model.Project;
-import org.ag.timeline.business.model.ProjectMetrics;
+import org.ag.timeline.business.model.Task;
 import org.ag.timeline.business.model.TimeData;
 import org.ag.timeline.business.model.User;
 import org.ag.timeline.business.model.UserPreferences;
 import org.ag.timeline.business.model.Week;
+import org.ag.timeline.business.model.metrics.ProjectMetrics;
 import org.ag.timeline.common.TextHelper;
 import org.ag.timeline.common.TimelineConstants;
 
@@ -163,7 +164,17 @@ final class AuditHelper {
 
 		return value;
 	}
+	
+	static String getNullSafeTaskText(Task task) {
+		String value = null;
 
+		if (task != null) {
+			value = task.getDescription();
+		}
+
+		return value;
+	}
+	
 	static String getNullSafeTimestamp(Date date) {
 		String value = null;
 
@@ -197,7 +208,9 @@ final class AuditHelper {
 	static TimelineConstants.AuditDataType getDataType(String entityName) {
 		TimelineConstants.AuditDataType type = null;
 
-		if (entityName.contains("Metrics")) {
+		if (entityName.contains("Task")) {
+			type = TimelineConstants.AuditDataType.TASK;
+		} else if (entityName.contains("Metrics")) {
 			type = TimelineConstants.AuditDataType.METRICS;
 		} else if (entityName.contains("Project")) {
 			type = TimelineConstants.AuditDataType.PROJECT;
@@ -281,6 +294,7 @@ final class AuditHelper {
 				Map<String, String> map = new HashMap<String, String>();
 				map.put("name", "Name");
 				map.put("lead", "Lead");
+				map.put("active", "Active");
 				map.put("budgetAtCompletion", "BAC");
 				map.put("startDate", "Start Date");
 				map.put("endDate", "End Date");
@@ -304,6 +318,7 @@ final class AuditHelper {
 				map.put("userId", "User Id");
 				map.put("password", "Password");
 				map.put("admin", "Admin");
+				map.put("active", "Active");
 
 				entityFieldNameMap.put(User.class.getSimpleName(), map);
 			}
@@ -341,7 +356,7 @@ final class AuditHelper {
 
 				entityFieldNameMap.put(Week.class.getSimpleName(), map);
 			}
-			
+
 			// Metrics entity
 			{
 				Map<String, String> map = new HashMap<String, String>();
@@ -353,6 +368,16 @@ final class AuditHelper {
 				map.put("defects", "Bugs");
 
 				entityFieldNameMap.put(ProjectMetrics.class.getSimpleName(), map);
+			}
+
+			// Task entity
+			{
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("text", "Name");
+				map.put("details", "Description");
+				map.put("activity", "Activity");
+
+				entityFieldNameMap.put(Task.class.getSimpleName(), map);
 			}
 		}
 
@@ -367,9 +392,14 @@ final class AuditHelper {
 	 */
 	static enum AuditableEntityField {
 
-		PROJECT(Project.class.getSimpleName()), ACTIVITY(Activity.class.getSimpleName()), USER(User.class
-				.getSimpleName()), PREFERENCES(UserPreferences.class.getSimpleName()), TIME_DATA(TimeData.class
-				.getSimpleName()), WEEK(Week.class.getSimpleName()), METRICS(ProjectMetrics.class.getSimpleName());
+		PROJECT(Project.class.getSimpleName()),
+		ACTIVITY(Activity.class.getSimpleName()),
+		USER(User.class.getSimpleName()),
+		PREFERENCES(UserPreferences.class.getSimpleName()),
+		TIME_DATA(TimeData.class.getSimpleName()),
+		WEEK(Week.class.getSimpleName()),
+		METRICS(ProjectMetrics.class.getSimpleName()),
+		TASK(Task.class.getSimpleName());
 
 		private final String entityName;
 

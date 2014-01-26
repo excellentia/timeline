@@ -13,17 +13,17 @@ import java.util.Set;
 
 import org.ag.timeline.business.model.AbstractModel;
 import org.ag.timeline.business.model.Activity;
-import org.ag.timeline.business.model.AuditRecord;
-import org.ag.timeline.business.model.AuditRecordDetail;
 import org.ag.timeline.business.model.Project;
-import org.ag.timeline.business.model.ProjectMetrics;
+import org.ag.timeline.business.model.Task;
 import org.ag.timeline.business.model.TimeData;
 import org.ag.timeline.business.model.User;
 import org.ag.timeline.business.model.Week;
+import org.ag.timeline.business.model.audit.AuditRecord;
+import org.ag.timeline.business.model.audit.AuditRecordDetail;
+import org.ag.timeline.business.model.metrics.ProjectMetrics;
 import org.ag.timeline.business.util.HibernateUtil;
 import org.ag.timeline.common.TextHelper;
 import org.ag.timeline.common.TimelineConstants;
-
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -98,6 +98,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 		Project project = null;
 		Activity activity = null;
 		Week week = null;
+		Task task = null;
 
 		List<String> weekDayList = null;
 		boolean isTimeEntry = false;
@@ -106,8 +107,8 @@ public class AuditInterceptor extends EmptyInterceptor {
 
 		Map<String, String> propertyMap = null;
 		boolean isMetricEntry = false;
-		
 		boolean isProject = false;
+		boolean isTask = false;
 
 		if (entity instanceof TimeData) {
 			weekDayList = TextHelper.getDisplayWeekDayList(((TimeData) entity).getWeek().getStartDate());
@@ -118,9 +119,11 @@ public class AuditInterceptor extends EmptyInterceptor {
 		} else if (entity instanceof Project) {
 			isProject = true;
 			propertyMap = AuditHelper.AuditableEntityField.PROJECT.getFieldMap();
+		} else if(entity instanceof Task) {
+			isTask  = true;
+			propertyMap = AuditHelper.AuditableEntityField.TASK.getFieldMap();
 		}
 
-		//TODO: AG
 		for (String property : propertyNames) {
 
 			if (auditPropertyNames.contains(property)) {
@@ -199,6 +202,14 @@ public class AuditInterceptor extends EmptyInterceptor {
 									newVal = AuditHelper.getNullSafeWeekText(week);
 									prevVal = AuditHelper.getNullSafeWeekText((Week) previousState[counter]);
 
+								} else if (foreignKeyType instanceof Task) {
+
+									// task type
+									task = (Task) currentState[counter];
+
+									newVal = AuditHelper.getNullSafeTaskText(task);
+									prevVal = AuditHelper.getNullSafeTaskText((Task) previousState[counter]);
+
 								} else {
 
 									// static data type
@@ -218,16 +229,16 @@ public class AuditInterceptor extends EmptyInterceptor {
 					} else if (type instanceof TimestampType) {
 
 						// time / date type
-						
+
 						if (isProject) {
 							newVal = AuditHelper.getNullSafeWeekDay((Date) currentState[counter]);
 							prevVal = AuditHelper.getNullSafeWeekDay((Date) previousState[counter]);
-							
+
 							property = propertyMap.get(property);
-							
+
 						} else {
-						newVal = AuditHelper.getNullSafeTimestamp((Date) currentState[counter]);
-						prevVal = AuditHelper.getNullSafeTimestamp((Date) previousState[counter]);
+							newVal = AuditHelper.getNullSafeTimestamp((Date) currentState[counter]);
+							prevVal = AuditHelper.getNullSafeTimestamp((Date) previousState[counter]);
 						}
 
 					} else if (type instanceof BigDecimalType) {
@@ -243,14 +254,14 @@ public class AuditInterceptor extends EmptyInterceptor {
 							if ((weekDayNum > 0) && (weekDayNum <= 7)) {
 								property = weekDayList.get(weekDayNum - 1);
 							}
-						} else if(isMetricEntry) {
-						
-							//metric data type
+						} else if (isMetricEntry) {
+
+							// metric data type
 							property = propertyMap.get(property);
-							
-						} else if(isProject) {
-							
-							//estimate data
+
+						} else if (isProject) {
+
+							// estimate data
 							property = propertyMap.get(property);
 						}
 
@@ -410,7 +421,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 			saveAudits(auditLog);
 		}
 
-		TextHelper.logMessage("Audit Save Time : " + (System.nanoTime() - time) / 1000000);
+		TextHelper.logMessage("Audit Delete Time", time);
 	}
 
 	/*
@@ -435,7 +446,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 
 		}
 
-		TextHelper.logMessage("Audit Save Time : " + (System.nanoTime() - time) / 1000000);
+		TextHelper.logMessage("Audit Save Time", time);
 
 		return changed;
 	}
@@ -464,7 +475,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 
 		}
 
-		TextHelper.logMessage("Audit Update Time : " + (System.nanoTime() - time) / 1000000);
+		TextHelper.logMessage("Audit Update Time", time);
 
 		return changed;
 	}
