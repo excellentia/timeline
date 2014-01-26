@@ -69,7 +69,7 @@ function editLead(leadElmId, projDbId, leadDbId) {
 
 				var saveHTML = "<img alt='Save' align='middle' class='icon' title='Save This Text'";
 				saveHTML = saveHTML + "src='" + saveIcon + "' onclick=\"saveLead(" + projDbId + ",'" + leadId
-				        + "')\" />";
+						+ "')\" />";
 
 				row.cells[1].innerHTML = saveHTML;
 			}
@@ -95,6 +95,7 @@ function saveLead(projDbId, leadElmId) {
 			if (selectElm.options[i].selected) {
 				leadId = selectElm.options[i].value;
 				leadName = selectElm.options[i].innerHTML;
+				break;
 			}
 		}
 
@@ -116,8 +117,8 @@ function saveLead(projDbId, leadElmId) {
 					row.cells[0].innerHTML = leadName;
 					row.cells[0].className = "leadArea";
 					row.cells[1].innerHTML = "<img alt=\"Edit Lead\" align=\"middle\" class=\"icon\" title=\""
-					        + editTitle + "\" src=\"" + editIcon + "\" onclick=\"editLead('" + projLeadId + "',"
-					        + projDbId +","+leadId+ ")\"/>";
+							+ editTitle + "\" src=\"" + editIcon + "\" onclick=\"editLead('" + projLeadId + "',"
+							+ projDbId + "," + leadId + ")\"/>";
 
 				}
 			}, JSON_RESULT_TYPE);
@@ -140,6 +141,7 @@ function deleteActivity(actElementId, actDbId) {
 			operation : "DELETE_ACTIVITY",
 			id : actDbId
 		}, function(data) {
+
 			jsonData = data;
 
 			if (jsonData.error) {
@@ -177,6 +179,7 @@ function saveActivity(actElmId, actDbId, projDbId) {
 				refId : actDbId,
 				text : text
 			}, function(data) {
+
 				jsonData = data;
 
 				if (jsonData.error) {
@@ -187,8 +190,12 @@ function saveActivity(actElmId, actDbId, projDbId) {
 					actRow.cells[0].innerHTML = jsonData.value;
 					actRow.cells[0].className = "activityArea";
 
-					actRow.children[1].innerHTML = "<img alt='Edit' align='middle' class='icon' title='" + editTitle + "' src='" + editIcon + "' onclick=\"editActivity('" + actId + "'," + jsonData.code + "," + projDbId + ")\" />";
-					actRow.children[2].innerHTML = "<img alt='Delete' align='middle' class='icon' title='" + activityDeleteTitle + "' src='" + deleteIcon + "' onclick=\"deleteActivity('" + actId + "'," + jsonData.code + ")\"/>";
+					actRow.children[1].innerHTML = "<img alt='Edit' align='middle' class='icon' title='" + editTitle
+							+ "' src='" + editIcon + "' onclick=\"editActivity('" + actId + "'," + jsonData.code + ","
+							+ projDbId + ")\" />";
+					actRow.children[2].innerHTML = "<img alt='Delete' align='middle' class='icon' title='"
+							+ activityDeleteTitle + "' src='" + deleteIcon + "' onclick=\"deleteActivity('" + actId
+							+ "'," + jsonData.code + ")\"/>";
 				}
 			}, JSON_RESULT_TYPE);
 		}
@@ -211,8 +218,10 @@ function editActivity(actElmId, actDbId, projDbId) {
 	actRow.cells[0].innerHTML = actInput;
 	actRow.cells[0].children[0].focus();
 
-	actRow.children[1].innerHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='" + saveIcon + "' onclick=\"saveActivity('" + actElmId + "'," + actDbId + "," + projDbId + ")\"/>";
-	actRow.children[2].innerHTML = "<img alt='Delete' align='middle' class='icon' title='" + activityDeleteTitle + "' src='" + deleteIcon + "' onclick=\"deleteActivity('" + actId + "'," + actDbId + ")\"/>";
+	actRow.children[2].innerHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='"
+			+ saveIcon + "' onclick=\"saveActivity('" + actElmId + "'," + actDbId + "," + projDbId + ")\"/>";
+	actRow.children[3].innerHTML = "<img alt='Delete' align='middle' class='icon' title='" + activityDeleteTitle
+			+ "' src='" + deleteIcon + "' onclick=\"deleteActivity('" + actId + "'," + actDbId + ")\"/>";
 }
 
 /**
@@ -232,8 +241,10 @@ function addNewActivity(tableID, projDbId) {
 	row.id = newId;
 
 	var activityHTML = "<input type='text' value='' class='activityAreaEdit' />";
-	var saveHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='" + saveIcon + "' onclick=\"saveActivity('" + newId + "',0," + projDbId + ")\"/>";
-	var deleteHTML = "<img alt='Delete' align='middle' class='icon' title='" + activityDeleteTitle + "' src='" + deleteIcon + "' onclick=\"deleteActivity('" + newId + "',0)\"/>";
+	var saveHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='" + saveIcon
+			+ "' onclick=\"saveActivity('" + newId + "',0," + projDbId + ")\"/>";
+	var deleteHTML = "<img alt='Delete' align='middle' class='icon' title='" + activityDeleteTitle + "' src='"
+			+ deleteIcon + "' onclick=\"deleteActivity('" + newId + "',0)\"/>";
 
 	var cellNum = 0;
 
@@ -293,6 +304,10 @@ function toggleProjectStatus(projDbId, inputId, projTitleId) {
 	}
 }
 
+function toggleDefaultActivity( rowElmId, actDbId, inputElmId) {
+	
+}
+
 function toggleUserStatus(userDbId, inputId, userRowId) {
 
 	var checkInput = document.getElementById(inputId);
@@ -338,7 +353,7 @@ function saveProject(divID, projDbId, projNameId, copyProjElmId) {
 
 	if (projText != "") {
 		var jsonData = null;
-		
+
 		var copyProj = document.getElementById(copyProjElmId);
 		var copyProjId = 0;
 
@@ -349,68 +364,82 @@ function saveProject(divID, projDbId, projNameId, copyProjElmId) {
 			}
 		}
 
-	$.post(
-		JSON_URL,
-		{
-			operation : "SAVE_PROJECT",
-			id : projDbId,
-			text : projText,
-			refId : copyProjId
-		},
-		function(data) {
-		jsonData = data;
+		$.post(
+				JSON_URL,
+				{
+					operation : "SAVE_PROJECT",
+					id : projDbId,
+					text : projText,
+					refId : copyProjId
+				},
+				function(data) {
 
-		if (jsonData.error) {
-			displayAlert(jsonData.error);
-		} else {
-			var projectId = jsonData.code;
-			var projectText = jsonData.value;
+					jsonData = data;
 
-			if (projDbId <= 0) {
+					if (jsonData.error) {
+						displayAlert(jsonData.error);
+					} else {
+						var projectId = jsonData.code;
+						var projectText = jsonData.value;
 
-				var projRowId = 'project_' + projectId + '_title';
-				var statusId = 'project_status_'+projectId;
+						if (projDbId <= 0) {
 
-				var newHTML = "<table class='projectTable' id='" + projectText 
-					+ "'><colgroup><col style='width: 88%' /><col style='width: 6%' /><col style='width: 6%' /></colgroup>";
-				newHTML = newHTML + "<tbody>";
-				newHTML = newHTML + "<tr id='" + projRowId + "'>";
-				newHTML = newHTML + "<td class='projectArea'>" + projectText + "</td>";
-				newHTML = newHTML + "<td align='center'><img alt='Edit' align='middle' class='icon' title='" + editTitle + "' src='" 
-					+ editIcon + "' onclick=\"editProject('" + projRowId + "'," + projectId + ")\" /></td>";
-				newHTML = newHTML + "<td align='center'><img alt='Delete' align='middle' class='icon' title='" + projectDeleteTitle 
-					+ "' src='" + deleteIcon + "' onclick=\"deleteProject('" + projectText + "'," + projectId + ")\" /></td>";
-				newHTML = newHTML + "</tr>";
+							var projRowId = 'project_' + projectId + '_title';
+							var statusId = 'project_status_' + projectId;
 
-				var projLeadRowId = projectText + "_lead";
-				var projLeadId = 0;
-				newHTML = newHTML + "<tr id='" + projLeadRowId + "'>";
-				newHTML = newHTML + "<td class='leadArea'>Please select...</td>";
-				newHTML = newHTML + "<td align='center' colspan='2'><img alt='Edit Lead' align='middle' class='icon' title='" + editTitle 
-					+ "' src='" + editIcon + "' onclick=\"editLead('" + projLeadRowId + "'," + projectId +","+ projLeadId + ")\" /></td>";
-				newHTML = newHTML + "</tr>";
+							var newHTML = "<table class='projectTable' id='"
+									+ projectText
+									+ "'><colgroup><col style='width: 88%' /><col style='width: 6%' /><col style='width: 6%' /></colgroup>";
+							newHTML = newHTML + "<tbody>";
+							newHTML = newHTML + "<tr id='" + projRowId + "'>";
+							newHTML = newHTML + "<td class='projectArea'>" + projectText + "</td>";
+							newHTML = newHTML
+									+ "<td align='center'><img alt='Edit' align='middle' class='icon' title='"
+									+ editTitle + "' src='" + editIcon + "' onclick=\"editProject('"
+									+ projRowId + "'," + projectId + ")\" /></td>";
+							newHTML = newHTML
+									+ "<td align='center'><img alt='Delete' align='middle' class='icon' title='"
+									+ projectDeleteTitle + "' src='" + deleteIcon
+									+ "' onclick=\"deleteProject('" + projectText + "'," + projectId
+									+ ")\" /></td>";
+							newHTML = newHTML + "</tr>";
 
-				newHTML = newHTML + "</tbody>";
-				newHTML = newHTML + "<tfoot><tr>";
-				newHTML = newHTML + "<td align='left'>&nbsp;Active&nbsp;<input id='"+statusId+"' type='checkbox' value='true' onchange=\"toggleProjectStatus("+projectId+",'"+statusId+"','"+projRowId+"')\"/></td>";
-				newHTML = newHTML + "<td colspan='2' align='right'>";
-				newHTML = newHTML + "<input type='button' value='Add Activity' class='button' onclick=\"addNewActivity('" + projectText + "'," + projectId + ")\" />";
-				newHTML = newHTML + "</td></tfoot>";
-				newHTML = newHTML + "</table>";
+							var projLeadRowId = projectText + "_lead";
+							var projLeadId = 0;
+							newHTML = newHTML + "<tr id='" + projLeadRowId + "'>";
+							newHTML = newHTML + "<td class='leadArea'>Please select...</td>";
+							newHTML = newHTML
+									+ "<td align='center' colspan='2'><img alt='Edit Lead' align='middle' class='icon' title='"
+									+ editTitle + "' src='" + editIcon + "' onclick=\"editLead('"
+									+ projLeadRowId + "'," + projectId + "," + projLeadId + ")\" /></td>";
+							newHTML = newHTML + "</tr>";
 
-				$("#" + divID).append(newHTML);
-				$("#" + projNameId).val("");
-			} else {
-				var row = document.getElementById(divID);
-				row.cells[0].innerHTML = projectText;
-				var editHTML = "<img alt='Edit' align='middle' class='icon' title='" + editTitle + "' src='" + editIcon 
-					+ "' onclick=\"editProject('" + divID + "'," + projectId + ")\" />";
-				row.cells[1].innerHTML = editHTML;
-			}
-			
-			displayAlert("Project Created");
-		}
-	 }, JSON_RESULT_TYPE);
+							newHTML = newHTML + "</tbody>";
+							newHTML = newHTML + "<tfoot><tr>";
+							newHTML = newHTML + "<td align='left'>&nbsp;Active&nbsp;<input id='" + statusId
+									+ "' type='checkbox' value='true' onchange=\"toggleProjectStatus("
+									+ projectId + ",'" + statusId + "','" + projRowId + "')\"/></td>";
+							newHTML = newHTML + "<td colspan='2' align='right'>";
+							newHTML = newHTML
+									+ "<input type='button' value='Add Activity' class='button' onclick=\"addNewActivity('"
+									+ projectText + "'," + projectId + ")\" />";
+							newHTML = newHTML + "</td></tfoot>";
+							newHTML = newHTML + "</table>";
+
+							$("#" + divID).append(newHTML);
+							$("#" + projNameId).val("");
+						} else {
+							var row = document.getElementById(divID);
+							row.cells[0].innerHTML = projectText;
+							var editHTML = "<img alt='Edit' align='middle' class='icon' title='" + editTitle
+									+ "' src='" + editIcon + "' onclick=\"editProject('" + divID + "',"
+									+ projectId + ")\" />";
+							row.cells[1].innerHTML = editHTML;
+						}
+
+						displayAlert("Project Created");
+					}
+				}, JSON_RESULT_TYPE);
 	} else {
 		displayAlert(errorMsgNoData);
 	}
@@ -436,10 +465,10 @@ function addNewUser(tableID) {
 	var firstNameHTML = "<input type='text' class='newUserEdit'/>";
 	var lastNameHTML = "<input type='text' class='newUserEdit'/>";
 	var deleteUserHTML = "<img alt='Delete' align='middle' class='icon' title='" + userDeleteTitle + "' src='"
-	        + deleteIcon + "' onclick=\"deleteUser('" + newId + "'," + 0 + ")\"/>";
+			+ deleteIcon + "' onclick=\"deleteUser('" + newId + "'," + 0 + ")\"/>";
 
 	var saveUserHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='" + saveIcon
-	        + "' onclick=\"saveUser('" + newId + "',0)\"/>";
+			+ "' onclick=\"saveUser('" + newId + "',0)\"/>";
 
 	var cellNum = 0;
 
@@ -468,7 +497,7 @@ function addNewUser(tableID) {
 	 * Create Admin Column
 	 */
 	newcell = row.insertCell(cellNum++);
-	
+
 	/**
 	 * Create Active/InActive Column
 	 */
@@ -519,7 +548,7 @@ function editProject(projTitleId, projDbId) {
 
 	var saveHTML = "<img alt='Save' align='middle' class='icon' title='Save This Text'";
 	saveHTML = saveHTML + "src='" + saveIcon + "' onclick=\"saveProject('" + projTitleId + "'," + projDbId + ",'"
-	        + textId + "')\" />";
+			+ textId + "')\" />";
 
 	row.cells[1].innerHTML = saveHTML;
 }
@@ -581,7 +610,7 @@ function editUser(userElmId, userDbId) {
 
 	var adminHTML = "<input type='checkbox' title='Toggle Admin Status'";
 	row.cells[3].align = "center";
-	
+
 	if (row.cells[3].children[0] != null) {
 		adminHTML = adminHTML + "checked ='true'";
 	}
@@ -590,7 +619,7 @@ function editUser(userElmId, userDbId) {
 	row.cells[3].innerHTML = adminHTML;
 
 	var saveHTML = "<img alt='Save' align='middle' class='icon' title='Save This Text' src='" + saveIcon
-	        + "' onclick=\"saveUser('" + userElmId + "'," + userDbId + ")\" />";
+			+ "' onclick=\"saveUser('" + userElmId + "'," + userDbId + ")\" />";
 
 	row.cells[5].innerHTML = saveHTML;
 }
@@ -614,8 +643,13 @@ function saveUser(userElmId, userDbId) {
 		var userId = userRow.children[0].children[0].value;
 		var fName = userRow.children[1].children[0].value;
 		var lName = userRow.children[2].children[0].value;
-		var userStatus = userRow.children[4].children[0].value;
 		
+		var userStatus = false;
+		
+		if (userRow.children[4].children[0] != null) {
+			userStatus = userRow.children[4].children[0].checked;
+		}
+
 		if ((userId != "") && (fName != "") && (lName != "")) {
 			$.post(JSON_URL, {
 				operation : "SAVE_USER",
@@ -649,31 +683,31 @@ function saveUser(userElmId, userDbId) {
 					}
 
 					userRow.children[3].innerHTML = adminHTML;
-					
-					
-					var userStatusId = "user_status_"+jsonData.id; 
-					var statusHTML = "<input id='"+userStatusId+"' type='checkbox'";
-					
+
+					var userStatusId = "user_status_" + jsonData.id;
+					var statusHTML = "<input id='" + userStatusId + "' type='checkbox'";
+
 					if (userStatus == true) {
-						statusHTML = statusHTML + " checked='checked' onchange=\"toggleUserStatus(" +jsonData.id+"'"+userStatusId+ "')\" />";
+						statusHTML = statusHTML + " checked='checked' onchange=\"toggleUserStatus(" + jsonData.id + ",'"
+								+ userStatusId + "','"+userElmId+"')\" />";
 					} else {
-						statusHTML = statusHTML + " onchange=\"toggleUserStatus(" +jsonData.id+"'"+userStatusId+ "')\" />";
+						statusHTML = statusHTML + " onchange=\"toggleUserStatus(" + jsonData.id + ",'" + userStatusId
+								+ "','"+userElmId+"')\" />";
 					}
-					
-					
+
 					userRow.children[4].innerHTML = statusHTML;
 
 					var editHTML = "<img alt='Edit' align='middle' class='icon' title='" + editTitle + "' src='"
-					        + editIcon + "' onclick=\"editUser('" + userElmId + "'," + jsonData.id + ")\" />";
+							+ editIcon + "' onclick=\"editUser('" + userElmId + "'," + jsonData.id + ")\" />";
 					userRow.children[5].innerHTML = editHTML;
 
 					var resetHTML = "<img alt='Reset' align='middle' class='icon' title='" + resetTitle + "' src='"
-					        + resetIcon + "' onclick=\"resetUser('user_" + jsonData.id + "'," + jsonData.id + ")\"/>";
+							+ resetIcon + "' onclick=\"resetUser('user_" + jsonData.id + "'," + jsonData.id + ")\"/>";
 					userRow.children[6].innerHTML = resetHTML;
 
 					var saveHTML = "<img alt='Delete' align='middle' class='icon' title='" + userDeleteTitle
-					        + "' src='" + deleteIcon + "' onclick=\"deleteUser('" + userElmId + "', " + jsonData.id
-					        + ")\" />";
+							+ "' src='" + deleteIcon + "' onclick=\"deleteUser('" + userElmId + "', " + jsonData.id
+							+ ")\" />";
 					userRow.children[7].innerHTML = saveHTML;
 				}
 			}, JSON_RESULT_TYPE);
@@ -698,6 +732,7 @@ function resetUser(userElmId, userDbId) {
 			operation : "RESET_USER",
 			id : userDbId
 		}, function(data) {
+
 			jsonData = data;
 
 			if (jsonData.error) {
@@ -710,12 +745,12 @@ function resetUser(userElmId, userDbId) {
 }
 
 $(function() {
-	
+
 	$("#adminAccordion").accordion({
-	    autoHeight : false,
-	    navigation : true,
-	    collapsible : true,
-	    active : 2
+		autoHeight : false,
+		navigation : true,
+		collapsible : true,
+		active : 2
 	});
-	
+
 });
