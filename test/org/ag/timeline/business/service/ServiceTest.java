@@ -30,8 +30,6 @@ import org.ag.timeline.presentation.transferobject.input.TimeDataInput;
 import org.ag.timeline.presentation.transferobject.input.UserInput;
 import org.ag.timeline.presentation.transferobject.input.UserPreferencesInput;
 import org.ag.timeline.presentation.transferobject.reply.ActivityReply;
-import org.ag.timeline.presentation.transferobject.reply.AuditDataReply;
-import org.ag.timeline.presentation.transferobject.reply.AuditRow;
 import org.ag.timeline.presentation.transferobject.reply.CodeValueReply;
 import org.ag.timeline.presentation.transferobject.reply.ProjectReply;
 import org.ag.timeline.presentation.transferobject.reply.TimeDataReply;
@@ -41,6 +39,8 @@ import org.ag.timeline.presentation.transferobject.reply.UserPreferenceSearchRep
 import org.ag.timeline.presentation.transferobject.reply.UserReply;
 import org.ag.timeline.presentation.transferobject.reply.UserSearchReply;
 import org.ag.timeline.presentation.transferobject.reply.WeeklyUserReply;
+import org.ag.timeline.presentation.transferobject.reply.audit.AuditDataReply;
+import org.ag.timeline.presentation.transferobject.reply.audit.AuditRow;
 import org.ag.timeline.presentation.transferobject.search.ActivitySearchParameter;
 import org.ag.timeline.presentation.transferobject.search.AuditDataSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.ProjectSearchParameter;
@@ -1113,8 +1113,8 @@ public class ServiceTest {
 	@Test
 	public void testNaughtyList() {
 
-		User naughty = dataHelper.createUser("Dev", "Naughty", "naughty", "naughty", false);
-		TimeData timeData = dataHelper.createBasicTimeData();
+//		User naughty = dataHelper.createUser("Dev", "Naughty", "naughty", "naughty", false);
+//		TimeData timeData = dataHelper.createBasicTimeData();
 
 		try {
 

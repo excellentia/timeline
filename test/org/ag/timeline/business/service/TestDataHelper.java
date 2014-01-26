@@ -8,13 +8,13 @@ import junit.framework.Assert;
 
 import org.ag.timeline.business.model.AbstractModel;
 import org.ag.timeline.business.model.Activity;
-import org.ag.timeline.business.model.AuditRecord;
-import org.ag.timeline.business.model.AuditRecordDetail;
 import org.ag.timeline.business.model.Project;
 import org.ag.timeline.business.model.TimeData;
 import org.ag.timeline.business.model.User;
 import org.ag.timeline.business.model.UserPreferences;
 import org.ag.timeline.business.model.Week;
+import org.ag.timeline.business.model.audit.AuditRecord;
+import org.ag.timeline.business.model.audit.AuditRecordDetail;
 import org.ag.timeline.common.TextHelper;
 
 import org.hibernate.Criteria;
