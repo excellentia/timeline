@@ -2,10 +2,9 @@
  * Common variables.
  */
 var JSON_URL = "ajax";
-var JSON_RESULT_TYPE = "json";
 
+var JSON_RESULT_TYPE = "json";
 var TEXT_RESULT_TYPE = "text";
-var METRICS_ACTION = "MetricsDetailsAction.action";
 
 var editIcon = "./pages/inc/icons/edit.png";
 var deleteIcon = "./pages/inc/icons/delete.png";
@@ -16,7 +15,7 @@ var noteIcon = "./pages/inc/icons/note.png";
 //var calendarIcon = "./pages/inc/images/calendar.gif";
 var emailIcon ="./pages/inc/icons/email.png";
 var calendarIcon ="./pages/inc/icons/calendar.png";
-
+var addIcon ="./pages/inc/icons/add.png";
 
 var editTitle = "Edit This Text";
 var saveTitle = "Save This Text";
@@ -25,46 +24,24 @@ var resetTitle = "Reset User Password";
 var noteTitle = "Attach A Note To This Item";
 var emailTitle ="Send an Email";
 
+var taskSaveTitle = "Save This Task";
+var taskEditTitle = "Edit This Task";
+var taskAddTitle = "Add Another Task";
+
 var projectDeleteTitle = "Delete This Project";
 var activityDeleteTitle = "Delete This Activity";
 var userDeleteTitle = "Delete This User";
+var stageDeleteTitle = "Delete This Stage";
+var taskDeleteTitle = "Delete This Task";
 
 var errorMsgNoData = "Mandatory Data Missing.";
 
-var errorStyle = "border: 1px solid #FF0000; background : #FFDCDC; color : #FF0000;";
-var successStyle = "border: 1px solid #00A200; background : #C0FFC0; color : #00A200;";
-var originalMetricEntryDateStyle = "width: 12.5em; text-align: center; ";
-var originalMetricEntryDateTitle = "Click Calendar Icon To Select A Week";
-var MIN_INDEX = 0.96;
-var MAX_INDEX = 0.99;
-var MIN_DEFECT_RATIO = 0.01;
-
-var leads = {};
-var activitySums = {};
 var weekStartDate = null;
 
+var leads = {};
 var projectArr = {};
 var activityArr = {};
-
-var projectsAvailableJSON = null;
-
-var searchStartDate = null;
-var searchEndDate = null;
-var searchProjId = null;
-var searchActId = null;
-
-var metricEntryDate = null;
-
-var itemCellIndex = 3;
-var weekDayCellStart = 4;
-var weekDayCellEndPlusOne = 11;
-var weeklySumCellIndex = 11;
-var weekDayDefaultValue = 0;
-
-var searchStartWeekNum = null;
-var searchEndWeekNum = null;
-var searchStartYear = null;
-var searchEndYear = null;
+var taskArr = {};
 
 var accOptions = {
 	autoHeight : false,
@@ -79,7 +56,15 @@ var accOptions = {
  * @param elementId
  */
 function focus(elementId) {
-	$("#" + elementId).focus();
+	var elm = document.getElementById(elementId);
+	
+	if (elm != null) {
+		elm.focus();
+	} else {
+		$('#'+elementId).focus();
+	}
+	
+	
 };
 
 /**
@@ -93,68 +78,174 @@ function populateActivities(projElmId, activityElmId) {
 	var selectElm = document.getElementById(projElmId);
 
 	if (selectElm != null) {
-		var selectedProjectId = 0;
+		var selectedProjectId = getDropDownValueAsInt(projElmId);
 
-		for ( var i = 0; i < selectElm.options.length; i++) {
-			if (selectElm.options[i].selected) {
-				selectedProjectId = selectElm.options[i].value;
+		if (selectedProjectId > 0) {
+			$.getJSON(
+				JSON_URL, {
+					operation : "ACTIVTIES",
+					id : selectedProjectId
+				},
+				function(data) {
+					var jsonData = data;
 
-				if (selectedProjectId > 0) {
-
-					$.getJSON(
-						JSON_URL, {
-							operation : "ACTIVTIES",
-							id : selectedProjectId
-						},
-						function(data) {
-							var jsonData = data;
-
-							if (jsonData.error) {
-								
-								displayAlert(jsonData.error);
-								
-							} else {
-							if (activityElmId == null) {
-
-								var activitySelectHTML = "<select size='1' class='timeEntrySelectEdit' name='activity' id='activity_" + selectedProjectId + "'>";
-								var optionHTML = "";
-
-								for ( var j = 0; j < jsonData.activities.length; j++) {
-									optionHTML = optionHTML + '<option value="' + jsonData.activities[j].code + '">' + jsonData.activities[j].value + '</option>';
-									activityArr[jsonData.activities[j].code] = jsonData.activities[j].value;
-								}
-
-								activitySelectHTML = activitySelectHTML + optionHTML + "</select>";
-
-								var selectElm = document.getElementById(projElmId);
-								var newRow = selectElm.parentNode.parentNode;
-								newRow.cells[2].innerHTML = activitySelectHTML;
-								newRow.cells[3].innerHTML = leads[selectedProjectId];
-
-							} else {
-								var selectElm = document.getElementById(activityElmId);
-								var optionHTML = "<option value='0' selected='selected'>All Activities</option>";
-
-								for ( var j = 0; j < jsonData.activities.length; j++) {
-									optionHTML = optionHTML + '<option value="' + jsonData.activities[j].code + '">' + jsonData.activities[j].value + '</option>';
-								}
-
-								selectElm.innerHTML = optionHTML;
-							}
-						}
-					}, JSON_RESULT_TYPE);
-				} else {
+					if (jsonData.error) {
+						
+						displayAlert(jsonData.error);
+						
+					} else {
 					if (activityElmId == null) {
+						var actElmId = "activity_"+selectedProjectId;
+						var activitySelectHTML = "<select size='1' class='timeEntrySelectEdit' name='activity' id='" + actElmId + "' ";
+						activitySelectHTML = activitySelectHTML +"onchange=\"populateTasks('"+projElmId+"','" + actElmId+"',null)\">";
+						var optionHTML = "<option value='0'>Select Activity</option>";
+
+						for ( var j = 0; j < jsonData.activities.length; j++) {
+							optionHTML = optionHTML + '<option value="' + jsonData.activities[j].code + '">' + jsonData.activities[j].value + '</option>';
+							activityArr[jsonData.activities[j].code] = jsonData.activities[j].value;
+						}
+
+						activitySelectHTML = activitySelectHTML + optionHTML + "</select>";
+
+						var selectElm = document.getElementById(projElmId);
 						var newRow = selectElm.parentNode.parentNode;
-						newRow.cells[2].innerHTML = "";
-						newRow.cells[3].innerHTML = "";
+						newRow.cells[2].innerHTML = activitySelectHTML;
+						
+						var leadNm = trimToNull(leads[selectedProjectId]);
+						
+						if(leadNm == null) {
+							leadNm = "";
+						}
+						
+						newRow.cells[3].innerHTML = leadNm;
+
 					} else {
 						var selectElm = document.getElementById(activityElmId);
 						var optionHTML = "<option value='0' selected='selected'>All Activities</option>";
+
+						for ( var j = 0; j < jsonData.activities.length; j++) {
+							optionHTML = optionHTML + '<option value="' + jsonData.activities[j].code + '">' + jsonData.activities[j].value + '</option>';
+							activityArr[jsonData.activities[j].code] = jsonData.activities[j].value;
+						}
+
 						selectElm.innerHTML = optionHTML;
 					}
 				}
+			}, JSON_RESULT_TYPE);
+		} else {
+
+			if (activityElmId == null) {
+				var newRow = selectElm.parentNode.parentNode;
+				newRow.cells[2].innerHTML = "";
+				newRow.cells[3].innerHTML = "";
+			} else {
+				var selectElm = document.getElementById(activityElmId);
+				var optionHTML = "<option value='0' selected='selected'>All Activities</option>";
+				selectElm.innerHTML = optionHTML;
 			}
+		}
+	}
+}
+
+/**
+ * Populates the Tasks of a project and activity combination in a Drop Down.
+ * 
+ * @param projElmId
+ * @param actElmId
+ * @param taskElmId
+ */
+function populateTasks(projElmId, actElmId, taskElmId) {
+
+	
+
+	var selectElm = document.getElementById(projElmId);
+
+	if (selectElm != null) {
+		var selectedProjectId = getDropDownValueAsInt(projElmId);
+		
+		selectElm = document.getElementById(actElmId);
+
+		if (selectElm != null) {
+			var selectedActivityId = getDropDownValueAsInt(actElmId);
+			
+			if ((selectedProjectId > 0) && (selectedActivityId > 0)) {
+			
+				$.getJSON(
+					JSON_URL, {
+						operation : "TASKS",
+						projectId : selectedProjectId,
+						activityId : selectedActivityId
+					},
+					function(data) {
+						var jsonData = data;
+
+						if (jsonData.error) {
+						
+							//clear any previous tasks drop down
+							var selectElm = document.getElementById(actElmId);
+							var newRow = selectElm.parentNode.parentNode;
+							newRow.cells[4].innerHTML = "";
+							
+							displayAlert("No Task Available For Selected Activity. Setup Tasks First.");
+							
+						} else  {
+
+							var taskSelectId = null;
+							
+							if (taskElmId == null) {
+								taskSelectId = "task_"+selectedActivityId;
+							} else {
+								taskSelectId = taskElmId;
+							}
+							var taskSelectHTML = "<select size='1' class='timeEntrySelectEdit' name='task' id='" + taskSelectId + "'>";
+							var optionHTML = "<option value='0'>All Tasks</option>";
+
+							var project = null;
+							var activity = null;
+							var task = null;
+							var taskPresent = true;
+							
+							for ( var i = 0; i < jsonData.projects.length; i++) {
+								project = jsonData.projects[i];
+								
+								if(project.projectId == selectedProjectId) {
+									
+									for ( var j = 0; j < project.activities.length; j++) {
+										activity = project.activities[j];
+										
+										if(activity.activityId == selectedActivityId) {
+											
+											for ( var k = 0; k < activity.tasks.length; k++) {
+												
+												task = activity.tasks[k];
+												optionHTML = optionHTML + '<option value="' + task.taskId + '">' + task.taskName + '</option>';
+												taskArr[task.taskId] = task.taskName;
+											}
+											taskPresent = false;
+											break;
+										}
+									}
+									
+									break;
+								}
+							}
+
+							if(!taskPresent) {
+								taskSelectHTML = taskSelectHTML + optionHTML + "</select>";
+								
+								if (taskElmId == null) {
+									//new time entry section
+									var selectElm = document.getElementById(actElmId);
+									var newRow = selectElm.parentNode.parentNode;
+									newRow.cells[4].innerHTML = taskSelectHTML;
+								} else {
+									//search section
+									document.getElementById(taskElmId).innerHTML = taskSelectHTML;
+								}
+							}
+						}
+				}, JSON_RESULT_TYPE);
+			} 
 		}
 	}
 }
@@ -195,7 +286,7 @@ function getValidFloat(floatText) {
 
 	var num = 0;
 
-	if ((floatText != null) && (floatText != "")) {
+	if ((floatText != null) && (floatText != "") && (!isNaN(floatText))) {
 		floatText = floatText.replace(",", "");
 
 		if (!isNaN(floatText)) {
@@ -227,6 +318,27 @@ function getValidInt(intText) {
 
 	return num;
 }
+
+/**
+ * Utility Method - Create a Valid Int object from incoming String.
+
+ * 
+ * @param intText
+ * @returns {Number}
+ */
+function getValidBoolean(strText) {
+
+	var val = false;
+	
+	var str = trimToNull(""+strText);
+
+	if ((str != null) && (str == "true")) {
+		val = true;
+	}
+
+	return val;
+}
+
 
 /**
  * Utility Method - Checks if a tetx is nit null and not empty.
@@ -278,4 +390,40 @@ function displayAlert(strVal) {
 	if (msg != null) {
 		alert(msg);
 	}
+}
+
+
+function getDropDownValueAsInt(selectElmId) {
+
+	var selectVal = 0;
+	var selectElm = $("#" + selectElmId + " :selected");
+
+	if (selectElm != null) {
+		selectVal = getValidInt(selectElm.val());
+	}
+
+	return selectVal;
+}
+
+function getDropDownValueAsText(selectElmId) {
+
+	var selectVal = 0;
+	var selectElm = $("#" + selectElmId + " :selected");
+
+	if (selectElm != null) {
+		selectVal = trimToNull(selectElm.text());
+	}
+
+	return selectVal;
+
+}
+
+function getTextInputValue(inputElmId) {
+	var text = null;
+	
+	if (inputElmId != null) {
+		text = trimToNull($("#" + inputElmId).val());
+	}
+	
+	return text;
 }
