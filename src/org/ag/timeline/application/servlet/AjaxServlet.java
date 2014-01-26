@@ -20,11 +20,13 @@ import org.ag.timeline.business.service.impl.TimelineServiceImpl;
 import org.ag.timeline.common.TextHelper;
 import org.ag.timeline.common.TimelineConstants;
 import org.ag.timeline.presentation.transferobject.common.CodeValue;
+import org.ag.timeline.presentation.transferobject.common.CodeValueStatus;
 import org.ag.timeline.presentation.transferobject.input.CodeValueInput;
 import org.ag.timeline.presentation.transferobject.input.ProjectEstimatesInput;
 import org.ag.timeline.presentation.transferobject.input.ProjectInput;
 import org.ag.timeline.presentation.transferobject.input.ProjectMetricsInput;
 import org.ag.timeline.presentation.transferobject.input.StatusInput;
+import org.ag.timeline.presentation.transferobject.input.TaskInput;
 import org.ag.timeline.presentation.transferobject.input.TimeDataInput;
 import org.ag.timeline.presentation.transferobject.input.UserInput;
 import org.ag.timeline.presentation.transferobject.input.UserPreferencesInput;
@@ -32,21 +34,24 @@ import org.ag.timeline.presentation.transferobject.reply.ActivityReply;
 import org.ag.timeline.presentation.transferobject.reply.BusinessReply;
 import org.ag.timeline.presentation.transferobject.reply.CodeValueListReply;
 import org.ag.timeline.presentation.transferobject.reply.CodeValueReply;
-import org.ag.timeline.presentation.transferobject.reply.DetailedReportReply;
-import org.ag.timeline.presentation.transferobject.reply.DetailedReportRow;
+import org.ag.timeline.presentation.transferobject.reply.CodeValueStatusListReply;
 import org.ag.timeline.presentation.transferobject.reply.ProjectData;
-import org.ag.timeline.presentation.transferobject.reply.ProjectEstimateData;
-import org.ag.timeline.presentation.transferobject.reply.ProjectEstimatesReply;
 import org.ag.timeline.presentation.transferobject.reply.ProjectReply;
+import org.ag.timeline.presentation.transferobject.reply.TaskReply;
 import org.ag.timeline.presentation.transferobject.reply.TimeDataReply;
 import org.ag.timeline.presentation.transferobject.reply.TimeDataRow;
 import org.ag.timeline.presentation.transferobject.reply.UserPreferenceReply;
 import org.ag.timeline.presentation.transferobject.reply.UserReply;
 import org.ag.timeline.presentation.transferobject.reply.UserSearchReply;
 import org.ag.timeline.presentation.transferobject.reply.WeeklyUserReply;
+import org.ag.timeline.presentation.transferobject.reply.metrics.ProjectEstimateData;
+import org.ag.timeline.presentation.transferobject.reply.metrics.ProjectEstimatesReply;
+import org.ag.timeline.presentation.transferobject.reply.report.DetailedReportReply;
+import org.ag.timeline.presentation.transferobject.reply.report.DetailedReportRow;
 import org.ag.timeline.presentation.transferobject.search.ActivitySearchParameter;
 import org.ag.timeline.presentation.transferobject.search.ProjectSearchParameter;
 import org.ag.timeline.presentation.transferobject.search.ReportSearchParameters;
+import org.ag.timeline.presentation.transferobject.search.TaskSearchParameter;
 import org.ag.timeline.presentation.transferobject.search.TimeDataSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.UserSearchParameter;
 import org.ag.timeline.presentation.transferobject.search.WeekSearchParameter;
@@ -77,6 +82,16 @@ public class AjaxServlet extends HttpServlet {
 		return (User) request.getSession().getAttribute(TimelineConstants.SessionAttribute.SESSION_USER.getText());
 	}
 
+	private String getFormattedTaskText(final String text) {
+		String value = TextHelper.trimToNull(text);
+
+		if (value != null) {
+			value = value.toUpperCase();
+		}
+
+		return value;
+	}
+
 	private String getJSON(final BusinessReply reply) {
 		String json = null;
 
@@ -105,7 +120,7 @@ public class AjaxServlet extends HttpServlet {
 				if ((activityReply != null) && (activityReply.getProjectIds() != null)) {
 
 					List<Long> projectIds = activityReply.getProjectIds();
-					List<CodeValue> activities = new ArrayList<CodeValue>();
+					List<CodeValueStatus> activities = new ArrayList<CodeValueStatus>();
 
 					for (long projId : projectIds) {
 						activities.addAll(activityReply.getProjectActivitiesById(projId));
@@ -115,9 +130,12 @@ public class AjaxServlet extends HttpServlet {
 
 						builder.append("\"activities\" : [");
 
-						for (CodeValue activity : activities) {
-							builder.append("{\"code\" : \"").append(activity.getCode()).append("\", \"value\" : \"")
-									.append(activity.getValue());
+						for (CodeValueStatus activity : activities) {
+							builder.append("{\"code\" : \"").append(activity.getCode());
+							builder.append("\",");
+							builder.append("\"value\" : \"").append(activity.getValue());
+							builder.append("\",");
+							builder.append("\"status\" : \"").append(activity.isStatus());
 							builder.append("\"},");
 						}
 
@@ -249,6 +267,8 @@ public class AjaxServlet extends HttpServlet {
 								builder.append("\"activityName\" : \"").append(entry.getActivityName()).append("\",");
 								builder.append("\"activityId\" : \"").append(entry.getActivityId()).append("\",");
 								builder.append("\"leadName\" : \"").append(entry.getLeadName()).append("\",");
+								builder.append("\"taskId\" : \"").append(entry.getTaskId()).append("\",");
+								builder.append("\"taskName\" : \"").append(entry.getTaskName()).append("\",");
 								builder.append("\"startDate\" : \"").append(entry.getFormattedStartDate())
 										.append("\",");
 
@@ -299,7 +319,8 @@ public class AjaxServlet extends HttpServlet {
 							for (User user : userReply.getWeeklyUsers(weekId)) {
 								builder.append("{");
 								builder.append("\"userName\" : \"").append(user.getUserName()).append("\",");
-								builder.append("\"email\" : \"").append(userReply.getUserEmail(user.getId())).append("\"");
+								builder.append("\"email\" : \"").append(userReply.getUserEmail(user.getId()))
+										.append("\"");
 								builder.append("},");
 							}
 
@@ -341,7 +362,7 @@ public class AjaxServlet extends HttpServlet {
 
 					List<CodeValue> taskList = codeValueListReply.getCodeValueList();
 
-					builder.append("\"tasks\" : [");
+					builder.append("\"elements\" : [");
 
 					for (CodeValue task : taskList) {
 						builder.append("{\"code\" : \"").append(task.getCode()).append("\", \"value\" : \"")
@@ -352,8 +373,95 @@ public class AjaxServlet extends HttpServlet {
 					builder = new StringBuilder(builder.substring(0, builder.length() - 1)).append("]");
 
 				} else {
-					builder.append("\"error\" : \"No Tasks\"");
+					builder.append("\"error\" : \"" + codeValueListReply.getMessage() + "\"");
 				}
+			} else if (reply instanceof CodeValueStatusListReply) {
+
+				CodeValueStatusListReply statusReply = (CodeValueStatusListReply) reply;
+
+				if ((statusReply != null) && (statusReply.getCodeValueStatusList() != null)
+						&& (statusReply.getCodeValueStatusList().size() > 0)) {
+
+					List<CodeValueStatus> list = statusReply.getCodeValueStatusList();
+
+					builder.append("\"elements\" : [");
+
+					for (CodeValueStatus entry : list) {
+						builder.append("{\"code\" : \"").append(entry.getCode()).append("\", \"value\" : \"")
+								.append(entry.getValue()).append("\", \"status\" : \"").append(entry.isStatus());
+						builder.append("\"},");
+					}
+
+					builder = new StringBuilder(builder.substring(0, builder.length() - 1)).append("]");
+
+				} else {
+					builder.append("\"error\" : \"" + statusReply.getMessage() + "\"");
+				}
+			} else if (reply instanceof TaskReply) {
+
+				TaskReply taskReply = (TaskReply) reply;
+
+				if ((taskReply != null) && (taskReply.hasTasks())) {
+
+					builder.append("\"projects\" : [");
+
+					for (long projectId : taskReply.getProjectIds()) {
+						builder.append("{");
+						builder.append("\"projectId\" : \"").append(projectId).append("\",");
+						builder.append("\"projectName\" : \"").append(taskReply.getProjectName(projectId))
+								.append("\",");
+
+						// populate activity info
+						{
+							builder.append("\"activities\" : [");
+
+							for (long activityId : taskReply.getProjectActivityIds(projectId)) {
+								builder.append("{");
+								builder.append("\"activityId\" : \"").append(activityId).append("\",");
+								builder.append("\"activityName\" : \"").append(taskReply.getActivityName(activityId))
+										.append("\",");
+
+								// populate task info
+								{
+									builder.append("\"tasks\" : [");
+									long taskId = 0;
+
+									for (CodeValue task : taskReply.getActivityTasks(activityId)) {
+
+										taskId = task.getCode();
+
+										builder.append("{");
+										builder.append("\"taskId\" : \"").append(taskId).append("\",");
+										// builder.append("\"taskUser\" : \"").append(taskReply.getTaskUserName(taskId)).append("\",");
+										builder.append("\"taskName\" : \"").append(task.getValue()).append("\",");
+										builder.append("\"taskDescription\" : \"")
+												.append(taskReply.getTaskDetail(taskId)).append("\"");
+										builder.append("},");
+									}
+
+									// remove trailing comma
+									builder = new StringBuilder(builder.substring(0, builder.length() - 1));
+									builder.append("]");
+								}
+
+								builder.append("},");
+							}
+
+							// remove trailing comma
+							builder = new StringBuilder(builder.substring(0, builder.length() - 1));
+							builder.append("]");
+						}
+
+						builder.append("},");
+					}
+
+					// remove trailing comma
+					builder = new StringBuilder(builder.substring(0, builder.length() - 1)).append("]");
+
+				} else {
+					builder.append("\"error\" : \"No Results Found.\"");
+				}
+
 			}
 
 			builder.append("}");
@@ -367,7 +475,7 @@ public class AjaxServlet extends HttpServlet {
 		PrintWriter out = null;
 
 		try {
-			String json = "{\"error\" : \"No projects\"}";
+			String json = "{\"error\" : \"Invalid Operation Requested\"}";
 			out = response.getWriter();
 			out.println(json);
 		} catch (Exception ex) {
@@ -378,7 +486,7 @@ public class AjaxServlet extends HttpServlet {
 			}
 		}
 	}
-	
+
 	private long getLongRequestValue(TimelineConstants.AjaxRequestParam param, HttpServletRequest request) {
 		return TextHelper.getLongValue(request.getParameter(param.getParamText()));
 	}
@@ -404,8 +512,9 @@ public class AjaxServlet extends HttpServlet {
 		PrintWriter out = null;
 
 		try {
-			final long id = getLongRequestValue(TimelineConstants.AjaxRequestParam.id ,request);
-			final boolean searchActiveProjects = Boolean.valueOf(getStringRequestValue(TimelineConstants.AjaxRequestParam.status, request));
+			final long id = getLongRequestValue(TimelineConstants.AjaxRequestParam.id, request);
+			final boolean searchActiveProjects = Boolean.valueOf(getStringRequestValue(
+					TimelineConstants.AjaxRequestParam.status, request));
 			final ProjectSearchParameter searchParameters = new ProjectSearchParameter();
 			searchParameters.setProjectId(id);
 			searchParameters.setSearchActiveProjects(searchActiveProjects);
@@ -429,7 +538,7 @@ public class AjaxServlet extends HttpServlet {
 		PrintWriter out = null;
 
 		try {
-			final long id = getLongRequestValue(TimelineConstants.AjaxRequestParam.id,request);
+			final long id = getLongRequestValue(TimelineConstants.AjaxRequestParam.id, request);
 			final ActivitySearchParameter searchParameters = new ActivitySearchParameter();
 
 			if (id > 0) {
@@ -454,7 +563,7 @@ public class AjaxServlet extends HttpServlet {
 	private void saveProject(HttpServletRequest request, HttpServletResponse response) {
 
 		final long id = getLongRequestValue(TimelineConstants.AjaxRequestParam.id, request);
-		final long copyProjectId  = getLongRequestValue(TimelineConstants.AjaxRequestParam.refId, request);
+		final long copyProjectId = getLongRequestValue(TimelineConstants.AjaxRequestParam.refId, request);
 		final String projectText = getStringRequestValue(TimelineConstants.AjaxRequestParam.text, request);
 		PrintWriter out = null;
 
@@ -495,7 +604,7 @@ public class AjaxServlet extends HttpServlet {
 			final TimelineConstants.StatusEntity entity) {
 
 		long id = getLongRequestValue(TimelineConstants.AjaxRequestParam.id, request);
-		final String statusText = getStringRequestValue(TimelineConstants.AjaxRequestParam.status,request);
+		final String statusText = getStringRequestValue(TimelineConstants.AjaxRequestParam.status, request);
 
 		PrintWriter out = null;
 
@@ -608,17 +717,37 @@ public class AjaxServlet extends HttpServlet {
 			}
 		}
 	}
-	
+
 	private void getTasks(HttpServletRequest request, HttpServletResponse response) {
 		PrintWriter out = null;
 
 		try {
 			final long projectId = getLongRequestValue(TimelineConstants.AjaxRequestParam.projectId, request);
+			final long activityId = getLongRequestValue(TimelineConstants.AjaxRequestParam.activityId, request);
+			final long taskId = getLongRequestValue(TimelineConstants.AjaxRequestParam.taskId, request);
 
-			final ProjectSearchParameter searchParameters = new ProjectSearchParameter();
+			final TaskSearchParameter searchParameters = new TaskSearchParameter();
 			searchParameters.setProjectId(projectId);
+			searchParameters.setActivityId(activityId);
+			searchParameters.setTaskId(taskId);
 
-			CodeValueListReply reply = SERVICE.searchTasks(searchParameters);
+			// set search all
+			if ((projectId == 0) && (activityId == 0) && (taskId == 0)) {
+				searchParameters.setSearchAllTasks(Boolean.TRUE);
+			}
+
+			// User user = getSessionUser(request);
+			//
+			// if (!user.isAdmin()) {
+			// searchParameters.setUserDbId(user.getId());
+			// } else {
+			// long userDbId =
+			// getLongRequestValue(TimelineConstants.AjaxRequestParam.userDbId,
+			// request);
+			// searchParameters.setUserDbId(userDbId);
+			// }
+
+			TaskReply reply = SERVICE.searchTasks(searchParameters);
 			String json = getJSON(reply);
 
 			out = response.getWriter();
@@ -960,8 +1089,9 @@ public class AjaxServlet extends HttpServlet {
 
 		long projectId = getLongRequestValue(TimelineConstants.AjaxRequestParam.projectId, request);
 		long activityId = getLongRequestValue(TimelineConstants.AjaxRequestParam.activityId, request);
+		long taskId = getLongRequestValue(TimelineConstants.AjaxRequestParam.taskId, request);
 
-		if ((projectId > 0) && (activityId > 0)) {
+		if ((projectId > 0) && (activityId > 0) && (taskId > 0)) {
 
 			long entryId = getLongRequestValue(TimelineConstants.AjaxRequestParam.entryId, request);
 
@@ -987,6 +1117,7 @@ public class AjaxServlet extends HttpServlet {
 			TimeDataInput myTimeData = new TimeDataInput();
 
 			myTimeData.setActivityId(activityId);
+			myTimeData.setTaskId(taskId);
 			myTimeData.setDate(weekStartDate);
 			myTimeData.setUserId(userId);
 			myTimeData.setProxiedUserDbId(proxiedUserDbId);
@@ -1036,6 +1167,7 @@ public class AjaxServlet extends HttpServlet {
 		long endYear = 0;
 		long projectId = 0;
 		long activityId = 0;
+		long taskId = 0;
 
 		Date weekStartDate = null;
 		Date weekEndDate = null;
@@ -1046,6 +1178,7 @@ public class AjaxServlet extends HttpServlet {
 			weekEndDate = getDateRequestValue(TimelineConstants.AjaxRequestParam.weekEndDate, request);
 			projectId = getLongRequestValue(TimelineConstants.AjaxRequestParam.projectId, request);
 			activityId = getLongRequestValue(TimelineConstants.AjaxRequestParam.activityId, request);
+			taskId = getLongRequestValue(TimelineConstants.AjaxRequestParam.taskId, request);
 			userDbId = getLongRequestValue(TimelineConstants.AjaxRequestParam.userDbId, request);
 
 			startWeekNum = getLongRequestValue(TimelineConstants.AjaxRequestParam.startWeekNum, request);
@@ -1085,6 +1218,7 @@ public class AjaxServlet extends HttpServlet {
 				TimeDataSearchParameters searchParameters = new TimeDataSearchParameters();
 				searchParameters.setActivityid(activityId);
 				searchParameters.setProjectId(projectId);
+				searchParameters.setTaskId(taskId);
 				searchParameters.setUserId(userDbId);
 				searchParameters.setStartDate(weekStartDate);
 				searchParameters.setStartWeekNum(startWeekNum);
@@ -1152,7 +1286,7 @@ public class AjaxServlet extends HttpServlet {
 				out.close();
 			}
 		}
-	
+
 	}
 
 	/**
@@ -1196,7 +1330,7 @@ public class AjaxServlet extends HttpServlet {
 			}
 		}
 	}
-	
+
 	private void saveEstimates(HttpServletRequest request, HttpServletResponse response) {
 
 		long projectId = getLongRequestValue(TimelineConstants.AjaxRequestParam.projectId, request);
@@ -1251,7 +1385,7 @@ public class AjaxServlet extends HttpServlet {
 			}
 		}
 	}
-	
+
 	private void saveMetrics(HttpServletRequest request, HttpServletResponse response) {
 
 		long projectId = getLongRequestValue(TimelineConstants.AjaxRequestParam.projectId, request);
@@ -1260,7 +1394,6 @@ public class AjaxServlet extends HttpServlet {
 
 			long metricId = getLongRequestValue(TimelineConstants.AjaxRequestParam.metricId, request);
 			Date weekStartDate = getDateRequestValue(TimelineConstants.AjaxRequestParam.weekStartDate, request);
-			;
 
 			double plannedValue = getDoubleRequestValue(TimelineConstants.AjaxRequestParam.pv, request);
 			double earnedValue = getDoubleRequestValue(TimelineConstants.AjaxRequestParam.ev, request);
@@ -1307,7 +1440,7 @@ public class AjaxServlet extends HttpServlet {
 			}
 		}
 	}
-	
+
 	private void deleteAllMetrics(HttpServletRequest request, HttpServletResponse response) {
 
 		long projectId = getLongRequestValue(TimelineConstants.AjaxRequestParam.projectId, request);
@@ -1343,6 +1476,12 @@ public class AjaxServlet extends HttpServlet {
 		}
 	}
 
+	/**
+	 * Searches the Project Estimates.
+	 * 
+	 * @param request
+	 * @param response
+	 */
 	private void searchEstimates(HttpServletRequest request, HttpServletResponse response) {
 		long projectId = getLongRequestValue(TimelineConstants.AjaxRequestParam.projectId, request);
 
@@ -1357,6 +1496,126 @@ public class AjaxServlet extends HttpServlet {
 
 				ProjectEstimatesReply reply = SERVICE.searchProjectEstimates(searchParameters);
 
+				String json = getJSON(reply);
+				out = response.getWriter();
+				out.println(json);
+
+			} catch (TimelineException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if (out != null) {
+					out.close();
+				}
+			}
+		}
+	}
+
+	private void saveTask(HttpServletRequest request, HttpServletResponse response) {
+
+		final long projectId = getLongRequestValue(TimelineConstants.AjaxRequestParam.projectId, request);
+		final long activityId = getLongRequestValue(TimelineConstants.AjaxRequestParam.activityId, request);
+		final long taskId = getLongRequestValue(TimelineConstants.AjaxRequestParam.taskId, request);
+		final String taskText = getStringRequestValue(TimelineConstants.AjaxRequestParam.text, request);
+		final String taskDesc = getStringRequestValue(TimelineConstants.AjaxRequestParam.description, request);
+
+		if (taskText != null) {
+
+			boolean hasEnoughData = false;
+
+			if ((taskId == 0) && ((projectId > 0) && (activityId > 0))) {
+				hasEnoughData = true;
+			} else if (taskId > 0) {
+				hasEnoughData = true;
+			}
+
+			if (hasEnoughData) {
+
+				PrintWriter out = null;
+
+				try {
+
+					CodeValueReply reply = null;
+					TaskInput input = new TaskInput();
+
+					input.setActivityId(activityId);
+					input.setProjectId(projectId);
+					input.setTaskText(this.getFormattedTaskText(taskText));
+					// input.setUserDbId(userDbId);
+					input.setTaskDescription(taskDesc);
+					input.setTaskId(taskId);
+
+					if (taskId > 0) {
+						reply = SERVICE.modifyTask(input);
+					} else {
+						reply = SERVICE.createTask(input);
+					}
+
+					String json = getJSON(reply);
+					out = response.getWriter();
+					out.println(json);
+
+				} catch (TimelineException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} finally {
+					if (out != null) {
+						out.close();
+					}
+				}
+			}
+		}
+	}
+
+	private void modifyTaskStage(HttpServletRequest request, HttpServletResponse response) {
+
+		final long activityId = getLongRequestValue(TimelineConstants.AjaxRequestParam.activityId, request);
+		final long taskId = getLongRequestValue(TimelineConstants.AjaxRequestParam.taskId, request);
+
+		if ((taskId > 0) && (activityId > 0)) {
+
+			PrintWriter out = null;
+
+			try {
+
+				CodeValueReply reply = null;
+
+				TaskInput input = new TaskInput();
+				input.setActivityId(activityId);
+				input.setTaskId(taskId);
+
+				reply = SERVICE.modifyTask(input);
+
+				String json = getJSON(reply);
+				out = response.getWriter();
+				out.println(json);
+
+			} catch (TimelineException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if (out != null) {
+					out.close();
+				}
+			}
+		}
+	}
+
+	private void deleteTask(HttpServletRequest request, HttpServletResponse response) {
+
+		long id = getLongRequestValue(TimelineConstants.AjaxRequestParam.id, request);
+
+		if (id > 0) {
+			PrintWriter out = null;
+			CodeValueReply reply = null;
+			CodeValueInput input = new CodeValueInput();
+			input.setCodeValue(new CodeValue(id));
+
+			try {
+				reply = SERVICE.deleteTask(input);
 				String json = getJSON(reply);
 				out = response.getWriter();
 				out.println(json);
@@ -1417,7 +1676,7 @@ public class AjaxServlet extends HttpServlet {
 				getActivities(request, response);
 			} else if (TimelineConstants.OperationType.LEAD.toString().equalsIgnoreCase(typeStr)) {
 				getLeads(request, response);
-			}  else if (TimelineConstants.OperationType.TASKS.toString().equalsIgnoreCase(typeStr)) {
+			} else if (TimelineConstants.OperationType.TASKS.toString().equalsIgnoreCase(typeStr)) {
 				getTasks(request, response);
 			} else if (TimelineConstants.OperationType.SAVE_PROJECT.toString().equalsIgnoreCase(typeStr)) {
 				saveProject(request, response);
@@ -1462,6 +1721,12 @@ public class AjaxServlet extends HttpServlet {
 				saveMetrics(request, response);
 			} else if (TimelineConstants.OperationType.SEARCH_ESTIMATES.toString().equalsIgnoreCase(typeStr)) {
 				searchEstimates(request, response);
+			} else if (TimelineConstants.OperationType.SAVE_TASK.toString().equalsIgnoreCase(typeStr)) {
+				saveTask(request, response);
+			} else if (TimelineConstants.OperationType.MODIFY_TASK_STAGE.toString().equalsIgnoreCase(typeStr)) {
+				modifyTaskStage(request, response);
+			} else if (TimelineConstants.OperationType.DELETE_TASK.toString().equalsIgnoreCase(typeStr)) {
+				deleteTask(request, response);
 			}
 		} else {
 			handleInvalidRequest(request, response);
