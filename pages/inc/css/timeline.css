@@ -503,6 +503,14 @@ html,body {
 	font-family: Arial;
 }
 
+.projectTasksTable {
+	width: 20em;
+	margin-bottom: 2em;
+	margin-right: 2em;
+	margin-top: 2em;
+	float: left;
+}
+
 .icon {
 	width: 1.5em;
 	height: 1.5em;
@@ -584,3 +592,76 @@ html,body {
 .smallFont {
 	font-size: 0.6em;
 }
+
+.rapidBoardDiv {
+	height: auto;
+	width: auto;
+	margin: 0;
+	padding: 0;
+	display: table;
+	font-size: large;
+}
+
+.center-text {
+	text-align: center;
+}
+
+.stg-column {
+	width: auto;
+	float: left;
+	padding: 0;
+	display: table-row;
+	margin: 1em;
+}
+
+.portlet {
+	margin: 1em;
+	width: auto;
+	height: auto;
+}
+
+.portlet-header {
+	margin: 0.3em;
+	padding-bottom: 0 0 0.5em 0.2em;
+	text-align: center;
+	height: 1.2em;
+}
+
+.portlet-header .ui-icon {
+	float: right;
+}
+
+.portlet-content {
+	margin: 0.4em !important;
+}
+
+.ui-sortable-placeholder {
+	border: 1px dotted black;
+	visibility: visible !important;
+	height: 3em !important;
+	margin: 0;
+	padding: 0;
+}
+
+.ui-sortable-placeholder * {
+	visibility: hidden;
+}
+
+.sortableUL {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	float: left;
+	margin-right: 0;
+	padding: 0.5em;
+	width: 10em;
+}
+
+.sortableLI {
+	margin: 0.3em;
+	padding: 0;
+	font-size: 1em;
+	width: 9em;
+	float: center;
+}
+
