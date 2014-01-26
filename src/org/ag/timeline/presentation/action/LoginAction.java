@@ -79,7 +79,7 @@ public class LoginAction extends BaseAction {
 			}
 		}
 		
-		TextHelper.logMessage("LoginAction.execute() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+		TextHelper.logMessage("LoginAction.execute()", time);
 
 		return result;
 	}
