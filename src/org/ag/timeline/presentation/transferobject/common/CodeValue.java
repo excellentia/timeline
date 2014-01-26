@@ -11,6 +11,7 @@ package org.ag.timeline.presentation.transferobject.common;
 public class CodeValue {
 
 	private long code = 0;
+
 	private String value = null;
 
 	public CodeValue() {
@@ -70,7 +71,21 @@ public class CodeValue {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("CodeValue [code=");
+		builder.append(code);
+		builder.append(", value=");
+		builder.append(value);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -84,7 +99,6 @@ public class CodeValue {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
