@@ -13,19 +13,16 @@ import java.util.Set;
 import org.ag.timeline.application.context.RequestContext;
 import org.ag.timeline.application.exception.TimelineException;
 import org.ag.timeline.business.model.Activity;
-import org.ag.timeline.business.model.AuditRecord;
-import org.ag.timeline.business.model.AuditRecordDetail;
 import org.ag.timeline.business.model.Project;
-import org.ag.timeline.business.model.ProjectMetrics;
-import org.ag.timeline.business.model.ProjectStage;
-import org.ag.timeline.business.model.ProjectStageTask;
-import org.ag.timeline.business.model.Stage;
 import org.ag.timeline.business.model.SystemSettings;
 import org.ag.timeline.business.model.Task;
 import org.ag.timeline.business.model.TimeData;
 import org.ag.timeline.business.model.User;
 import org.ag.timeline.business.model.UserPreferences;
 import org.ag.timeline.business.model.Week;
+import org.ag.timeline.business.model.audit.AuditRecord;
+import org.ag.timeline.business.model.audit.AuditRecordDetail;
+import org.ag.timeline.business.model.metrics.ProjectMetrics;
 import org.ag.timeline.business.service.iface.TimelineService;
 import org.ag.timeline.business.util.HibernateUtil;
 import org.ag.timeline.business.util.audit.AuditInterceptor;
@@ -38,31 +35,16 @@ import org.ag.timeline.presentation.transferobject.input.CodeValueInput;
 import org.ag.timeline.presentation.transferobject.input.ProjectEstimatesInput;
 import org.ag.timeline.presentation.transferobject.input.ProjectInput;
 import org.ag.timeline.presentation.transferobject.input.ProjectMetricsInput;
-import org.ag.timeline.presentation.transferobject.input.ProjectStageInput;
-import org.ag.timeline.presentation.transferobject.input.ProjectStageTaskInput;
 import org.ag.timeline.presentation.transferobject.input.StatusInput;
+import org.ag.timeline.presentation.transferobject.input.TaskInput;
 import org.ag.timeline.presentation.transferobject.input.TimeDataInput;
 import org.ag.timeline.presentation.transferobject.input.UserInput;
 import org.ag.timeline.presentation.transferobject.input.UserPreferencesInput;
 import org.ag.timeline.presentation.transferobject.reply.ActivityReply;
-import org.ag.timeline.presentation.transferobject.reply.AuditDataReply;
-import org.ag.timeline.presentation.transferobject.reply.AuditDetailRow;
-import org.ag.timeline.presentation.transferobject.reply.AuditRow;
-import org.ag.timeline.presentation.transferobject.reply.BasicProjectMetrics;
-import org.ag.timeline.presentation.transferobject.reply.CodeValueListReply;
 import org.ag.timeline.presentation.transferobject.reply.CodeValueReply;
-import org.ag.timeline.presentation.transferobject.reply.DetailedReportReply;
-import org.ag.timeline.presentation.transferobject.reply.DetailedReportRow;
 import org.ag.timeline.presentation.transferobject.reply.ProjectData;
-import org.ag.timeline.presentation.transferobject.reply.ProjectDetailMetrics;
-import org.ag.timeline.presentation.transferobject.reply.ProjectDetailMetricsReply;
-import org.ag.timeline.presentation.transferobject.reply.ProjectEstimateData;
-import org.ag.timeline.presentation.transferobject.reply.ProjectEstimatesReply;
-import org.ag.timeline.presentation.transferobject.reply.ProjectLevelMetrics;
-import org.ag.timeline.presentation.transferobject.reply.ProjectLevelMetricsReply;
 import org.ag.timeline.presentation.transferobject.reply.ProjectReply;
-import org.ag.timeline.presentation.transferobject.reply.ReportRow;
-import org.ag.timeline.presentation.transferobject.reply.SummaryReportReply;
+import org.ag.timeline.presentation.transferobject.reply.TaskReply;
 import org.ag.timeline.presentation.transferobject.reply.TimeDataReply;
 import org.ag.timeline.presentation.transferobject.reply.UserPreferenceReply;
 import org.ag.timeline.presentation.transferobject.reply.UserPreferenceSearchReply;
@@ -70,14 +52,28 @@ import org.ag.timeline.presentation.transferobject.reply.UserReply;
 import org.ag.timeline.presentation.transferobject.reply.UserSearchReply;
 import org.ag.timeline.presentation.transferobject.reply.WeekReply;
 import org.ag.timeline.presentation.transferobject.reply.WeeklyUserReply;
+import org.ag.timeline.presentation.transferobject.reply.agile.RapidBoardReply;
+import org.ag.timeline.presentation.transferobject.reply.audit.AuditDataReply;
+import org.ag.timeline.presentation.transferobject.reply.audit.AuditDetailRow;
+import org.ag.timeline.presentation.transferobject.reply.audit.AuditRow;
+import org.ag.timeline.presentation.transferobject.reply.metrics.BasicProjectMetrics;
+import org.ag.timeline.presentation.transferobject.reply.metrics.ProjectDetailMetrics;
+import org.ag.timeline.presentation.transferobject.reply.metrics.ProjectDetailMetricsReply;
+import org.ag.timeline.presentation.transferobject.reply.metrics.ProjectEstimateData;
+import org.ag.timeline.presentation.transferobject.reply.metrics.ProjectEstimatesReply;
+import org.ag.timeline.presentation.transferobject.reply.metrics.ProjectLevelMetrics;
+import org.ag.timeline.presentation.transferobject.reply.metrics.ProjectLevelMetricsReply;
+import org.ag.timeline.presentation.transferobject.reply.report.DetailedReportReply;
+import org.ag.timeline.presentation.transferobject.reply.report.DetailedReportRow;
+import org.ag.timeline.presentation.transferobject.reply.report.ReportRow;
+import org.ag.timeline.presentation.transferobject.reply.report.SummaryReportReply;
 import org.ag.timeline.presentation.transferobject.search.ActivitySearchParameter;
 import org.ag.timeline.presentation.transferobject.search.AuditDataSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.ProjectDetailMetricsSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.ProjectMetricsSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.ProjectSearchParameter;
-import org.ag.timeline.presentation.transferobject.search.ProjectStageSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.ReportSearchParameters;
-import org.ag.timeline.presentation.transferobject.search.StageSearchParameter;
+import org.ag.timeline.presentation.transferobject.search.TaskSearchParameter;
 import org.ag.timeline.presentation.transferobject.search.TimeDataSearchParameters;
 import org.ag.timeline.presentation.transferobject.search.UserPreferenceSearchParameter;
 import org.ag.timeline.presentation.transferobject.search.UserSearchParameter;
@@ -191,7 +187,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setUser(user);
 					}
 
-					TextHelper.logMessage("autheticateUser() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("autheticateUser()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -277,7 +273,7 @@ public class TimelineServiceImpl implements TimelineService {
 						}
 					}
 
-					TextHelper.logMessage("createActivity() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("createActivity()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -383,7 +379,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setSuccessMessage("Created successfully.");
 					}
 
-					TextHelper.logMessage("createProject() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("createProject()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -448,7 +444,9 @@ public class TimelineServiceImpl implements TimelineService {
 
 					long time = System.nanoTime();
 
-					Activity activity = (Activity) session.get(Activity.class, new Long(myTimeData.getActivityId()));
+					Activity activity = (Activity) session
+							.get(Activity.class, Long.valueOf(myTimeData.getActivityId()));
+					Task task = (Task) session.get(Task.class, Long.valueOf(myTimeData.getTaskId()));
 					User currentUser = (User) session.get(User.class, myTimeData.getUserId());
 					Date startDate = myTimeData.getDate();
 					Long year = TextHelper.getYearForWeekDay(startDate);
@@ -474,7 +472,8 @@ public class TimelineServiceImpl implements TimelineService {
 						}
 					}
 
-					if ((activity != null) && (user != null) && (startDate != null) && (user.getId() > 0)) {
+					if ((activity != null) && (task != null) && (user != null) && (startDate != null)
+							&& (user.getId() > 0)) {
 
 						// week handling
 						Week week = null;
@@ -515,9 +514,11 @@ public class TimelineServiceImpl implements TimelineService {
 							criteria.createAlias("activity", "act");
 							criteria.createAlias("project", "proj");
 							criteria.createAlias("week", "wk");
+							criteria.createAlias("task", "task");
 							criteria.add(Restrictions.and(
 									Restrictions.eq("wk.weekNumber", new Long(week.getWeekNumber())),
 									Restrictions.eq("wk.year", new Long(year)),
+									Restrictions.eq("task.id", new Long(task.getId())),
 									Restrictions.eq("usr.id", new Long(user.getId())),
 									Restrictions.eq("act.id", new Long(activity.getId())),
 									Restrictions.eq("proj.id", new Long(activity.getProject().getId()))));
@@ -529,7 +530,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 							// user is trying to add same activity as existing
 							if ((list != null) && (list.size() > 0)) {
-								reply.setErrorMessage("An entry for same user, project, activity and week already exists.");
+								reply.setErrorMessage("An entry for same user, project, activity, task and week already exists.");
 							} else {
 
 								// ceate new entry
@@ -537,6 +538,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 								data.setActivity(activity);
 								data.setProject(activity.getProject());
+								data.setTask(task);
 								data.setUser(user);
 								data.setWeek(week);
 
@@ -559,7 +561,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setErrorMessage("Mandatory data is missing.");
 					}
 
-					TextHelper.logMessage("createTimeData() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("createTimeData()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -658,7 +660,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setSuccessMessage("Created successfully.");
 					}
 
-					TextHelper.logMessage("createUser() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("createUser()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -745,7 +747,7 @@ public class TimelineServiceImpl implements TimelineService {
 						}
 					}
 
-					TextHelper.logMessage("deleteActivity() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("deleteActivity()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -831,7 +833,7 @@ public class TimelineServiceImpl implements TimelineService {
 						}
 					}
 
-					TextHelper.logMessage("deleteProject() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("deleteProject()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -904,7 +906,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setSuccessMessage("Deleted successfully.");
 					}
 
-					TextHelper.logMessage("deleteTimeData() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("deleteTimeData()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -992,7 +994,7 @@ public class TimelineServiceImpl implements TimelineService {
 						}
 					}
 
-					TextHelper.logMessage("deleteUser() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("deleteUser()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -1060,8 +1062,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setErrorMessage("Specified user preference not present in system.");
 					}
 
-					TextHelper.logMessage("deleteUserPreferences() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("deleteUserPreferences()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -1406,7 +1407,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("getReport() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("getReport()", time);
 
 			// commit the transaction
 			transaction.commit();
@@ -1472,7 +1473,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setErrorMessage("Specified activity not present in system.");
 					}
 
-					TextHelper.logMessage("modifyActivity() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("modifyActivity()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -1590,7 +1591,7 @@ public class TimelineServiceImpl implements TimelineService {
 					}
 				}
 
-				TextHelper.logMessage("modifyProject() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+				TextHelper.logMessage("modifyProject()", time);
 
 				// commit the transaction
 				transaction.commit();
@@ -1658,8 +1659,9 @@ public class TimelineServiceImpl implements TimelineService {
 
 					TimeData data = (TimeData) session.get(TimeData.class, new Long(entryId));
 					Activity activity = (Activity) session.get(Activity.class, new Long(myTimeData.getActivityId()));
+					Task task = (Task) session.get(Task.class, Long.valueOf(myTimeData.getTaskId()));
 
-					if ((data != null) && (activity != null)) {
+					if ((data != null) && (activity != null) && (task != null)) {
 
 						// check if there is already an entry with same
 						// activity, user and week
@@ -1675,9 +1677,11 @@ public class TimelineServiceImpl implements TimelineService {
 								criteria.createAlias("activity", "act");
 								criteria.createAlias("project", "proj");
 								criteria.createAlias("week", "wk");
+								criteria.createAlias("task", "task");
 								criteria.add(Restrictions.and(
 										Restrictions.eq("wk.weekNumber", new Long(data.getWeek().getWeekNumber())),
 										Restrictions.eq("wk.year", new Long(data.getWeek().getYear())),
+										Restrictions.eq("task.id", new Long(data.getTask().getId())),
 										Restrictions.eq("usr.id", new Long(data.getUser().getId())),
 										Restrictions.eq("act.id", new Long(activity.getId())),
 										Restrictions.eq("proj.id", new Long(activity.getProject().getId()))));
@@ -1697,12 +1701,13 @@ public class TimelineServiceImpl implements TimelineService {
 
 								// user is trying to add same activity as
 								// existing
-								reply.setErrorMessage("An entry for same user, project, activity and week already exists.");
+								reply.setErrorMessage("An entry for same user, project, activity, task and week already exists.");
 
 							} else {
 
 								// update the entry
 								data.setActivity(activity);
+								data.setTask(task);
 								data.setProject(activity.getProject());
 
 								data.setData_weekday_1(TextHelper.getScaledBigDecimal(myTimeData.getDay_1_time()));
@@ -1724,7 +1729,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setErrorMessage("Mandatory data is missing.");
 					}
 
-					TextHelper.logMessage("modifyTimeData() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("modifyTimeData()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -1856,7 +1861,7 @@ public class TimelineServiceImpl implements TimelineService {
 						}
 					}
 
-					TextHelper.logMessage("modifyUser() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("modifyUser()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -1979,8 +1984,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setPreference(preferences);
 					}
 
-					TextHelper.logMessage("modifyUserPreferences() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("modifyUserPreferences()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -2058,8 +2062,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setErrorMessage("Specified user not present in system.");
 					}
 
-					TextHelper.logMessage("resetUserCredentials() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("resetUserCredentials()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -2154,9 +2157,9 @@ public class TimelineServiceImpl implements TimelineService {
 
 			if ((dbList != null) && (dbList.size() > 0)) {
 
-				for (Activity label : dbList) {
-					reply.addActivity(label.getProject().getId(), label.getProject().getName(), label.getId(),
-							label.getName());
+				for (Activity activity : dbList) {
+					reply.addActivity(activity.getProject().getId(), activity.getProject().getName(), activity.getId(),
+							activity.getName(), activity.isDefaultActivity());
 				}
 
 			} else {
@@ -2164,7 +2167,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("searchProjects() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("searchProjects()", time);
 
 			// commit the transaction
 			transaction.commit();
@@ -2264,7 +2267,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("searchProjects() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("searchProjects()", time);
 
 			// commit the transaction
 			transaction.commit();
@@ -2311,6 +2314,7 @@ public class TimelineServiceImpl implements TimelineService {
 			Long userId = 0l;
 			Long projectId = 0l;
 			Long activityId = 0l;
+			Long taskId = 0l;
 
 			Long startWeekId = 0l;
 			Long startWeekNum = 0l;
@@ -2326,6 +2330,7 @@ public class TimelineServiceImpl implements TimelineService {
 				userId = searchParameters.getUserId();
 				projectId = searchParameters.getProjectId();
 				activityId = searchParameters.getActivityid();
+				taskId = searchParameters.getTaskId();
 
 				startWeekId = searchParameters.getStartWeekId();
 				startWeekNum = searchParameters.getStartWeekNum();
@@ -2341,6 +2346,7 @@ public class TimelineServiceImpl implements TimelineService {
 			criteria.createAlias("week", "wk");
 			criteria.createAlias("project", "proj");
 			criteria.createAlias("activity", "act");
+			criteria.createAlias("task", "tsk");
 
 			User user = (User) session.get(User.class, userId);
 
@@ -2356,6 +2362,10 @@ public class TimelineServiceImpl implements TimelineService {
 
 			if (activityId > 0) {
 				criteria.add(Restrictions.eq("act.id", activityId));
+			}
+
+			if (taskId > 0) {
+				criteria.add(Restrictions.eq("tsk.id", taskId));
 			}
 
 			if (startWeekId > 0) {
@@ -2434,7 +2444,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("searchTimeData() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("searchTimeData()", time);
 
 			// commit the transaction
 			transaction.commit();
@@ -2515,7 +2525,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("searchUserPreferences() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("searchUserPreferences()", time);
 
 			// commit the transaction
 			transaction.commit();
@@ -2618,7 +2628,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("searchUsers() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("searchUsers()", time);
 
 			// commit the transaction
 			transaction.commit();
@@ -2706,7 +2716,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("searchWeeks() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("searchWeeks()", time);
 
 			// commit the transaction
 			transaction.commit();
@@ -2849,7 +2859,7 @@ public class TimelineServiceImpl implements TimelineService {
 				}
 			}
 
-			TextHelper.logMessage("systemManagement() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("systemManagement()", time);
 
 			// commit the transaction
 			transaction.commit();
@@ -2995,7 +3005,7 @@ public class TimelineServiceImpl implements TimelineService {
 				}
 			}
 
-			TextHelper.logMessage("searchAuditData() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("searchAuditData()", time);
 
 			// commit the transaction
 			transaction.commit();
@@ -3092,7 +3102,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("Missing search data.");
 			}
 
-			TextHelper.logMessage("getDetailedReport() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("getDetailedReport()", time);
 
 			// commit the transaction
 			transaction.commit();
@@ -3187,7 +3197,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setCodeValue(codeValue);
 					}
 
-					TextHelper.logMessage("modifyStatus() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("modifyStatus()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -3326,8 +3336,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("searchUsersWithoutEntries() > Time taken : "
-					+ ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("searchUsersWithoutEntries()", time);
 
 			// commit the transaction
 			transaction.commit();
@@ -3465,8 +3474,7 @@ public class TimelineServiceImpl implements TimelineService {
 						}
 					}
 
-					TextHelper.logMessage("createProjectDetailMetrics() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("createProjectDetailMetrics()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -3549,8 +3557,7 @@ public class TimelineServiceImpl implements TimelineService {
 					reply.setCodeValue(new CodeValue(projectId, project.getName()));
 					reply.setSuccessMessage(msg.toString());
 
-					TextHelper.logMessage("deleteProjectMetrics() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("deleteProjectMetrics()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -3615,8 +3622,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setErrorMessage("Specified project metrics entry not present in System.");
 					}
 
-					TextHelper.logMessage("deleteProjectDetailMetrics() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("deleteProjectDetailMetrics()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -3707,8 +3713,7 @@ public class TimelineServiceImpl implements TimelineService {
 						reply.setSuccessMessage("Modified successfully.");
 					}
 
-					TextHelper.logMessage("modifyProjectDetailMetrics() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("modifyProjectDetailMetrics()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -3789,8 +3794,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 					}
 
-					TextHelper.logMessage("saveProjectEstimates() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("saveProjectEstimates()", time);
 
 					// commit the transaction
 					transaction.commit();
@@ -3910,7 +3914,7 @@ public class TimelineServiceImpl implements TimelineService {
 				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("searchProjectEstimates() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("searchProjectEstimates()", time);
 
 			// commit the transaction
 			transaction.commit();
@@ -3937,53 +3941,77 @@ public class TimelineServiceImpl implements TimelineService {
 	}
 
 	@Override
-	public CodeValueListReply searchTasks(ProjectSearchParameter searchParameters) throws TimelineException {
+	public TaskReply searchTasks(TaskSearchParameter searchParameters) throws TimelineException {
 		Session session = null;
 		Transaction transaction = null;
-		final CodeValueListReply reply = new CodeValueListReply();
+		final TaskReply reply = new TaskReply();
 
 		try {
-			Long projectId = 0l;
 
 			if (searchParameters != null) {
-				projectId = searchParameters.getProjectId();
 
-				if (projectId > 0) {
+				// read data, hence using normal session()
+				session = getNormalSession();
+				transaction = session.beginTransaction();
 
-					// read data, hence using normal session()
-					session = getNormalSession();
-					transaction = session.beginTransaction();
+				long time = System.nanoTime();
 
-					long time = System.nanoTime();
+				Criteria criteria = session.createCriteria(Task.class);
+				criteria.createAlias("project", "project");
+				criteria.createAlias("activity", "activity");
+				// criteria.createAlias("user", "user");
 
-					Criteria criteria = session.createCriteria(Task.class);
-					criteria.createAlias("project", "p");
-					criteria.add(Restrictions.eq("p.id", projectId));
+				if (!searchParameters.isSearchAllTasks()) {
 
-					// add order
-					criteria.addOrder(Order.asc("taskText"));
+					Long projectId = searchParameters.getProjectId();
+					Long activityId = searchParameters.getActivityId();
+					Long taskId = searchParameters.getTaskId();
+					// Long userId = searchParameters.getUserDbId();
 
-					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
-
-					@SuppressWarnings("unchecked")
-					List<Task> dbList = criteria.list();
-
-					if ((dbList != null) && (dbList.size() > 0)) {
-
-						for (Task task : dbList) {
-							reply.addCodeValue(new CodeValue(task.getId(), task.getTaskText()));
-						}
-
-					} else {
-						// No results found
-						reply.setErrorMessage("No results found.");
+					if (projectId > 0) {
+						criteria.add(Restrictions.eq("project.id", projectId));
 					}
 
-					TextHelper.logMessage("searchTasks() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+					if (activityId > 0) {
+						criteria.add(Restrictions.eq("activity.id", activityId));
+					}
 
-					// commit the transaction
-					transaction.commit();
+					if (taskId > 0) {
+						criteria.add(Restrictions.eq("id", taskId));
+					}
+
+					// if (userId > 0) {
+					// criteria.add(Restrictions.eq("user.id", userId));
+					// }
 				}
+
+				// add order
+				criteria.addOrder(Order.asc("project.id"));
+				criteria.addOrder(Order.asc("activity.id"));
+				// criteria.addOrder(Order.asc("user.id"));
+				criteria.addOrder(Order.asc("text"));
+
+				criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+				@SuppressWarnings("unchecked")
+				List<Task> dbList = criteria.list();
+
+				if ((dbList != null) && (dbList.size() > 0)) {
+
+					for (Task task : dbList) {
+						reply.addTask(task);
+					}
+
+				} else {
+					// No results found
+					reply.setErrorMessage("No results found.");
+				}
+
+				TextHelper.logMessage("searchTasks()", time);
+
+				// commit the transaction
+				transaction.commit();
+
 			}
 
 		} catch (HibernateException hibernateException) {
@@ -4206,8 +4234,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 			}
 
-			TextHelper.logMessage("getProjectLevelMetricsReport() > Time taken : "
-					+ ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("getProjectLevelMetricsReport()", time);
 
 			// commit the transaction
 			transaction.commit();
@@ -4342,8 +4369,7 @@ public class TimelineServiceImpl implements TimelineService {
 				}
 			}
 
-			TextHelper.logMessage("getProjectDetailMetricsReport() > Time taken : "
-					+ ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("getProjectDetailMetricsReport()", time);
 
 			// commit the transaction
 			transaction.commit();
@@ -4371,356 +4397,11 @@ public class TimelineServiceImpl implements TimelineService {
 	}
 
 	@Override
-	public CodeValueReply createStage(CodeValueInput input) throws TimelineException {
-		Session session = null;
-		Transaction transaction = null;
-		final CodeValueReply reply = new CodeValueReply();
-
-		if ((input != null) && (input.getCodeValue() != null)) {
-
-			final String text = TextHelper.trimToNull(input.getCodeValue().getValue());
-
-			if (text != null) {
-
-				try {
-					// create data, hence using AuditableSession()
-					session = getAuditableSession();
-					transaction = session.beginTransaction();
-
-					long time = System.nanoTime();
-					Stage stage = null;
-
-					Criteria criteria = session.createCriteria(Stage.class);
-					criteria.add(Restrictions.eq("name", text));
-					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
-
-					@SuppressWarnings("unchecked")
-					List<Stage> list = criteria.list();
-
-					if ((list != null) && (list.size() > 0)) {
-
-						// already a project exists with given name.
-						reply.setErrorMessage("This stage name is already present in system.");
-
-					} else {
-
-						stage = new Stage();
-						stage.setName(text);
-						session.saveOrUpdate(stage);
-
-						reply.setSuccessMessage("Created successfully.");
-
-					}
-
-					TextHelper.logMessage("createStage() > Time taken : " + ((System.nanoTime() - time) / 1000000));
-
-					// commit the transaction
-					transaction.commit();
-
-					if (stage != null) {
-						reply.setCodeValue(new CodeValue(stage.getId(), stage.getName()));
-					}
-
-				} catch (HibernateException hibernateException) {
-
-					// rollback transaction
-					if (transaction != null) {
-						transaction.rollback();
-					}
-
-					hibernateException.printStackTrace();
-
-					// create a reply for error message
-					reply.setErrorMessage("Create failed due to Technical Reasons.");
-
-				} finally {
-					// close the session
-					if (session != null) {
-						session.close();
-					}
-				}
-			} else {
-				reply.setErrorMessage("Invalid stage name specified.");
-			}
-		}
-
-		return reply;
-	}
-
-	@Override
-	public CodeValueReply createProjectStage(ProjectStageInput input) throws TimelineException {
-		Session session = null;
-		Transaction transaction = null;
-		final CodeValueReply reply = new CodeValueReply();
-
-		if (input != null) {
-
-			final Long projectId = input.getProjectId();
-			final Long stageId = input.getStageId();
-
-			if ((projectId > 0) && (stageId > 0)) {
-
-				try {
-					// create data, hence using AuditableSession()
-					session = getAuditableSession();
-					transaction = session.beginTransaction();
-
-					long time = System.nanoTime();
-
-					ProjectStage projectStage = null;
-
-					Criteria criteria = session.createCriteria(ProjectStage.class);
-					criteria.createAlias("project", "project");
-					criteria.createAlias("stage", "stage");
-
-					criteria.add(Restrictions.and(Restrictions.eq("project.id", projectId),
-							Restrictions.eq("stage.id", stageId)));
-
-					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
-
-					@SuppressWarnings("unchecked")
-					List<ProjectStage> list = criteria.list();
-
-					if ((list != null) && (list.size() > 0)) {
-
-						// already a project stage exists
-						reply.setErrorMessage("This project stage is already present in system.");
-
-					} else {
-
-						Project project = (Project) session.get(Project.class, projectId);
-						Stage stage = (Stage) session.get(Stage.class, stageId);
-
-						final long position = input.getPosition();
-
-						if ((project != null) && (stage != null) && (position > 0)) {
-
-							projectStage = new ProjectStage();
-							projectStage.setPosition(position);
-							projectStage.setProject(project);
-							projectStage.setStage(stage);
-							session.saveOrUpdate(projectStage);
-							reply.setSuccessMessage("Created successfully.");
-
-						} else {
-							reply.setErrorMessage("Invalid data provided.");
-						}
-					}
-
-					TextHelper.logMessage("createProjectStage() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
-
-					// commit the transaction
-					transaction.commit();
-
-					if (projectStage != null) {
-						reply.setCodeValue(new CodeValue(projectStage.getId(), projectStage.getDescription()));
-					}
-
-				} catch (HibernateException hibernateException) {
-
-					// rollback transaction
-					if (transaction != null) {
-						transaction.rollback();
-					}
-
-					hibernateException.printStackTrace();
-
-					// create a reply for error message
-					reply.setErrorMessage("Create failed due to Technical Reasons.");
-
-				} finally {
-					// close the session
-					if (session != null) {
-						session.close();
-					}
-				}
-			} else {
-				reply.setErrorMessage("Invalid Project or Stage specified.");
-			}
-		}
-
-		return reply;
-	}
-
-	@Override
-	public CodeValueReply deleteStage(CodeValueInput input) throws TimelineException {
+	public RapidBoardReply getRapidBoardData(ProjectSearchParameter searchParameters) throws TimelineException {
 
 		Session session = null;
 		Transaction transaction = null;
-		final CodeValueReply reply = new CodeValueReply();
-
-		if ((input != null) && (input.getCodeValue() != null)) {
-			final long id = input.getCodeValue().getCode();
-
-			if (id > 0) {
-
-				try {
-					// create data, hence using AuditableSession()
-					session = getAuditableSession();
-					transaction = session.beginTransaction();
-
-					long time = System.nanoTime();
-
-					final Long stageId = id;
-
-					Criteria criteria = session.createCriteria(ProjectStageTask.class);
-					criteria.createAlias("projectStage", "projectStage");
-					criteria.createAlias("projectStage.stage", "stage");
-
-					criteria.add(Restrictions.eq("stage.id", stageId));
-					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
-
-					@SuppressWarnings("unchecked")
-					List<ProjectStageTask> list = criteria.list();
-
-					if ((list != null) && (list.size() > 0)) {
-
-						// already a project exists with given name.
-						reply.setErrorMessage("There are already tasks present for this stage.");
-
-					} else {
-
-						Stage stage = (Stage) session.get(Stage.class, stageId);
-
-						if (stage != null) {
-							session.delete(stage);
-							reply.setSuccessMessage("Deleted successfully.");
-							reply.setCodeValue(new CodeValue(stage.getId(), stage.getName()));
-						} else {
-							reply.setErrorMessage("Specified stage not present in system.");
-						}
-					}
-
-					TextHelper.logMessage("deleteStage() > Time taken : " + ((System.nanoTime() - time) / 1000000));
-
-					// commit the transaction
-					transaction.commit();
-
-				} catch (HibernateException hibernateException) {
-
-					// rollback transaction
-					if (transaction != null) {
-						transaction.rollback();
-					}
-
-					hibernateException.printStackTrace();
-
-					// create a reply for error message
-					reply.setErrorMessage("Delete failed due to Technical Reasons.");
-
-				} finally {
-					// close the session
-					if (session != null) {
-						session.close();
-					}
-				}
-			} else {
-				if (id <= 0) {
-					reply.setErrorMessage("Invalid stage specified.");
-				}
-			}
-		}
-
-		return reply;
-
-	}
-
-	@Override
-	public CodeValueReply deleteProjectStage(CodeValueInput input) throws TimelineException {
-
-		Session session = null;
-		Transaction transaction = null;
-		final CodeValueReply reply = new CodeValueReply();
-
-		if ((input != null) && (input.getCodeValue() != null)) {
-			final long id = input.getCodeValue().getCode();
-
-			if (id > 0) {
-
-				try {
-					// create data, hence using AuditableSession()
-					session = getAuditableSession();
-					transaction = session.beginTransaction();
-
-					long time = System.nanoTime();
-
-					final Long projectStageId = id;
-
-					Criteria criteria = session.createCriteria(ProjectStageTask.class);
-					criteria.createAlias("projectStage", "projectStage");
-
-					criteria.add(Restrictions.eq("projectStage.id", projectStageId));
-					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
-
-					@SuppressWarnings("unchecked")
-					List<ProjectStageTask> list = criteria.list();
-
-					if ((list != null) && (list.size() > 0)) {
-
-						// already a project exists with given name.
-						reply.setErrorMessage("There are already tasks present for this project stage.");
-
-					} else {
-
-						ProjectStage projectStage = (ProjectStage) session.get(ProjectStage.class, projectStageId);
-
-						if (projectStage != null) {
-							session.delete(projectStage);
-							reply.setSuccessMessage("Deleted successfully.");
-							reply.setCodeValue(new CodeValue(projectStage.getId(), projectStage.getDescription()));
-						} else {
-							reply.setErrorMessage("Specified project stage not present in system.");
-						}
-					}
-
-					TextHelper.logMessage("deleteProjectStage() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
-
-					// commit the transaction
-					transaction.commit();
-
-				} catch (HibernateException hibernateException) {
-
-					// rollback transaction
-					if (transaction != null) {
-						transaction.rollback();
-					}
-
-					hibernateException.printStackTrace();
-
-					// create a reply for error message
-					reply.setErrorMessage("Delete failed due to Technical Reasons.");
-
-				} finally {
-					// close the session
-					if (session != null) {
-						session.close();
-					}
-				}
-			} else {
-				if (id <= 0) {
-					reply.setErrorMessage("Invalid project stage specified.");
-				}
-			}
-		}
-
-		return reply;
-
-	}
-
-	@Override
-	public CodeValueReply modifyProjectStageTask(ProjectStageTaskInput input) throws TimelineException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CodeValueListReply searchStages(StageSearchParameter searchParameters) throws TimelineException {
-
-		Session session = null;
-		Transaction transaction = null;
-		final CodeValueListReply reply = new CodeValueListReply();
+		final RapidBoardReply reply = new RapidBoardReply();
 
 		try {
 			// read data, hence using normal session()
@@ -4728,50 +4409,51 @@ public class TimelineServiceImpl implements TimelineService {
 			transaction = session.beginTransaction();
 
 			long time = System.nanoTime();
-			Long stageId = 0l;
-			String stageName = null;
+			Long projectId = 0l;
 
-			Criteria criteria = session.createCriteria(Stage.class);
+			Criteria criteria = session.createCriteria(Task.class);
 
 			if (searchParameters != null) {
-				stageId = searchParameters.getStageId();
-				stageName = TextHelper.trimToNull(searchParameters.getStageName());
+				projectId = searchParameters.getProjectId();
 			}
 
-			if (stageId > 0) {
-				criteria.add(Restrictions.eq("id", stageId));
-			}
+			if (projectId > 0) {
+				criteria.createAlias("project", "project");
+				criteria.add(Restrictions.eq("project.id", projectId));
 
-			if (stageName != null) {
-				criteria.add(Restrictions.ilike("name", stageName.toLowerCase(), MatchMode.ANYWHERE));
-			}
+				// set project in reply
+				Project project = (Project) session.get(Project.class, projectId);
 
-			// add order
-			criteria.addOrder(Order.asc("name"));
+				if (project != null) {
 
-			criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+					reply.addProject(project);
 
-			@SuppressWarnings("unchecked")
-			List<Stage> dbList = criteria.list();
+					// add all activities
+					for (Activity activity : project.getActivities()) {
+						reply.addActivity(activity);
+					}
 
-			if ((dbList != null) && (dbList.size() > 0)) {
+					// add order
+					criteria.addOrder(Order.asc("text"));
+					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
-				CodeValue codeValue = null;
+					@SuppressWarnings("unchecked")
+					List<Task> dbList = criteria.list();
 
-				for (Stage stage : dbList) {
-					codeValue = new CodeValue();
-					codeValue.setCode(stage.getId());
-					codeValue.setValue(stage.getName());
+					if ((dbList != null) && (dbList.size() > 0)) {
 
-					reply.addCodeValue(codeValue);
+						for (Task task : dbList) {
+							reply.addActivityTask(task);
+						}
+					}
+
+				} else {
+					reply.setErrorMessage("Specified Project is not present in System");
 				}
 
-			} else {
-				// No results found
-				reply.setErrorMessage("No results found.");
 			}
 
-			TextHelper.logMessage("searchStages() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+			TextHelper.logMessage("getRapidBoardData()", time);
 
 			// commit the transaction
 			transaction.commit();
@@ -4795,113 +4477,78 @@ public class TimelineServiceImpl implements TimelineService {
 			}
 		}
 		return reply;
+
 	}
 
 	@Override
-	public CodeValueListReply searchProjectStage(ProjectStageSearchParameters searchParameters)
-			throws TimelineException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public CodeValueReply createTask(TaskInput input) throws TimelineException {
 
-	@Override
-	public CodeValueReply createProjectStageTask(ProjectStageTaskInput input) throws TimelineException {
 		Session session = null;
 		Transaction transaction = null;
 		final CodeValueReply reply = new CodeValueReply();
 
-		if (input != null) {
+		if ((input != null) && (input.getTaskText() != null)) {
 
-			final Long projectId = input.getProjectId();
-			final Long stageId = input.getStageId();
-			final Long taskId = input.getTaskId();
+			final Long activityId = input.getActivityId();
 
-			if ((projectId > 0) && (stageId > 0) && (taskId > 0)) {
+			if (activityId > 0) {
 
 				try {
 					// create data, hence using AuditableSession()
 					session = getAuditableSession();
 					transaction = session.beginTransaction();
 
+					Task task = null;
+
 					long time = System.nanoTime();
 
-					ProjectStageTask projectStageTask = null;
+					final Activity activity = (Activity) session.get(Activity.class, activityId);
 
-					Criteria criteria = session.createCriteria(ProjectStageTask.class);
-					criteria.createAlias("projectStage", "projectStage");
-					criteria.createAlias("projectStage.project", "project");
-					criteria.createAlias("projectStage.stage", "stage");
-					criteria.createAlias("task", "task");
+					if (activity != null) {
 
-					criteria.add(Restrictions.and(Restrictions.eq("project.id", projectId),
-							Restrictions.eq("stage.id", stageId), Restrictions.eq("task.id", taskId)));
+						final Long projectId = activity.getProject().getId();
+						final String text = TextHelper.trimToNull(input.getTaskText());
+						final String details = TextHelper.trimToNull(input.getTaskDescription());
 
-					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+						// check if existing task is present
+						Criteria criteria = session.createCriteria(Task.class);
+						criteria.createAlias("project", "project");
+						criteria.add(Restrictions.and(Restrictions.eq("project.id", projectId),
+								Restrictions.eq("text", text)));
+						criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
-					@SuppressWarnings("unchecked")
-					List<ProjectStageTask> list = criteria.list();
+						@SuppressWarnings("unchecked")
+						List<Task> list = criteria.list();
 
-					if ((list != null) && (list.size() > 0)) {
+						if ((list != null) && (list.size() > 0)) {
 
-						// already a project stage task exists
-						reply.setErrorMessage("This combination of Task, Project & Stage already exists");
-
-					} else {
-
-						Project project = (Project) session.get(Project.class, projectId);
-						Stage stage = (Stage) session.get(Stage.class, stageId);
-						Task task = (Task) session.get(Task.class, taskId);
-
-						final long position = input.getPosition();
-
-						if ((project != null) && (stage != null) && (task != null) && (position > 0)) {
-
-							ProjectStage projectStage = null;
-
-							{
-								Criteria innerCtiteria = session.createCriteria(ProjectStage.class);
-								innerCtiteria.createAlias("project", "project");
-								innerCtiteria.createAlias("stage", "stage");
-
-								innerCtiteria.add(Restrictions.and(Restrictions.eq("project.id", projectId),
-										Restrictions.eq("stage.id", stageId)));
-
-								criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
-
-								@SuppressWarnings("unchecked")
-								List<ProjectStage> innerList = criteria.list();
-
-								if (innerList != null) {
-									projectStage = innerList.get(0);
-								}
-
-								if (projectStage != null) {
-
-									projectStageTask = new ProjectStageTask();
-									projectStageTask.setPosition(position);
-									projectStageTask.setProjectStage(projectStage);
-									projectStageTask.setTask(task);
-									session.saveOrUpdate(projectStage);
-									reply.setSuccessMessage("Created successfully.");
-
-								} else {
-									reply.setErrorMessage("Specified ProjectStage not present in system.");
-								}
-							}
+							// already a project exists with given name.
+							reply.setErrorMessage("This task name is already present in project.");
 
 						} else {
-							reply.setErrorMessage("Invalid data provided.");
+
+							task = new Task();
+							task.setActivity(activity);
+							task.setText(text);
+							task.setDetails(details);
+
+							session.saveOrUpdate(task);
+
+							reply.setSuccessMessage("Created Successfully");
+						}
+					} else {
+						if (activity == null) {
+							reply.setErrorMessage("Specified Activity does not exist in System.");
 						}
 					}
 
-					TextHelper.logMessage("createProjectStageTask() > Time taken : "
-							+ ((System.nanoTime() - time) / 1000000));
+					TextHelper.logMessage("createTask()", time);
 
 					// commit the transaction
 					transaction.commit();
 
-					if (projectStageTask != null) {
-						reply.setCodeValue(new CodeValue(projectStageTask.getId(), projectStageTask.getDescription()));
+					if (task != null) {
+						reply.setCodeValue(new CodeValue(task.getId(), task.getText()));
 					}
 
 				} catch (HibernateException hibernateException) {
@@ -4923,7 +4570,14 @@ public class TimelineServiceImpl implements TimelineService {
 					}
 				}
 			} else {
-				reply.setErrorMessage("Invalid Project or Stage or Task specified.");
+
+				if (activityId <= 0) {
+					reply.setErrorMessage("Invalid Activity specified.");
+				}
+			}
+		} else {
+			if (input.getTaskText() == null) {
+				reply.setErrorMessage("Task name not specified.");
 			}
 		}
 
@@ -4931,8 +4585,210 @@ public class TimelineServiceImpl implements TimelineService {
 	}
 
 	@Override
-	public CodeValueReply deleteProjectStageTask(CodeValueInput input) throws TimelineException {
-		// TODO Auto-generated method stub
-		return null;
+	public CodeValueReply deleteTask(CodeValueInput input) throws TimelineException {
+
+		Session session = null;
+		Transaction transaction = null;
+		final CodeValueReply reply = new CodeValueReply();
+
+		if ((input != null) && (input.getCodeValue() != null)) {
+
+			final long id = input.getCodeValue().getCode();
+
+			if (id > 0) {
+
+				try {
+					// create data, hence using AuditableSession()
+					session = getAuditableSession();
+					transaction = session.beginTransaction();
+
+					long time = System.nanoTime();
+					final Long taskId = id;
+
+					Criteria criteria = session.createCriteria(TimeData.class);
+					criteria.createAlias("task", "task");
+					criteria.add(Restrictions.eq("task.id", taskId));
+					criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+					@SuppressWarnings("unchecked")
+					List<TimeData> list = criteria.list();
+
+					if ((list != null) && (list.size() > 0)) {
+
+						// already a project exists with given name.
+						reply.setErrorMessage("There are already time entries present for this Task.");
+
+					} else {
+
+						Task task = (Task) session.get(Task.class, taskId);
+
+						if (task != null) {
+
+							session.delete(task);
+							reply.setSuccessMessage("Deleted successfully.");
+							reply.setCodeValue(new CodeValue(task.getId(), task.getText()));
+
+						} else {
+							reply.setErrorMessage("Specified Task not present in system.");
+						}
+					}
+
+					TextHelper.logMessage("deleteTask()", time);
+
+					// commit the transaction
+					transaction.commit();
+
+				} catch (HibernateException hibernateException) {
+
+					// rollback transaction
+					if (transaction != null) {
+						transaction.rollback();
+					}
+
+					hibernateException.printStackTrace();
+
+					// create a reply for error message
+					reply.setErrorMessage("Delete failed due to Technical Reasons.");
+
+				} finally {
+					// close the session
+					if (session != null) {
+						session.close();
+					}
+				}
+			} else {
+				if (id <= 0) {
+					reply.setErrorMessage("Invalid task specified.");
+				}
+			}
+		}
+
+		return reply;
+	}
+
+	@Override
+	public CodeValueReply modifyTask(TaskInput input) throws TimelineException {
+
+		Session session = null;
+		Transaction transaction = null;
+		final CodeValueReply reply = new CodeValueReply();
+		Task task = null;
+
+		if ((input != null) && (input.getTaskId() > 0)
+				&& ((input.getTaskText() != null) || (input.getActivityId() > 0))) {
+
+			try {
+				// create data, hence using AuditableSession()
+				session = getAuditableSession();
+				transaction = session.beginTransaction();
+
+				long time = System.nanoTime();
+				final Long taskId = input.getTaskId();
+				final String text = TextHelper.trimToNull(input.getTaskText());
+				final String details = TextHelper.trimToNull(input.getTaskDescription());
+
+				task = (Task) session.get(Task.class, taskId);
+				boolean hasError = false;
+
+				if (task != null) {
+
+					// task text is changed
+					if (text != null) {
+
+						if ((!text.equalsIgnoreCase(task.getText()))) {
+							final Long projectId = task.getActivity().getProject().getId();
+
+							// check if existing task is present
+							Criteria criteria = session.createCriteria(Task.class);
+							criteria.createAlias("project", "project");
+							criteria.add(Restrictions.and(Restrictions.eq("project.id", projectId),
+									Restrictions.eq("text", text), Restrictions.ne("id", taskId)));
+							criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+							@SuppressWarnings("unchecked")
+							List<Task> list = criteria.list();
+
+							if ((list != null) && (list.size() > 0)) {
+
+								// already a project exists with given name.
+								reply.setErrorMessage("This task name is already present in project.");
+								hasError = true;
+
+							} else {
+
+								// set the task text
+								task.setText(text);
+
+							}
+						} else {
+							task.setDetails(details);
+						}
+					}
+
+					// check for activity change
+					if (!hasError) {
+
+						final Long activityId = input.getActivityId();
+
+						if ((activityId > 0) && (activityId != task.getActivity().getId())) {
+
+							Activity activity = (Activity) session.get(Activity.class, activityId);
+
+							if (activity != null) {
+								task.setActivity(activity);
+							} else {
+								// incorrect activity specified.
+								reply.setErrorMessage("Specified Activity is not present in System.");
+								hasError = true;
+							}
+
+						}
+					}
+
+					if (!hasError) {
+						session.saveOrUpdate(task);
+						reply.setSuccessMessage("Modified Successfully");
+					}
+
+				} else {
+					reply.setErrorMessage("Specified Task does not exist in System.");
+				}
+
+				TextHelper.logMessage("modifyTask()", time);
+
+				// commit the transaction
+				transaction.commit();
+
+				if ((!hasError) && (task != null)) {
+					reply.setCodeValue(new CodeValue(task.getId(), task.getText()));
+				}
+
+			} catch (HibernateException hibernateException) {
+
+				// rollback transaction
+				if (transaction != null) {
+					transaction.rollback();
+				}
+
+				hibernateException.printStackTrace();
+
+				// create a reply for error message
+				reply.setErrorMessage("Create failed due to Technical Reasons.");
+
+			} finally {
+				// close the session
+				if (session != null) {
+					session.close();
+				}
+			}
+
+		} else {
+			if (input.getTaskText() == null) {
+				reply.setErrorMessage("Task name not specified.");
+			}
+		}
+
+		return reply;
+
 	}
 }
