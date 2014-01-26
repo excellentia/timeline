@@ -13,12 +13,14 @@
 			</generator>
 		</id>
 
-		<property name="taskText" type="string" column="TEXT" />
+		<property name="text" type="string" column="TEXT" not-null="true" />
+		<property name="details" type="string" column="DETAILS" />
 
 		<many-to-one name="project" class="Project" column="PROJECT_ID" cascade="none" not-null="true" />
+		<many-to-one name="activity" class="Activity" column="ACTIVITY_ID" cascade="none" not-null="true" />
 
 		<property name="createUserId" type="java.lang.Long" column="CREATE_USER" not-null="true" />
-		<property name="createDate" type="java.util.Date" not-null="true" column="CREATE_DATE" />
+		<property name="createDate" type="java.util.Date" column="CREATE_DATE" not-null="true" />
 		<property name="modifyUserId" type="java.lang.Long" column="MODIFY_USER" />
 		<property name="modifyDate" type="java.util.Date" column="MODIFY_DATE" />
 

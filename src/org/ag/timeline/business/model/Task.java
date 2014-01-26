@@ -13,19 +13,20 @@ import org.ag.timeline.common.TimelineConstants;
  */
 public class Task extends AbstractModel {
 
-	// Task does not contain Activity as same Task may be target of different
-	// activities for a single Project
-
 	private Project project = null;
 
-	private String taskText = null;
+	private Activity activity = null;
+
+	private String text = null;
+
+	private String details = null;
 
 	/**
 	 * Getter for project.
 	 * 
 	 * @return the project.
 	 */
-	public Project getProject() {
+	private Project getProject() {
 		return this.project;
 	}
 
@@ -34,26 +35,66 @@ public class Task extends AbstractModel {
 	 * 
 	 * @param project the project to set.
 	 */
-	public void setProject(Project project) {
+	private void setProject(Project project) {
 		this.project = project;
 	}
 
 	/**
-	 * Getter for taskText.
+	 * Getter for text.
 	 * 
-	 * @return the taskText.
+	 * @return the text.
 	 */
-	public String getTaskText() {
-		return this.taskText;
+	public String getText() {
+		return this.text;
 	}
 
 	/**
-	 * Setter for taskText.
+	 * Setter for text.
 	 * 
-	 * @param taskText the taskText to set.
+	 * @param text the text to set.
 	 */
-	public void setTaskText(String taskText) {
-		this.taskText = taskText;
+	public void setText(String taskText) {
+		this.text = taskText;
+	}
+
+	/**
+	 * Getter for activity.
+	 * 
+	 * @return the activity.
+	 */
+	public Activity getActivity() {
+		return this.activity;
+	}
+
+	/**
+	 * Setter for activity.
+	 * 
+	 * @param activity the activity to set.
+	 */
+	public void setActivity(Activity activity) {
+		this.activity = activity;
+
+		if (activity != null) {
+			this.setProject(activity.getProject());
+		}
+	}
+
+	/**
+	 * Getter for details.
+	 * 
+	 * @return the details.
+	 */
+	public String getDetails() {
+		return this.details;
+	}
+
+	/**
+	 * Setter for details.
+	 * 
+	 * @param details the details to set.
+	 */
+	public void setDetails(String details) {
+		this.details = details;
 	}
 
 	/*
@@ -67,8 +108,12 @@ public class Task extends AbstractModel {
 		builder.append(super.getId());
 		builder.append(", project=");
 		builder.append(project);
-		builder.append(", taskText=");
-		builder.append(taskText);
+		builder.append(", activity=");
+		builder.append(activity);
+		builder.append(", text=");
+		builder.append(text);
+		builder.append(", details=");
+		builder.append(details);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -77,7 +122,9 @@ public class Task extends AbstractModel {
 	public String getDescription() {
 		StringBuilder builder = new StringBuilder(this.getProject().getName());
 		builder.append(TimelineConstants.COMMA);
-		builder.append(this.getTaskText());
+		builder.append(this.getActivity().getName());
+		builder.append(TimelineConstants.COMMA);
+		builder.append(this.getText());
 		return builder.toString();
 	}
 
