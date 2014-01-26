@@ -13,11 +13,6 @@ import java.util.List;
  */
 public class ProjectEstimatesReply extends BusinessReply {
 
-	/**
-	 * Serial Version U-Id.
-	 */
-	private static final long serialVersionUID = 3598326881240180613L;
-
 	private List<ProjectEstimateData> estimates = null;
 
 	/**

@@ -23,6 +23,10 @@ public class TimeDataRow {
 
 	private String activityName = null;
 
+	private long taskId = 0;
+
+	private String taskName = null;
+
 	private long userId = 0;
 
 	private String userFirstName = null;
@@ -514,4 +518,41 @@ public class TimeDataRow {
 	public String getFormattedStartDate() {
 		return TextHelper.getDateAsString(this.startDate);
 	}
+
+	/**
+	 * Getter for taskId.
+	 * 
+	 * @return the taskId.
+	 */
+	public long getTaskId() {
+		return this.taskId;
+	}
+
+	/**
+	 * Setter for taskId.
+	 * 
+	 * @param taskId the taskId to set.
+	 */
+	public void setTaskId(long taskId) {
+		this.taskId = taskId;
+	}
+
+	/**
+	 * Getter for taskName.
+	 * 
+	 * @return the taskName.
+	 */
+	public String getTaskName() {
+		return this.taskName;
+	}
+
+	/**
+	 * Setter for taskName.
+	 * 
+	 * @param taskName the taskName to set.
+	 */
+	public void setTaskName(String taskName) {
+		this.taskName = taskName;
+	}
+
 }

@@ -33,6 +33,8 @@ public class TimeDataReply extends BusinessReply {
 	private Map<Long, List<TimeDataRow>> projTimeMap = null;
 
 	private Map<Long, List<TimeDataRow>> actTimeMap = null;
+	
+	private Map<Long, List<TimeDataRow>> taskTimeMap = null;
 
 	private Map<Long, List<TimeDataRow>> userTimeMap = null;
 
@@ -74,6 +76,7 @@ public class TimeDataReply extends BusinessReply {
 		this.userTimeMap = new HashMap<Long, List<TimeDataRow>>();
 		this.weekTimeMap = new HashMap<Long, List<TimeDataRow>>();
 		this.yearTimeMap = new HashMap<Long, List<TimeDataRow>>();
+		this.taskTimeMap = new HashMap<Long, List<TimeDataRow>>();
 
 		this.userIdList = new TreeSet<Long>();
 		this.weekIdList = new TreeSet<Long>();
@@ -94,6 +97,7 @@ public class TimeDataReply extends BusinessReply {
 		// populate row
 		final long userId = data.getUser().getId();
 		final long projectId = data.getProject().getId();
+		final long tasktId = data.getTask().getId();
 		final String projectName = data.getProject().getName();
 		
 		String leadName = TimelineConstants.EMPTY;
@@ -115,6 +119,9 @@ public class TimeDataReply extends BusinessReply {
 
 		row.setActivityId(activityId);
 		row.setActivityName(activityName);
+		
+		row.setTaskId(tasktId);
+		row.setTaskName(data.getTask().getText());
 
 		row.setUserId(userId);
 		row.setUserFirstName(data.getUser().getFirstName());
@@ -153,6 +160,10 @@ public class TimeDataReply extends BusinessReply {
 			if (actTimeMap.get(activityId) == null) {
 				actTimeMap.put(activityId, new ArrayList<TimeDataRow>());
 			}
+			
+			if (taskTimeMap.get(tasktId) == null) {
+				taskTimeMap.put(tasktId, new ArrayList<TimeDataRow>());
+			}
 
 			if (userTimeMap.get(userId) == null) {
 				userTimeMap.put(userId, new ArrayList<TimeDataRow>());
@@ -168,6 +179,7 @@ public class TimeDataReply extends BusinessReply {
 
 			projTimeMap.get(projectId).add(row);
 			actTimeMap.get(activityId).add(row);
+			taskTimeMap.get(tasktId).add(row);
 			userTimeMap.get(userId).add(row);
 			weekTimeMap.get(weekId).add(row);
 			yearTimeMap.get(year).add(row);
@@ -231,6 +243,16 @@ public class TimeDataReply extends BusinessReply {
 
 		if ((this.userTimeMap != null) && (this.userTimeMap.containsKey(userId))) {
 			list = this.userTimeMap.get(userId);
+		}
+
+		return list;
+	}
+	
+	public List<TimeDataRow> getEntriesForTask(final long taskId) {
+		List<TimeDataRow> list = null;
+
+		if ((this.taskTimeMap != null) && (this.taskTimeMap.containsKey(taskId))) {
+			list = this.taskTimeMap.get(taskId);
 		}
 
 		return list;

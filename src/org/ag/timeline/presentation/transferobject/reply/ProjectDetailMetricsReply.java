@@ -5,11 +5,6 @@ import java.util.List;
 
 public class ProjectDetailMetricsReply extends BusinessReply {
 
-	/**
-	 * Serial Version U-Id.
-	 */
-	private static final long serialVersionUID = 7247589258223096495L;
-
 	private ProjectEstimateData basicData = null;
 
 	private List<ProjectDetailMetrics> weeklyMetrics = null;

@@ -26,7 +26,7 @@ public class CalculatedMetrics {
 			double plannedValue = basicMetrics.getPlannedValue();
 			double earnedValue = basicMetrics.getEarnedValue();
 			double actualCost = basicMetrics.getActualCost();
-			double actualsToDate = basicMetrics.getActualsToDate();
+//			double actualsToDate = basicMetrics.getActualsToDate();
 			double softwareProgrammingEffort = basicMetrics.getSoftwareProgrammingEffort();
 			long defects = basicMetrics.getDefects();
 
