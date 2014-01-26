@@ -54,13 +54,23 @@
 			<result name="error">pages/login.jsp</result>
 		</action>
 
+		<action name="Tasks" class="org.ag.timeline.presentation.action.TaskAction">
+			<result name="success">pages/tasks.jsp</result>
+			<result name="error">pages/login.jsp</result>
+		</action>
+
 		<action name="Export" class="org.ag.timeline.presentation.action.ExportAction">
-			<result name ="success" type="stream">
+			<result name="success" type="stream">
 				<param name="contentType">"application/vnd.ms-excel"</param>
 				<param name="inputName">excelStream</param>
 				<param name="contentDisposition">attachment;filename="${fileName}"</param>
 				<param name="bufferSize">1024</param>
 			</result>
+			<result name="error">pages/login.jsp</result>
+		</action>
+
+		<action name="RapidBoard" class="org.ag.timeline.presentation.action.RapidBoardAction">
+			<result name="success">pages/rapid-board.jsp</result>
 			<result name="error">pages/login.jsp</result>
 		</action>
 
