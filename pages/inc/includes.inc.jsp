@@ -24,7 +24,10 @@
 <c:set var="noteTitle" value="Attach A Note To This Item" />
 <c:set var="emailTitle" value="Send an Email" />
 
+<c:set var="taskNameEditTitle" value="Edit This Task Name" />
+
 <c:set var="projectDeleteTitle" value="Delete This Project" />
 <c:set var="activityDeleteTitle" value="Delete This Activity" />
 <c:set var="userDeleteTitle" value="Delete This User" />
 <c:set var="rowDeleteTitle" value="Delete This Row" />
+<c:set var="taskDeleteTitle" value="Delete This Task" />
