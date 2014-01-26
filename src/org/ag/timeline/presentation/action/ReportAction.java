@@ -1,6 +1,6 @@
 package org.ag.timeline.presentation.action;
 
-import org.ag.timeline.presentation.transferobject.reply.SummaryReportReply;
+import org.ag.timeline.presentation.transferobject.reply.report.SummaryReportReply;
 import org.ag.timeline.presentation.transferobject.search.ReportSearchParameters;
 
 /**
