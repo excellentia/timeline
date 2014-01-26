@@ -3,7 +3,7 @@
  */
 package org.ag.timeline.presentation.transferobject.search;
 
-import org.ag.timeline.business.model.Project;
+import org.ag.timeline.business.model.Activity;
 
 /**
  * Search parameter
@@ -12,13 +12,13 @@ import org.ag.timeline.business.model.Project;
  */
 public class ActivitySearchParameter extends ProjectSearchParameter {
 
-	private Project activity = null;
+	private Activity activity = null;
 
 	/**
 	 * Constructor.
 	 */
 	public ActivitySearchParameter() {
-		this.activity = new Project();
+		this.activity = new Activity();
 	}
 
 	/**
