@@ -2,10 +2,10 @@ package org.ag.timeline.presentation.action;
 
 import java.util.Date;
 
-import org.ag.timeline.business.model.AuditRecord;
+import org.ag.timeline.business.model.audit.AuditRecord;
 import org.ag.timeline.common.TextHelper;
 import org.ag.timeline.common.TimelineConstants;
-import org.ag.timeline.presentation.transferobject.reply.AuditDataReply;
+import org.ag.timeline.presentation.transferobject.reply.audit.AuditDataReply;
 import org.ag.timeline.presentation.transferobject.search.AuditDataSearchParameters;
 
 /**
