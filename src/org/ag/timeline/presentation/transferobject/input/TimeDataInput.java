@@ -17,6 +17,8 @@ public class TimeDataInput extends AbstractTimelineInput {
 	private long userId = 0;
 
 	private long activityId = 0;
+	
+	private long taskId = 0;
 
 	// private long projectId = 0;
 	private long proxiedUserDbId = 0;
@@ -73,6 +75,8 @@ public class TimeDataInput extends AbstractTimelineInput {
 		this.userId = userId;
 	}
 
+	
+	
 	// /**
 	// * Getter for projectId.
 	// *
@@ -90,6 +94,24 @@ public class TimeDataInput extends AbstractTimelineInput {
 	// public void setProjectId(long projectId) {
 	// this.projectId = projectId;
 	// }
+
+	/**
+	 * Getter for taskId.
+	 *
+	 * @return the taskId.
+	 */
+	public long getTaskId() {
+		return this.taskId;
+	}
+
+	/**
+	 * Setter for taskId.
+	 *
+	 * @param taskId the taskId to set.
+	 */
+	public void setTaskId(long taskId) {
+		this.taskId = taskId;
+	}
 
 	/**
 	 * Getter for activityId.
@@ -287,6 +309,8 @@ public class TimeDataInput extends AbstractTimelineInput {
 		builder.append(proxiedUserDbId);
 		builder.append(", activityId=");
 		builder.append(activityId);
+		builder.append(", taskId=");
+		builder.append(taskId);
 		// builder.append(", projectId=");
 		// builder.append(projectId);
 		builder.append(", date=");
