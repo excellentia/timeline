@@ -1,13 +1,8 @@
 package org.ag.timeline.presentation.transferobject.input;
 
-import org.ag.timeline.presentation.transferobject.reply.ProjectEstimateData;
+import org.ag.timeline.presentation.transferobject.reply.metrics.ProjectEstimateData;
 
 public class ProjectEstimatesInput extends AbstractTimelineInput {
-
-	/**
-	 * Serial Version U-Id.
-	 */
-	private static final long serialVersionUID = 5367634177449957185L;
 
 	private ProjectEstimateData estimateData = null;
 

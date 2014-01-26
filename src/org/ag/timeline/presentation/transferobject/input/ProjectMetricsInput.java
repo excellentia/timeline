@@ -9,11 +9,6 @@ import java.util.Date;
  */
 public class ProjectMetricsInput extends AbstractTimelineInput {
 
-	/**
-	 * Serial Version U-Id.
-	 */
-	private static final long serialVersionUID = 1314966721737178897L;
-
 	private long projectId = 0;
 
 	private long metricId = 0;
