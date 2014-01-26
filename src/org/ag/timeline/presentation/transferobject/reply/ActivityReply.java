@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ag.timeline.common.TextHelper;
-import org.ag.timeline.presentation.transferobject.common.CodeValue;
+import org.ag.timeline.presentation.transferobject.common.CodeValueStatus;
 
 /**
  * 
@@ -20,7 +20,7 @@ public class ActivityReply extends BusinessReply {
 
 	private long activityCount = 0;
 	private Map<Long, String> projectNameMap = null;
-	private Map<Long, List<CodeValue>> projectActivitiesMap = null;
+	private Map<Long, List<CodeValueStatus>> projectActivitiesMap = null;
 	private List<Long> projectIdSet = null;
 	private List<Long> activityIdSet = null;
 
@@ -34,10 +34,10 @@ public class ActivityReply extends BusinessReply {
 	}
 
 	public void addActivity(final long projectId, final String projectName, final long activityId,
-			final String activityText) {
+			final String activityText, final boolean isDefaultActivity) {
 
 		if (this.projectActivitiesMap == null) {
-			this.projectActivitiesMap = new HashMap<Long, List<CodeValue>>();
+			this.projectActivitiesMap = new HashMap<Long, List<CodeValueStatus>>();
 		}
 
 		if (this.projectNameMap == null) {
@@ -58,19 +58,19 @@ public class ActivityReply extends BusinessReply {
 		}
 
 		if (!this.projectActivitiesMap.containsKey(projectId)) {
-			this.projectActivitiesMap.put(projectId, new ArrayList<CodeValue>());
+			this.projectActivitiesMap.put(projectId, new ArrayList<CodeValueStatus>());
 		}
 
 		if (!this.activityIdSet.contains(activityId)) {
-			this.projectActivitiesMap.get(projectId).add(new CodeValue(activityId, activityText));
+			this.projectActivitiesMap.get(projectId).add(new CodeValueStatus(activityId, activityText, isDefaultActivity));
 			this.activityIdSet.add(activityId);
 			activityCount++;
 		}
 	}
 
-	public List<CodeValue> getProjectActivitiesById(final long projectId) {
+	public List<CodeValueStatus> getProjectActivitiesById(final long projectId) {
 
-		List<CodeValue> activities = null;
+		List<CodeValueStatus> activities = null;
 
 		if (this.projectActivitiesMap != null) {
 			activities = this.projectActivitiesMap.get(projectId);
@@ -79,9 +79,9 @@ public class ActivityReply extends BusinessReply {
 		return activities;
 	}
 
-	public List<CodeValue> getProjectActivitiesByName(final String projectName) {
+	public List<CodeValueStatus> getProjectActivitiesByName(final String projectName) {
 
-		List<CodeValue> activities = null;
+		List<CodeValueStatus> activities = null;
 		String projName = TextHelper.trimToNull(projectName);
 
 		if ((this.projectNameMap != null) && (projName != null) && (this.projectNameMap.containsValue(projName))) {
