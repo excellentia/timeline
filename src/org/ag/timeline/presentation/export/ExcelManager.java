@@ -122,6 +122,7 @@ public class ExcelManager {
 			createCell(row, colIndex++, "Project", headerStyle);
 			createCell(row, colIndex++, "Activity", headerStyle);
 			createCell(row, colIndex++, "Lead", headerStyle);
+			createCell(row, colIndex++, "Task", headerStyle);
 
 			createCell(row, colIndex++, "Week", headerStyle);
 
@@ -152,6 +153,7 @@ public class ExcelManager {
 					createCell(row, colIndex++, dataRow.getProjectName(), borderStyle);
 					createCell(row, colIndex++, dataRow.getActivityName(), borderStyle);
 					createCell(row, colIndex++, dataRow.getLeadName(), borderStyle);
+					createCell(row, colIndex++, dataRow.getTaskName(), borderStyle);
 
 					// create week label
 					createCell(row, colIndex++, reply.getWeekLabel(weekDbId), borderStyle);
