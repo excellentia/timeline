@@ -5,7 +5,7 @@
 
 <hibernate-mapping schema="TIMELINE_SCHEMA" package="org.ag.timeline.business.model">
 	<class name="TimeData" table="TIME_DATA_T" dynamic-update="true" dynamic-insert="true">
-		
+
 		<id name="id" type="java.lang.Long" column="ID">
 			<generator class="sequence">
 				<param name="sequence">TIME_DATA_S</param>
@@ -17,7 +17,7 @@
 		<many-to-one name="activity" class="Activity" column="ACTIVITY_ID" cascade="none" not-null="true" />
 		<many-to-one name="week" class="Week" column="WEEK_ID" cascade="none" not-null="true" />
 		<many-to-one name="task" class="Task" column="TASK_ID" cascade="none" not-null="true" />
-		
+
 		<property name="data_weekday_1" type="java.math.BigDecimal" column="WEEK_DAY_1" />
 		<property name="data_weekday_2" type="java.math.BigDecimal" column="WEEK_DAY_2" />
 		<property name="data_weekday_3" type="java.math.BigDecimal" column="WEEK_DAY_3" />
@@ -25,7 +25,6 @@
 		<property name="data_weekday_5" type="java.math.BigDecimal" column="WEEK_DAY_5" />
 		<property name="data_weekday_6" type="java.math.BigDecimal" column="WEEK_DAY_6" />
 		<property name="data_weekday_7" type="java.math.BigDecimal" column="WEEK_DAY_7" />
-		<property name="note" type="string" column="NOTE" />
 
 		<property name="createUserId" type="java.lang.Long" column="CREATE_USER" not-null="true" />
 		<property name="createDate" type="java.util.Date" not-null="true" column="CREATE_DATE" />

@@ -39,8 +39,6 @@ public class TimeData extends AbstractModel {
 
 	private Task task = null;
 
-	private String note = null;
-
 	/**
 	 * Getter for user.
 	 * 
@@ -256,24 +254,6 @@ public class TimeData extends AbstractModel {
 	public void setTask(Task task) {
 		this.task = task;
 	}
-
-	/**
-	 * Getter for note.
-	 * 
-	 * @return the note.
-	 */
-	public String getNote() {
-		return this.note;
-	}
-
-	/**
-	 * Setter for note.
-	 * 
-	 * @param note the note to set.
-	 */
-	public void setNote(String note) {
-		this.note = note;
-	}
 	
 	/**
 	 * Business method. Checks if this time data was created as Proxy.
@@ -338,8 +318,6 @@ public class TimeData extends AbstractModel {
 		builder.append(data_weekday_7);
 		builder.append(", task=");
 		builder.append(task);
-		builder.append(", note=");
-		builder.append(note);
 		builder.append("]");
 		return builder.toString();
 	}
