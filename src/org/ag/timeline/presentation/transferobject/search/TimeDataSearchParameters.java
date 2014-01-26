@@ -5,7 +5,6 @@ package org.ag.timeline.presentation.transferobject.search;
 
 import java.util.Date;
 
-
 /**
  * Wraps the search parameters.
  * 
@@ -14,19 +13,26 @@ import java.util.Date;
 public class TimeDataSearchParameters extends BasicSearchParameter {
 
 	private long timeDataId = 0;
+
 	private UserSearchParameter user = null;
+
 	private ActivitySearchParameter activity = null;
+
 	private WeekSearchParameter startWeek = null;
+
 	private WeekSearchParameter endWeek = null;
+
+	private TaskSearchParameter task = null;
 
 	/**
 	 * Constructor.
 	 */
 	public TimeDataSearchParameters() {
-		user = new UserSearchParameter();
-		activity = new ActivitySearchParameter();
-		startWeek = new WeekSearchParameter();
-		endWeek = new WeekSearchParameter();
+		this.user = new UserSearchParameter();
+		this.activity = new ActivitySearchParameter();
+		this.startWeek = new WeekSearchParameter();
+		this.endWeek = new WeekSearchParameter();
+		this.task = new TaskSearchParameter();
 	}
 
 	/**
@@ -70,7 +76,7 @@ public class TimeDataSearchParameters extends BasicSearchParameter {
 	public void setActivityid(long activityId) {
 		this.activity.setActivityId(activityId);
 	}
-	
+
 	public Date getStartDate() {
 		return this.startWeek.getStartDate();
 	}
@@ -78,7 +84,7 @@ public class TimeDataSearchParameters extends BasicSearchParameter {
 	public void setStartDate(Date startDate) {
 		this.startWeek.setStartDate(startDate);
 	}
-	
+
 	public Date getEndDate() {
 		return this.endWeek.getEndDate();
 	}
@@ -106,7 +112,7 @@ public class TimeDataSearchParameters extends BasicSearchParameter {
 	public long getStartWeekId() {
 		return this.startWeek.getWeekId();
 	}
-	
+
 	public void setStartWeekId(long weekId) {
 		this.startWeek.setweekId(weekId);
 	}
@@ -134,5 +140,23 @@ public class TimeDataSearchParameters extends BasicSearchParameter {
 	public void setEndWeekId(long weekId) {
 		this.endWeek.setweekId(weekId);
 	}
-	
+
+	/**
+	 * Getter for taskId.
+	 * 
+	 * @return the taskId.
+	 */
+	public long getTaskId() {
+		return this.task.getTaskId();
+	}
+
+	/**
+	 * Setter for taskId.
+	 * 
+	 * @param taskId the taskId to set.
+	 */
+	public void setTaskId(long taskId) {
+		this.task.setTaskId(taskId);
+	}
+
 }
