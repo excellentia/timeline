@@ -51,12 +51,13 @@
 						<col style="width: 10%" />
 						<col style="width: 10%" />
 						<col style="width: 7%" />
-						<col style="width: 7%" />
-						<col style="width: 7%" />
-						<col style="width: 7%" />
-						<col style="width: 7%" />
-						<col style="width: 7%" />
-						<col style="width: 7%" />
+						<col style="width: 6%" />
+						<col style="width: 6%" />
+						<col style="width: 6%" />
+						<col style="width: 6%" />
+						<col style="width: 6%" />
+						<col style="width: 6%" />
+						<col style="width: 6%" />
 						<col style="width: 5%" />
 						<col style="width: 3%" />
 						<col style="width: 3%" />
@@ -67,6 +68,7 @@
 							<th>Project</th>
 							<th>Activity</th>
 							<th>Lead</th>
+							<th>Task</th>
 							<th id="day1Text">Mon</th>
 							<th id="day2Text">Tue</th>
 							<th id="day3Text">Wed</th>
@@ -107,7 +109,7 @@
 				</div>
 				<%-- Project --%>
 				<div style="display: inline; padding: 0; margin: 0; margin-left: 2em;">
-					<select id="searchProjectId" name="" searchProjectId"" size="1" class="dateSearch" title="Select Project" onchange="populateActivities('searchProjectId','searchActivityId')">
+					<select id="searchProjectId" name="searchProjectId" size="1" class="dateSearch" title="Select Project" onchange="populateActivities('searchProjectId', 'searchActivityId')">
 						<option value="0" <c:if test="${selectedProjId == 0}">selected="selected"</c:if>>All Projects</option>
 						<c:forEach var="project" items="${PROJECT_LIST.projects}">
 							<option value="${project.code}" <c:if test="${selectedProjId == project.code}">selected="selected"</c:if>>${project.value}</option>
@@ -116,13 +118,19 @@
 				</div>
 				<%-- Activity --%>
 				<div style="display: inline; padding: 0; margin: 0">
-					<select id="searchActivityId" name="searchActivityId" size="1" class="dateSearch" title="Select Activity">
+					<select id="searchActivityId" name="searchActivityId" size="1" class="dateSearch" title="Select Activity" onchange="populateTasks('searchProjectId', 'searchActivityId','searchTaskId')">
 						<option value="0" <c:if test="${selectedActId == 0}">selected="selected"</c:if>>All Activities</option>
 						<c:if test="${selectedProjId > 0}">
 							<c:forEach var="activity" items="${ACTIVITY_LIST.getProjectActivities(selectedProjId)}">
 								<option value="${activity.code}" <c:if test="${selectedActId == activity.code}">selected="selected"</c:if>>${activity.value}</option>
 							</c:forEach>
 						</c:if>
+					</select>
+				</div>
+				<%-- Tasks --%>
+				<div style="display: inline; padding: 0; margin: 0">
+					<select id="searchTaskId" name="searchTaskId" size="1" class="dateSearch" title="Select Task">
+						<option value="0" <c:if test="${selectedTaskId == 0}">selected="selected"</c:if>>All Tasks</option>
 					</select>
 				</div>
 				<%-- Users --%>
@@ -160,12 +168,13 @@
 											<col style="width: 10%" />
 											<col style="width: 10%" />
 											<col style="width: 7%" />
-											<col style="width: 7%" />
-											<col style="width: 7%" />
-											<col style="width: 7%" />
-											<col style="width: 7%" />
-											<col style="width: 7%" />
-											<col style="width: 7%" />
+											<col style="width: 6%" />
+											<col style="width: 6%" />
+											<col style="width: 6%" />
+											<col style="width: 6%" />
+											<col style="width: 6%" />
+											<col style="width: 6%" />
+											<col style="width: 6%" />
 											<col style="width: 5%" />
 											<col style="width: 3%" />
 											<col style="width: 3%" />
@@ -176,6 +185,7 @@
 												<th>Project</th>
 												<th>Activity</th>
 												<th>Lead</th>
+												<th>Task</th>
 												<c:forEach var="label" items="${timeData.getDayLabels(weekId)}" varStatus="cnt">
 													<th id="day_${cnt.count}_Text">${label}</th>
 												</c:forEach>
@@ -190,10 +200,10 @@
 													<c:set var="entryId">entry_${weeklyEntry.id}</c:set>
 													<tr id='${entryId}' class="leadColumn">
 														<td>${weeklyEntry.userFullName}</td>
-														<td>${weeklyEntry.projectName} <input type="hidden" id="startDate_${weeklyEntry.id}" value="${weeklyEntry.formattedStartDate}" />
-														</td>
+														<td>${weeklyEntry.projectName} <input type="hidden" id="startDate_${weeklyEntry.id}" value="${weeklyEntry.formattedStartDate}" /></td>
 														<td>${weeklyEntry.activityName}</td>
 														<td><c:if test="${weeklyEntry.leadName != null}">${weeklyEntry.leadName}</c:if></td>
+														<td>${weeklyEntry.taskName}</td>
 														<td>${weeklyEntry.day_1_time}</td>
 														<td>${weeklyEntry.day_2_time}</td>
 														<td>${weeklyEntry.day_3_time}</td>
@@ -203,7 +213,7 @@
 														<td class="weekEnd">${weeklyEntry.day_7_time}</td>
 														<td class="rowTotal">${weeklyEntry.weeklySum}</td>
 														<td align="center"><img alt="Edit" align="middle" class="icon" title="${editTitle}" src="${editIconPath}"
-															onclick="editTimeEntry('${entryId}',${weeklyEntry.projectId},${weeklyEntry.activityId}, ${weeklyEntry.id})"
+															onclick="editTimeEntry('${entryId}',${weeklyEntry.projectId},${weeklyEntry.activityId},${weeklyEntry.taskId},${weeklyEntry.id})"
 														/></td>
 														<td align="center"><img alt="Delete" align="middle" class="icon" title="${activityDeleteTitle}" src="${deleteIconPath}" onclick="deleteTimeEntry('${entryId}',${weeklyEntry.id})" /></td>
 													</tr>
@@ -323,4 +333,3 @@
 <%@ include file="inc/footer.inc.jsp"%>
 <%-- Focus  --%>
 <script type="text/javascript">focus('weekImg');</script>
-
