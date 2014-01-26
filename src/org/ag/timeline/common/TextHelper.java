@@ -444,6 +444,12 @@ public class TextHelper {
 			System.out.println("[Timeline] " + msg);
 		}
 	}
+	
+	public static final void logMessage(String msg, long time) {
+		if (LOGGING_ON) {
+			System.out.println("[Timeline] " + msg + " > Time taken : " + ((System.nanoTime() - time) / 1000000));
+		}
+	}
 
 	public static String getDisplayDate(final Date date, final int offsetDays) {
 		String val = null;
