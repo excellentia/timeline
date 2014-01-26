@@ -60,7 +60,8 @@ public interface TimelineConstants {
 		ACTIVITY(2, "Activity Data"),
 		TIME_DATA(3, "Time Entry Data"),
 		USER(4, "User Data"),
-		METRICS(5, "Metrics");
+		METRICS(5, "Metrics"),
+		TASK(5, "Task");
 
 		private final int typeId;
 
@@ -166,7 +167,7 @@ public interface TimelineConstants {
 		spe,
 		bug,
 		taskId,
-		note;
+		description;
 
 		public static final AjaxRequestParam getParam(String text) {
 			AjaxRequestParam type = null;
@@ -202,23 +203,32 @@ public interface TimelineConstants {
 		SAVE_USER(true),
 		SAVE_USER_STATUS(true),
 		SAVE_TIME_ENTRY(false),
+		SAVE_TASK(false),
+		SAVE_ESTIMATES(true),
+		SAVE_METRIC_DETAILS(true),
 		DELETE_PROJECT(true),
 		DELETE_ACTIVITY(true),
 		DELETE_USER(true),
 		DELETE_TIME_ENTRY(false),
+		DELETE_TASK(false),
+		DELETE_METRIC_DETAILS(true),
+		DELETE_ALL_METRICS(true),
 		RESET_USER(true),
 		MODIFY_USER(false),
 		MODIFY_USER_PREF(false),
+		MODIFY_TASK_STAGE(false),
 		SEARCH_ENTRIES(false),
-		REPORT_DETAIL(false),
 		SEARCH_USERS_WITHOUT_ENTRIES(false),
 		SEARCH_PROJECT_METRICS(true),
 		SEARCH_PROJECT_DETAIL_METRICS(true),
-		SAVE_METRIC_DETAILS(true),
-		DELETE_METRIC_DETAILS(true),
 		SEARCH_ESTIMATES(true),
-		SAVE_ESTIMATES(true),
-		DELETE_ALL_METRICS(true);
+		REPORT_DETAIL(false);
+//		SEARCH_PROJECT_STAGES(true),
+//		SEARCH_POSSIBLE_STAGES(true),
+//		SAVE_STAGE(true),
+//		MODIFY_PROJECT_STAGE(true),
+//		SEARCH_STAGES(true),
+//		DELETE_STAGE(true);
 
 		/**
 		 * Denotes if an operation can be done by admin only.
