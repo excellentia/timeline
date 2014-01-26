@@ -1,6 +1,6 @@
 package org.ag.timeline.presentation.action;
 
-import org.ag.timeline.presentation.transferobject.reply.ProjectLevelMetricsReply;
+import org.ag.timeline.presentation.transferobject.reply.metrics.ProjectLevelMetricsReply;
 import org.ag.timeline.presentation.transferobject.search.ProjectMetricsSearchParameters;
 
 /**
