@@ -7,7 +7,7 @@ public abstract class SecureBaseAction extends BaseAction {
 	public abstract String secureExecute() throws Exception;
 
 	public final String execute() throws Exception {
-		
+
 		long time = System.nanoTime();
 
 		String forward = ERROR;
@@ -24,9 +24,9 @@ public abstract class SecureBaseAction extends BaseAction {
 		if (ERROR.equalsIgnoreCase(forward)) {
 			super.clearSession();
 		}
-		
-		TextHelper.logMessage("SecureBaseAction.execute() > Time taken : " + ((System.nanoTime() - time) / 1000000));
-		
+
+		TextHelper.logMessage("SecureBaseAction.execute()", time);
+
 		return forward;
 	}
 }
