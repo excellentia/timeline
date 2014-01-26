@@ -15,7 +15,12 @@
 
 		<property name="name" type="string" not-null="true" column="NAME" />
 
-		<many-to-one name="project" class="Project" cascade="none" column="PROJECT_ID"/>
+		<many-to-one name="project" class="Project" cascade="none" column="PROJECT_ID" />
+
+		<set name="tasks" cascade="all" inverse="true">
+			<key column="ACTIVITY_ID" not-null="true" />
+			<one-to-many class="Task" />
+		</set>
 
 		<property name="createUserId" type="java.lang.Long" column="CREATE_USER" not-null="true" />
 		<property name="createDate" type="java.util.Date" not-null="true" column="CREATE_DATE" />
