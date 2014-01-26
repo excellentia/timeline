@@ -15,11 +15,6 @@ import org.ag.timeline.presentation.transferobject.common.CodeValue;
  */
 public class CodeValueListReply extends BusinessReply {
 
-	/**
-	 * Serial Version U-Id.
-	 */
-	private static final long serialVersionUID = 268828136698069405L;
-
 	private List<CodeValue> codeValueList = null;
 
 	/**
