@@ -12,7 +12,9 @@ import org.ag.timeline.presentation.transferobject.reply.UserSearchReply;
 public class AdminAction extends SecureBaseAction {
 
 	private ProjectReply projectReply = null;
+
 	private ActivityReply activityReply = null;
+
 	private UserSearchReply userReply = null;
 
 	public String secureExecute() throws Exception {
@@ -88,5 +90,4 @@ public class AdminAction extends SecureBaseAction {
 	public void setUserReply(UserSearchReply userReply) {
 		this.userReply = userReply;
 	}
-
 }
