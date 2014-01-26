@@ -2,7 +2,6 @@ package org.ag.timeline.presentation.action;
 
 import org.ag.timeline.common.TextHelper;
 
-
 /**
  * Handles logout functionality.
  * 
@@ -17,9 +16,8 @@ public class LogoutAction extends BaseAction {
 		// clear the session
 		super.clearSession();
 
-		TextHelper.logMessage("LogoutAction.execute() > Time taken : " + ((System.nanoTime() - time) / 1000000));
+		TextHelper.logMessage("LogoutAction.execute()", time);
 		
 		return SUCCESS;
 	}
-
 }
