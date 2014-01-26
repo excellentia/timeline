@@ -1,3 +1,32 @@
+
+var WEEKDAY_DEFAULT_VALUE = 0;
+
+var USER_CELLINDEX = 0;
+var PROJECT_CELLINDEX = USER_CELLINDEX + 1;
+var ACTIVITY_CELLINDEX = PROJECT_CELLINDEX + 1;
+var LEAD_CELLINDEX = ACTIVITY_CELLINDEX + 1;
+var TASK_CELLINDEX = LEAD_CELLINDEX + 1;
+
+var WEEKDAY_CELLSTART = TASK_CELLINDEX + 1;
+var WEEKLYSUM_CELLINDEX = WEEKDAY_CELLSTART + 7;
+var EDIT_SAVE_CELLINDEX = WEEKLYSUM_CELLINDEX + 1;
+var DELETE_CELLINDEX = EDIT_SAVE_CELLINDEX + 1;
+
+var activitySums = {};
+var tasksArr = {};
+
+var searchStartWeekNum = null;
+var searchEndWeekNum = null;
+var searchStartYear = null;
+var searchEndYear = null;
+
+var projectsAvailableJSON = null;
+
+var searchStartDate = null;
+var searchEndDate = null;
+var searchProjId = null;
+var searchActId = null;
+
 /**
  * Updates Weekly Sum of a given Time Entry Row.
  * 
@@ -11,7 +40,7 @@ function updateWeeklySum(rowElmId) {
 		var currSum = 0.0;
 		var val;
 
-		for ( var i = 4; i < 11; i++) {
+		for ( var i = WEEKDAY_CELLSTART; i < WEEKLYSUM_CELLINDEX; i++) {
 			val = activeRow.cells[i].children[0].value;
 
 			if ((val != null) && (val != "") && (!isNaN(val)) ) {
@@ -25,7 +54,7 @@ function updateWeeklySum(rowElmId) {
 			}
 		}
 
-		activeRow.cells[11].innerHTML = currSum;
+		activeRow.cells[WEEKLYSUM_CELLINDEX].innerHTML = currSum;
 	}
 }
 
@@ -37,16 +66,19 @@ function updateWeeklySum(rowElmId) {
  * @param actDbId
  * @param entryDbId
  */
-function editTimeEntry(rowElmId, projDbId, actDbId, entryDbId) {
+function editTimeEntry(rowElmId, projDbId, actDbId, taskDbId, entryDbId) {
 
 	if (rowElmId != "") {
 		var activityRow = document.getElementById(rowElmId);
 
 		// project
+		var projSelId = null;
+		var actSelectId = null;
+		var taskSelectId = null;
 		{
-			var selectId = "project_" + entryDbId;
-
-			var projectHTML = "<select size='1' class='timeEntrySelectEdit' name='project' id='" + selectId + "' onchange=\"populateActivities('" + selectId + "', null)\"><option value='0'>Select Project...</option>";
+			projSelId = "project_" + entryDbId;
+			
+			var projectHTML = "<select size='1' class='timeEntrySelectEdit' name='project' id='" + projSelId + "' onchange=\"populateActivities('" + projSelId + "', null)\"><option value='0'>Select Project...</option>";
 			var optionHTML = "";
 			
 			if ((projectsAvailableJSON != null) && (projectsAvailableJSON.projects != null)) {
@@ -70,8 +102,11 @@ function editTimeEntry(rowElmId, projDbId, actDbId, entryDbId) {
 
 		// activities
 		{
-			var activitySelectHTML = "<select size='1' name='activity' class='timeEntrySelectEdit' id='activity_"
-			        + actDbId + "'>";
+			actSelectId = "activity_"+actDbId;
+			taskSelectId = "task_"+actDbId;
+			
+			var activitySelectHTML = "<select size='1' name='activity' class='timeEntrySelectEdit' id='"
+			        + actSelectId + "' onchange=\"populateTasks('"+projSelId+"','"+actSelectId+"','"+taskSelectId+"')\">";
 			var optionHTML = "";
 
 			$.getJSON(
@@ -98,13 +133,74 @@ function editTimeEntry(rowElmId, projDbId, actDbId, entryDbId) {
 					activityRow.cells[2].innerHTML = activitySelectHTML;
 			});
 		}
+		
+		// tasks
+		{
+			var taskSelectHtml = "<select size='1' name='task' class='timeEntrySelectEdit' id='" + taskSelectId+ "'>";
+			var taskOptionHTML = "";
+
+			$.getJSON(
+				JSON_URL,
+				{
+					operation : "TASKS",
+					projectId : projDbId,
+					activityId : actDbId
+				},
+				function(data) {
+					var jsonData = data;
+					var elmId = 0;
+					var elmText = null;
+					
+					var project = null;
+					var activity = null;
+					var task = null;
+					
+					for ( var i = 0; i < jsonData.projects.length; i++) {
+					
+						project = jsonData.projects[i];
+						
+						if(project.projectId == projDbId) {
+							
+							for ( var j = 0; j < project.activities.length; j++) {
+								
+								activity =  project.activities[j];
+								
+								if(activity.activityId == actDbId) {
+									
+									for ( var k = 0; k < activity.tasks.length; k++) {
+										
+										task = activity.tasks[k];
+										
+										elmId = task.taskId;
+										elmText = task.taskName;
+										
+										taskOptionHTML = taskOptionHTML + "<option value='" + elmId + "'";
+
+										if (taskDbId == elmId) {
+											taskOptionHTML = taskOptionHTML + " selected='selected' ";
+										}
+										
+										taskOptionHTML = taskOptionHTML + ">" + elmText + "</option>";
+										taskArr[elmId] = elmText;
+									}
+									
+									break;
+								}
+							}
+						}
+					}
+
+					taskSelectHtml = taskSelectHtml + taskOptionHTML + "</select>";
+					activityRow.cells[TASK_CELLINDEX].innerHTML = taskSelectHtml;
+			});
+		}
 
 		// days
 		{
 			var selectPrefix = "<input type='text' class='timeEntryEdit' value='";
 			var selectSufix = "' id='" + entryDbId + "_day1' class='timeEntry'onchange=\"updateWeeklySum('" + rowElmId + "')\">";
 
-			for ( var i = 4; i < 11; i++) {
+			for ( var i = WEEKDAY_CELLSTART; i < WEEKLYSUM_CELLINDEX; i++) {
 				activityRow.cells[i].innerHTML = selectPrefix + activityRow.cells[i].innerHTML + selectSufix;
 			}
 		}
@@ -112,17 +208,34 @@ function editTimeEntry(rowElmId, projDbId, actDbId, entryDbId) {
 		// save button
 		{
 			var saveHTML = "<img alt='Save' class='icon' title='" + saveTitle + "' src='" + saveIcon + "' onclick=\"saveTimeEntry('" + rowElmId + "'," + entryDbId + ",0)\" align='middle'>";
-			activityRow.cells[12].innerHTML = saveHTML;
+			activityRow.cells[EDIT_SAVE_CELLINDEX].innerHTML = saveHTML;
 		}
 	}
 }
 
-//TODO:AG javadoc
+function validateTimeData(projId, actId, taskId, timeData) {
+	
+	var errMsg = null;
+	
+	if(projId <= 0) {
+		errMsg = "Missing Project Data";
+	} else if(actId <= 0) {
+		errMsg = "Missing Activity Data";
+	} else if(taskId <= 0) {
+		errMsg = "Missing Task Data";
+	} else if (timeData <= 0) {
+		errMsg = "Missing Time Data";
+	}
+	
+	return errMsg;
+}
+
 /**
  * Saves a Time Entry Row.
  * 
  * @param rowElmId
  * @param entryDbId
+ * @param proxiedUserDbId
  */
 function saveTimeEntry(rowElmId, entryDbId, proxiedUserDbId) {
 
@@ -132,21 +245,34 @@ function saveTimeEntry(rowElmId, entryDbId, proxiedUserDbId) {
 
 		// get the selected project
 		var projDbId = 0;
-		var projects = entryRow.cells[1].children[0].options;
+		var projects = entryRow.cells[PROJECT_CELLINDEX].children[0].options;
 
 		for ( var i = 0; i < projects.length; i++) {
 			if (projects[i].selected) {
 				projDbId = projects[i].value;
+				break;
 			}
 		}
 
 		// get the selected activity
 		var actDbId = 0;
-		var activities = entryRow.cells[2].children[0].options;
+		var activities = entryRow.cells[ACTIVITY_CELLINDEX].children[0].options;
 
 		for ( var i = 0; i < activities.length; i++) {
 			if (activities[i].selected) {
 				actDbId = activities[i].value;
+				break;
+			}
+		}
+		
+		// get the selected task
+		var taskDbId = 0;
+		var tasks = entryRow.cells[TASK_CELLINDEX].children[0].options;
+
+		for ( var i = 0; i < tasks.length; i++) {
+			if (tasks[i].selected) {
+				taskDbId = tasks[i].value;
+				break;
 			}
 		}
 
@@ -155,7 +281,7 @@ function saveTimeEntry(rowElmId, entryDbId, proxiedUserDbId) {
 		var sum = 0;
 
 		for ( var i = 0; i < 7; i++) {
-			timeData[i] = entryRow.cells[i+4].children[0].value;
+			timeData[i] = entryRow.cells[i + WEEKDAY_CELLSTART].children[0].value;
 			
 			if ((timeData[i] != null) && (timeData[i] != "") && (!isNaN(timeData[i])) ) {
 				sum = sum + parseFloat(timeData[i], 10);
@@ -172,14 +298,20 @@ function saveTimeEntry(rowElmId, entryDbId, proxiedUserDbId) {
 				weekStart = startDateElm.value;
 			}
 		}
-
-		if ((projDbId > 0) && (actDbId > 0) && (sum > 0) && ((weekStart != null) || (entryDbId > 0))) {
+		
+		var errMsg = validateTimeData(projDbId, actDbId, taskDbId, sum);
+		
+		if(errMsg != null) {
+			displayAlert(errMsg);
+			
+		} else if ((weekStart != null) || (entryDbId > 0)) {
 
 			$.post(JSON_URL, {
 			    operation : "SAVE_TIME_ENTRY",
 			    entryId : entryDbId,
 			    projectId : projDbId,
 			    activityId : actDbId,
+			    taskId : taskDbId,
 			    weekStartDate : weekStart,
 			    proxiedUserDbId : proxiedUserDbId,
 			    day1 : timeData[0],
@@ -198,22 +330,21 @@ function saveTimeEntry(rowElmId, entryDbId, proxiedUserDbId) {
 
 					var activityRow = document.getElementById(rowElmId);
 
-					activityRow.cells[1].innerHTML = projectArr[projDbId];
-					activityRow.cells[2].innerHTML = activityArr[actDbId];
-					activityRow.cells[4].innerHTML = timeData[0];
-					activityRow.cells[5].innerHTML = timeData[1];
-					activityRow.cells[6].innerHTML = timeData[2];
-					activityRow.cells[7].innerHTML = timeData[3];
-					activityRow.cells[8].innerHTML = timeData[4];
-					activityRow.cells[9].innerHTML = timeData[5];
-					activityRow.cells[10].innerHTML = timeData[6];
+					activityRow.cells[PROJECT_CELLINDEX].innerHTML = projectArr[projDbId];
+					activityRow.cells[ACTIVITY_CELLINDEX].innerHTML = activityArr[actDbId];
+					activityRow.cells[TASK_CELLINDEX].innerHTML = taskArr[taskDbId];
+					
+					for ( var idx = 0; idx < 7; idx++) {
+						activityRow.cells[idx + WEEKDAY_CELLSTART].innerHTML = timeData[idx];
+					}
+					
 					activityRow.className = "leadColumn";
 
-					var editHTML = "<img alt='Edit' class='icon' title='" + editTitle + "' src='" + editIcon + "' onclick=\"editTimeEntry('" + rowElmId + "'," + projDbId + "," + actDbId + "," + jsonData.code + ")\" align='middle'>";
-					activityRow.cells[12].innerHTML = editHTML;
+					var editHTML = "<img alt='Edit' class='icon' title='" + editTitle + "' src='" + editIcon + "' onclick=\"editTimeEntry('" + rowElmId + "'," + projDbId + "," + actDbId + "," + taskDbId+ "," + jsonData.code + ")\" align='middle'>";
+					activityRow.cells[EDIT_SAVE_CELLINDEX].innerHTML = editHTML;
 
 				}
-			}, "json");
+			}, JSON_RESULT_TYPE);
 		}
 	}
 }
@@ -311,6 +442,11 @@ function addEntryRow(tableID) {
 					*/
 					newcell = row.insertCell(cellNum++);
 					newcell.className = "leadColumn";
+					
+					/**
+					* Create Task Column
+					*/
+					newcell = row.insertCell(cellNum++);
 
 					/**
 					* Week Day
@@ -399,6 +535,7 @@ function searchEntries(divId, tbodyElmId, accordId, adminUser) {
 	var endDate = searchEndDate;
 	var projId = document.getElementById("searchProjectId").value;
 	var actId = document.getElementById("searchActivityId").value;
+	var tskId = document.getElementById("searchTaskId").value;
 
 	var usrElm = document.getElementById("searchUserId");
 	var userId = 0;
@@ -428,6 +565,7 @@ function searchEntries(divId, tbodyElmId, accordId, adminUser) {
 				endYear : searchEndYear,
 				projectId : projId,
 				activityId : actId,
+				taskId : tskId,
 				userDbId : userId
 			},
 			function(data) {
@@ -452,17 +590,42 @@ function searchEntries(divId, tbodyElmId, accordId, adminUser) {
 							weekHTML = "<h3><a href='#week_" + currWeekData.weekId + "'>" + currWeekData.weekName + "</a></h3>";
 							weekHTML = weekHTML + "<div>";
 							weekHTML = weekHTML + "<table style='width: 100%;' id='timeTable_" + currWeekData.weekId + "'>";
-							weekHTML = weekHTML + "<colgroup><col style='width: 10%' /><col style='width: 10%' /><col style='width: 10%' /><col style='width: 10%' /><col style='width: 7%' /><col style='width: 7%' /><col style='width: 7%' /><col style='width: 7%' /><col style='width: 7%' /><col style='width: 7%' /><col style='width: 7%' /><col style='width: 5%' /><col style='width: 3%' /><col style='width: 3%' /></colgroup>";
+							weekHTML = weekHTML + "<colgroup>";
+							weekHTML = weekHTML + "<col style='width: 10%' />";
+							weekHTML = weekHTML + "<col style='width: 10%' />";
+							weekHTML = weekHTML + "<col style='width: 10%' />";
+							weekHTML = weekHTML + "<col style='width: 10%' />";
+							weekHTML = weekHTML + "<col style='width: 7%' />";
+							weekHTML = weekHTML + "<col style='width: 6%' />";
+							weekHTML = weekHTML + "<col style='width: 6%' />";
+							weekHTML = weekHTML + "<col style='width: 6%' />";
+							weekHTML = weekHTML + "<col style='width: 6%' />";
+							weekHTML = weekHTML + "<col style='width: 6%' />";
+							weekHTML = weekHTML + "<col style='width: 6%' />";
+							weekHTML = weekHTML + "<col style='width: 6%' />";
+							weekHTML = weekHTML + "<col style='width: 5%' />";
+							weekHTML = weekHTML + "<col style='width: 3%' />";
+							weekHTML = weekHTML + "<col style='width: 3%' />";
+							weekHTML = weekHTML + "</colgroup>";
 
 							// head
-							weekHTML = weekHTML + "<thead><tr><th>User</th><th>Project</th><th>Activity</th><th>Lead</th>";
+							weekHTML = weekHTML + "<thead>";
+							weekHTML = weekHTML + "<tr>";
+							weekHTML = weekHTML + "<th>User</th>";
+							weekHTML = weekHTML + "<th>Project</th>";
+							weekHTML = weekHTML + "<th>Activity</th>";
+							weekHTML = weekHTML + "<th>Lead</th>";
+							weekHTML = weekHTML + "<th>Task</th>";
 
 							for ( var j = 0; j < currWeekData.weekDayLabels.length; j++) {
 								dayLabel = currWeekData.weekDayLabels[j];
 								weekHTML = weekHTML + "<th id=day_" + j + "_Text>" + dayLabel.label + "</th>";
 							}
 
-							weekHTML = weekHTML + "<th>Total</th><th colspan='2'>&nbsp;</th></tr></thead>";
+							weekHTML = weekHTML + "<th>Total</th>";
+							weekHTML = weekHTML + "<th colspan='2'>&nbsp;</th>";
+							weekHTML = weekHTML + "</tr>";
+							weekHTML = weekHTML + "</thead>";
 
 							// body
 							weekHTML = weekHTML + "<tbody id='" + tbodyElmId + "_" + currWeekData.weekId + "' class='reportBody'>";
@@ -479,12 +642,17 @@ function searchEntries(divId, tbodyElmId, accordId, adminUser) {
 								weekHTML = weekHTML + "<td>" + entry.activityName + "</td>";
 								weekHTML = weekHTML + "<td>";
 								
+								//lead name
 								if (entry.leadName != null) {
 									weekHTML = weekHTML + entry.leadName + "</td>";
 								} else {
 									weekHTML = weekHTML + "</td>";
 								}
 
+								//task
+								weekHTML = weekHTML + "<td>" + entry.taskName + "</td>";
+								
+								//days
 								weekHTML = weekHTML + "<td>" + entry.day1 + "</td>";
 								weekHTML = weekHTML + "<td>" + entry.day2 + "</td>";
 								weekHTML = weekHTML + "<td>" + entry.day3 + "</td>";
@@ -567,10 +735,17 @@ function searchMissingEntries(accordId, divId) {
 							weekHTML = "<h3><a href='#missing_week_" + currWeekData.weekId + "'>" + currWeekData.weekName + "</a></h3>";
 							weekHTML = weekHTML + "<div>";
 							weekHTML = weekHTML + "<table style='width: 15%;' id='missing_timeTable_" + currWeekData.weekId + "'>";
-							weekHTML = weekHTML + "<colgroup><col style='width: 15%' /><col style='width: 70%' /><col style='width: 15%' /></colgroup>";
+							weekHTML = weekHTML + "<colgroup>";
+							weekHTML = weekHTML + "<col style='width: 15%' />";
+							weekHTML = weekHTML + "<col style='width: 70%' />";
+							weekHTML = weekHTML + "<col style='width: 15%' />";
+							weekHTML = weekHTML + "</colgroup>";
 
 							// head
-							weekHTML = weekHTML + "<thead><tr><th colspan='3'>User Name</th></thead>";
+							weekHTML = weekHTML + "<thead>";
+							weekHTML = weekHTML + "<tr>";
+							weekHTML = weekHTML + "<th colspan='3'>User Name</th>";
+							weekHTML = weekHTML + "</thead>";
 
 							// body
 							weekHTML = weekHTML + "<tbody class='reportBody'>";
@@ -592,10 +767,18 @@ function searchMissingEntries(accordId, divId) {
 							}
 							
 							weekHTML = weekHTML + "</tbody>";
-							weekHTML = weekHTML + "<tfoot><tr><td colspan='2' style='text-align: center;'>Total Users : "+k+"</td>";
-							weekHTML = weekHTML + "<td><a href='mailto:"+ allUserEmail +"'>";
-							weekHTML = weekHTML + "<img class='icon' style='margin: 0; padding: 0; border: 2px solid #609AFA' title='Send Email To Users (Ones with Email Icon)' alt='Send Email' src='"+emailIcon+"'/></a></td></tr></tfoot>"
-							weekHTML = weekHTML + "</table></div>";
+							weekHTML = weekHTML + "<tfoot>";
+							weekHTML = weekHTML + "<tr>";
+							weekHTML = weekHTML + "<td colspan='2' style='text-align: center;'>Total Users : "+k+"</td>";
+							weekHTML = weekHTML + "<td>";
+							weekHTML = weekHTML + "<a href='mailto:"+ allUserEmail +"'>";
+							weekHTML = weekHTML + "<img class='icon' style='margin: 0; padding: 0; border: 2px solid #609AFA' title='Send Email To Users (Ones with Email Icon)' alt='Send Email' src='"+emailIcon+"'/>";
+							weekHTML = weekHTML + "</a>";
+							weekHTML = weekHTML + "</td>";
+							weekHTML = weekHTML + "</tr>";
+							weekHTML = weekHTML + "</tfoot>"
+							weekHTML = weekHTML + "</table>";
+							weekHTML = weekHTML + "</div>";
 							
 							accDivHTML = accDivHTML + weekHTML;
 							
