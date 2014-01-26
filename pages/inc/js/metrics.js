@@ -1,3 +1,16 @@
+var MIN_INDEX = 0.96;
+var MAX_INDEX = 0.99;
+var MIN_DEFECT_RATIO = 0.01;
+
+var metricEntryDate = null;
+
+var METRICS_ACTION = "MetricsDetailsAction.action";
+
+var errorStyle = "border: 1px solid #FF0000; background : #FFDCDC; color : #FF0000;";
+var successStyle = "border: 1px solid #00A200; background : #C0FFC0; color : #00A200;";
+var originalMetricEntryDateStyle = "width: 12.5em; text-align: center; ";
+var originalMetricEntryDateTitle = "Click Calendar Icon To Select A Week";
+
 var EstimateData = function() {
 
 	var bac = 0.0;
