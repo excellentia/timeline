@@ -7,11 +7,6 @@ package org.ag.timeline.presentation.transferobject.search;
  */
 public class ProjectDetailMetricsSearchParameters extends BasicSearchParameter {
 
-	/**
-	 * Serial Version U-Id.
-	 */
-	private static final long serialVersionUID = 4948625048298703905L;
-
 	private long userDbId = 0;
 
 	private long projectDbId = 0;
