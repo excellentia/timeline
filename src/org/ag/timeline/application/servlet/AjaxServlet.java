@@ -726,27 +726,20 @@ public class AjaxServlet extends HttpServlet {
 			final long projectId = getLongRequestValue(TimelineConstants.AjaxRequestParam.projectId, request);
 			final long activityId = getLongRequestValue(TimelineConstants.AjaxRequestParam.activityId, request);
 			final long taskId = getLongRequestValue(TimelineConstants.AjaxRequestParam.taskId, request);
-
+			final long statusId = getLongRequestValue(TimelineConstants.AjaxRequestParam.status, request);
+			
 			final TaskSearchParameter searchParameters = new TaskSearchParameter();
+			
 			searchParameters.setProjectId(projectId);
 			searchParameters.setActivityId(activityId);
 			searchParameters.setTaskId(taskId);
 
 			// set search all
-			if ((projectId == 0) && (activityId == 0) && (taskId == 0)) {
+			if ((statusId == 0) || ((projectId == 0) && (activityId == 0) && (taskId == 0))) {
 				searchParameters.setSearchAllTasks(Boolean.TRUE);
+			} else if(statusId == 1) {
+				searchParameters.setSearchActiveTasks(Boolean.TRUE);
 			}
-
-			// User user = getSessionUser(request);
-			//
-			// if (!user.isAdmin()) {
-			// searchParameters.setUserDbId(user.getId());
-			// } else {
-			// long userDbId =
-			// getLongRequestValue(TimelineConstants.AjaxRequestParam.userDbId,
-			// request);
-			// searchParameters.setUserDbId(userDbId);
-			// }
 
 			TaskReply reply = SERVICE.searchTasks(searchParameters);
 			String json = getJSON(reply);
