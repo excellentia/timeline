@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.ag.timeline.common.TimelineConstants;
 import org.ag.timeline.presentation.transferobject.reply.BusinessReply;
 
 public class SummaryReportReply extends BusinessReply {
@@ -67,6 +68,32 @@ public class SummaryReportReply extends BusinessReply {
 
 	public List<ReportRow> getUserRowList(final long projectId) {
 		return this.userTimeMap.get(projectId);
+	}
+	
+	public double getProjectTime(final long projectId) {
+		double time = 0d;
+		
+		List<ReportRow> list = activityTimeMap.get(projectId);
+		
+		for (ReportRow reportRow : list) {
+			time = time + reportRow.getRowTime();
+		} 
+		
+		return time;
+	}
+	
+	public String getProjectName(final long projectId) {
+		String name = TimelineConstants.EMPTY;
+		
+		if (activityTimeMap.containsKey(projectId)) {
+			ReportRow first = activityTimeMap.get(projectId).get(0);
+			
+			if (first != null) {
+				name = first.getProjectName();
+			}
+		}
+		
+		return name;
 	}
 
 	public Set<Long> getProjectIds() {
