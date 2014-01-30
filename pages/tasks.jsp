@@ -85,6 +85,14 @@
 						</c:if>
 					</select>
 				</div>
+				<%-- Status --%>
+				<div style="display: inline; padding: 0; margin: 0">
+					<select id="taskStatusId" size="1" name="taskStatusId" class="dateSearch" title="Select Task Status">
+						<option value="0" <c:if test="${taskStatusId == 0}">selected="selected"</c:if>>All Tasks</option>
+						<option value="1" <c:if test="${taskStatusId == 1}">selected="selected"</c:if>>Active</option>
+						<option value="2" <c:if test="${taskStatusId == 2}">selected="selected"</c:if>>Inactive</option>
+					</select>
+				</div>
 				<%-- Users --%>
 				<%-- 
 				<c:if test="${SESSION_USER.admin}">
