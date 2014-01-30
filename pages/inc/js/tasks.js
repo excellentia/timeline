@@ -19,6 +19,7 @@ var TaskConstants = {
 
 	existingProjSelectId : "searchProjectId",
 	existingActivitySelectId : "searchActivityId",
+	existingTaskStatusId : "taskStatusId",
 	//existingUserSelectId : "searchUserId",
 
 	taskSearchResultsDivId : "myTaskSearchResults",
@@ -363,13 +364,14 @@ function searchTasks() {
 
 	var projId = getDropDownValueAsInt(TaskConstants.existingProjSelectId);
 	var actId = getDropDownValueAsInt(TaskConstants.existingActivitySelectId);
-//	var usrId = getDropDownValueAsInt(TaskConstants.existingUserSelectId);
+	var statusId = getDropDownValueAsInt(TaskConstants.existingTaskStatusId);
 
 	$.post(JSON_URL, {
 		operation : "TASKS",
 		projectId : projId,
+		activityId : actId,
 //		userDbId : usrId,
-		activityId : actId
+		status : statusId
 	}, function(data) {
 
 		var jsonData = data;
