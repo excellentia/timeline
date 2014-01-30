@@ -15,7 +15,7 @@ import org.ag.timeline.business.model.Activity;
 import org.ag.timeline.business.model.Project;
 import org.ag.timeline.business.model.Task;
 import org.ag.timeline.common.CodeValueComparator;
-import org.ag.timeline.presentation.transferobject.common.CodeValue;
+import org.ag.timeline.presentation.transferobject.common.CodeValueStatus;
 
 /**
  * Contains Tasks fetched from backend.
@@ -36,7 +36,7 @@ public class TaskReply extends BusinessReply {
 
 	private Map<Long, Set<Long>> projectActivityIdMap = null;
 
-	private Map<Long, Set<CodeValue>> activityTasksMap = null;
+	private Map<Long, Set<CodeValueStatus>> activityTasksMap = null;
 
 	public TaskReply() {
 		this.projectNameMap = new HashMap<Long, String>();
@@ -44,7 +44,7 @@ public class TaskReply extends BusinessReply {
 		this.taskDetailMap = new HashMap<Long, String>();
 //		this.taskUserNameMap = new HashMap<Long, String>();
 		this.projectActivityIdMap = new HashMap<Long, Set<Long>>();
-		this.activityTasksMap = new HashMap<Long, Set<CodeValue>>();
+		this.activityTasksMap = new HashMap<Long, Set<CodeValueStatus>>();
 	}
 
 	/**
@@ -94,13 +94,13 @@ public class TaskReply extends BusinessReply {
 			this.projectActivityIdMap.put(projId, actSet);
 
 			// populate task
-			Set<CodeValue> taskSet = this.activityTasksMap.get(actId);
+			Set<CodeValueStatus> taskSet = this.activityTasksMap.get(actId);
 
 			if (taskSet == null) {
-				taskSet = new HashSet<CodeValue>();
+				taskSet = new HashSet<CodeValueStatus>();
 			}
 
-			taskSet.add(new CodeValue(taskId, task.getText()));
+			taskSet.add(new CodeValueStatus(taskId, task.getText(), task.isActive()));
 			this.activityTasksMap.put(actId, taskSet);
 			this.taskDetailMap.put(taskId, task.getDetails());
 //			this.taskUserNameMap.put(taskId, task.getUser().getAbbrvUserName());
@@ -125,8 +125,8 @@ public class TaskReply extends BusinessReply {
 		return activities;
 	}
 
-	public List<CodeValue> getActivityTasks(final long activityId) {
-		List<CodeValue> list = new ArrayList<CodeValue>();
+	public List<CodeValueStatus> getActivityTasks(final long activityId) {
+		List<CodeValueStatus> list = new ArrayList<CodeValueStatus>();
 
 		if ((this.activityTasksMap != null) & (this.activityTasksMap.containsKey(activityId))) {
 			list.addAll(this.activityTasksMap.get(activityId));
