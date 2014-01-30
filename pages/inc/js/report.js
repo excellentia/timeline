@@ -10,8 +10,14 @@ function toggleProjectInclusion(timeValue, checkElmId) {
 		
 		if (toggleStatus) {
 			newVal = existingVal + timeValue;
+			
+			//remove the highlight
+			checkInput.parentNode.parentNode.className = "";
 		} else {
 			newVal = existingVal - timeValue;
+			
+			//make the row highlighted
+			checkInput.parentNode.parentNode.className = "inActiveEntity";
 		}
 		
 		document.getElementById("projTotal").innerHTML = newVal;
