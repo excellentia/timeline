@@ -77,4 +77,11 @@ public class TaskSearchParameter extends ActivitySearchParameter {
 		this.searchAllTasks = searchAllTasks;
 	}
 
+	public void setSearchActiveTasks(boolean active) {
+		this.task.setActive(active);
+	}
+
+	public boolean isSearchActiveTasks() {
+		return this.task.isActive();
+	}
 }
