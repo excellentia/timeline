@@ -295,6 +295,7 @@ final class AuditHelper {
 				map.put("name", "Name");
 				map.put("lead", "Lead");
 				map.put("active", "Active");
+				map.put("agile", "Agile");
 				map.put("budgetAtCompletion", "BAC");
 				map.put("startDate", "Start Date");
 				map.put("endDate", "End Date");
@@ -374,6 +375,7 @@ final class AuditHelper {
 			{
 				Map<String, String> map = new HashMap<String, String>();
 				map.put("text", "Name");
+				map.put("active", "Active");
 				map.put("details", "Description");
 				map.put("activity", "Activity");
 

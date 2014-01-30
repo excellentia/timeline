@@ -108,7 +108,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 		Map<String, String> propertyMap = null;
 		boolean isMetricEntry = false;
 		boolean isProject = false;
-		boolean isTask = false;
+//		boolean isTask = false;
 
 		if (entity instanceof TimeData) {
 			weekDayList = TextHelper.getDisplayWeekDayList(((TimeData) entity).getWeek().getStartDate());
@@ -120,7 +120,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 			isProject = true;
 			propertyMap = AuditHelper.AuditableEntityField.PROJECT.getFieldMap();
 		} else if(entity instanceof Task) {
-			isTask  = true;
+//			isTask  = true;
 			propertyMap = AuditHelper.AuditableEntityField.TASK.getFieldMap();
 		}
 
