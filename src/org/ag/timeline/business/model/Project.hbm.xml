@@ -13,6 +13,7 @@
 
 		<property name="name" type="string" not-null="true" column="NAME" />
 		<property name="active" type="boolean" column="ACTIVE" />
+		<property name="agile" type="boolean" column="AGILE" />
 
 		<many-to-one name="lead" class="User" column="LEAD_ID" cascade="none" />
 

@@ -29,6 +29,8 @@ public class Project extends AbstractModel {
 
 	private Date endDate = null;
 
+	private boolean agile = true;
+
 	/**
 	 * Getter for name.
 	 * 
@@ -189,20 +191,38 @@ public class Project extends AbstractModel {
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
-	
+
+	/**
+	 * Getter for agile.
+	 * 
+	 * @return the agile.
+	 */
+	public boolean isAgile() {
+		return this.agile;
+	}
+
+	/**
+	 * Setter for agile.
+	 * 
+	 * @param agile the agile to set.
+	 */
+	public void setAgile(boolean agile) {
+		this.agile = agile;
+	}
+
 	/**
 	 * Business method for lead name.
 	 * 
 	 * @return Lead name, Null if not set.
 	 */
 	public String getLeadName() {
-		
+
 		String leadName = null;
-		
+
 		if (this.lead != null) {
 			leadName = this.lead.getUserName();
 		}
-		
+
 		return leadName;
 	}
 
@@ -217,6 +237,10 @@ public class Project extends AbstractModel {
 		builder.append(super.getId());
 		builder.append(", name=");
 		builder.append(name);
+		builder.append(", leadName=");
+		builder.append(lead.getAbbrvUserName());
+		builder.append(", agile=");
+		builder.append(agile);
 		builder.append(", leadName=");
 		builder.append(", budgetAtCompletion=");
 		builder.append(budgetAtCompletion);
