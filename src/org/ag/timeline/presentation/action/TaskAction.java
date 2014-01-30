@@ -16,11 +16,6 @@ public class TaskAction extends SecureBaseAction {
 
 		TaskSearchParameter searchParameters = new TaskSearchParameter();
 		searchParameters.setSearchAllTasks(Boolean.TRUE);
-
-//		if (!super.isSessionUserAdmin()) {
-//			searchParameters.setUserDbId(super.getSessionUserId());
-//		}
-
 		taskReply = service.searchTasks(searchParameters);
 
 		return SUCCESS;
