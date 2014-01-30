@@ -1,3 +1,24 @@
+function toggleProjectInclusion(timeValue, checkElmId) {
+
+	var checkInput = document.getElementById(checkElmId);
+
+	if (checkInput != null) {
+
+		var toggleStatus = checkInput.checked;
+		var existingVal = getValidInt(document.getElementById("projTotal").innerHTML);
+		var newVal = 0;
+		
+		if (toggleStatus) {
+			newVal = existingVal + timeValue;
+		} else {
+			newVal = existingVal - timeValue;
+		}
+		
+		document.getElementById("projTotal").innerHTML = newVal;
+	}
+	
+}
+
 /**
 * Get Report Details.
 */
@@ -79,3 +100,13 @@ function hideReportDetails() {
 	document.getElementById('light').style.display='none';
 	document.getElementById('fade').style.display='none';
 }
+
+$(function() {
+
+	$("#reportAccordion").accordion({
+		autoHeight : false,
+		navigation : true,
+		collapsible : true,
+		active : 2
+	});
+});
