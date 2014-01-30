@@ -21,6 +21,8 @@ public class Task extends AbstractModel {
 
 	private String details = null;
 
+	private boolean active = true;
+
 	/**
 	 * Getter for project.
 	 * 
@@ -97,6 +99,24 @@ public class Task extends AbstractModel {
 		this.details = details;
 	}
 
+	/**
+	 * Getter for active.
+	 * 
+	 * @return the active.
+	 */
+	public boolean isActive() {
+		return this.active;
+	}
+
+	/**
+	 * Setter for active.
+	 * 
+	 * @param active the active to set.
+	 */
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -112,6 +132,8 @@ public class Task extends AbstractModel {
 		builder.append(activity);
 		builder.append(", text=");
 		builder.append(text);
+		builder.append(", active=");
+		builder.append(active);
 		builder.append(", details=");
 		builder.append(details);
 		builder.append("]");
