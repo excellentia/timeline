@@ -426,7 +426,7 @@ public class AjaxServlet extends HttpServlet {
 									builder.append("\"tasks\" : [");
 									long taskId = 0;
 
-									for (CodeValue task : taskReply.getActivityTasks(activityId)) {
+									for (CodeValueStatus task : taskReply.getActivityTasks(activityId)) {
 
 										taskId = task.getCode();
 
@@ -434,6 +434,7 @@ public class AjaxServlet extends HttpServlet {
 										builder.append("\"taskId\" : \"").append(taskId).append("\",");
 										// builder.append("\"taskUser\" : \"").append(taskReply.getTaskUserName(taskId)).append("\",");
 										builder.append("\"taskName\" : \"").append(task.getValue()).append("\",");
+										builder.append("\"active\" : \"").append(task.isStatus()).append("\",");
 										builder.append("\"taskDescription\" : \"")
 												.append(taskReply.getTaskDetail(taskId)).append("\"");
 										builder.append("},");
