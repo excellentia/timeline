@@ -3980,9 +3980,8 @@ public class TimelineServiceImpl implements TimelineService {
 						criteria.add(Restrictions.eq("id", taskId));
 					}
 
-					// if (userId > 0) {
-					// criteria.add(Restrictions.eq("user.id", userId));
-					// }
+					// will search active/inactive tasks only
+					criteria.add(Restrictions.eq("active", searchParameters.isSearchActiveTasks()));
 				}
 
 				// add order
