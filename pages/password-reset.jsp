@@ -8,6 +8,7 @@
 
 <%-- Main content --%>
 <div id="content">
+	<div id="messageBar"></div>
 	<div id="login" align="center">
 		<c:if test="${(question == null) || (userId == null)}">
 			<div id="userArea">

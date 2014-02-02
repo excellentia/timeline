@@ -12,6 +12,7 @@
 
 <%-- Main content --%>
 <div id="content">
+	<div id="messageBar"></div>
 	<div id="taskAccordion">
 		<%-- New Task Related Section--%>
 		<h3>

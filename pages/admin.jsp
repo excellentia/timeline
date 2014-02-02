@@ -12,6 +12,7 @@
 
 <%-- Main content --%>
 <div id="content">
+	<div id="messageBar"></div>
 	<div id="adminAccordion">
 		<%-- User Related Section--%>
 		<h3>
@@ -84,7 +85,7 @@
 						<option value="${project.code}">${project.value}</option>
 					</c:forEach>
 				</select> 
-				<input type="button" value="Create Project" class="button"	onclick="saveProject('projectSection',0, 'newProject','copyProjId')" />
+				<input type="button" value="Create Project" class="button" onclick="saveProject('projectSection',0, 'newProject','copyProjId')" />
 			</div>
 			<div id="projectSection">
 				<c:if test="${(projectReply != null) && (projectReply.projects != null) && (projectReply.projects.size() > 0)}">

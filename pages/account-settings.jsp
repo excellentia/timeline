@@ -12,6 +12,7 @@
 
 <%-- Main content --%>
 <div id="content">
+	<div id="messageBar"></div>
 	<div id="account" align="center">
 		<c:set var="userId" value="${SESSION_USER.id}" />
 		<table style="width: 30em; margin: 0; padding: 0" id="${userId}">

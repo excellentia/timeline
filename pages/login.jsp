@@ -8,6 +8,7 @@
 
 <%-- Main content --%>
 <div id="content">
+	<div id="messageBar"></div>
 	<div id="login" align="center">
 		<form name="loginForm" id="loginForm" action="Login" method="POST">
 			<table style="width: 27em;">

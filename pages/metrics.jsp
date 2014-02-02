@@ -12,6 +12,7 @@
 
 <%-- Main content --%>
 <div id="content">
+	<div id="messageBar"></div>
 	<div id="metrics_accordion">
 		<!-- Project Level Metrics-->
 		<h3>

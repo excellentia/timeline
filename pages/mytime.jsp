@@ -12,6 +12,7 @@
 
 <%-- Main content --%>
 <div id="content">
+	<div id="messageBar"></div>
 	<%-- Time Entry Area --%>
 	<div id="newEntryAccordion">
 		<%-- New Entry Section--%>
