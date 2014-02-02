@@ -1461,7 +1461,7 @@ public class TimelineServiceImpl implements TimelineService {
 					long time = System.nanoTime();
 					final Long activityId = id;
 
-					Project activity = (Project) session.get(Project.class, activityId);
+					Activity activity = (Activity) session.get(Activity.class, activityId);
 
 					if (activity != null) {
 						activity.setName(newText);
