@@ -180,7 +180,7 @@
 					</select>
 				</div>
 				<div class="thin">
-					<input type="button" value="Go" class="button" onclick="showMetricEntryArea('metricEntryTable')"/>
+					<input type="button" value="Go" class="button" style="font-size : 0.9em;" onclick="showMetricEntryArea('metricEntryTable')"/>
 				</div>
 				<div class="thin" id="newMetricDiv"></div>
 			</div>
