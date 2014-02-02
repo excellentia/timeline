@@ -63,7 +63,7 @@
 				</div>
 			</c:if>
 			<div class="thin leftPadding">
-				<input type="submit" value="Display Changes" class="button" style="font-size : 0.8em;"/>
+				<input type="submit" value="Display Changes" class="button" style="font-size : 0.9em;"/>
 			</div>
 		</form>
 	</div>
