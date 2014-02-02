@@ -1,3 +1,8 @@
+var AdminConstants = {
+	activityNameCellIdx : 0,
+	activityModifyCellIdx : 1,
+	activityDeleteCellIdx : 2	
+};
 /**
  * Deletes a Project.
  * 
@@ -212,16 +217,21 @@ function saveActivity(actElmId, actDbId, projDbId) {
 function editActivity(actElmId, actDbId, projDbId) {
 
 	var actRow = document.getElementById(actElmId);
-	actRow.cells[0].className = null;
-	var oldValue = actRow.cells[0].innerHTML;
-	var actInput = "<input type='text' name='activityText' value='" + oldValue + "' class='activityAreaEdit' />";
-	actRow.cells[0].innerHTML = actInput;
-	actRow.cells[0].children[0].focus();
+	var nameCell = actRow.cells[AdminConstants.activityNameCellIdx];
+	nameCell.className = null;
+	
+	var oldValue = nameCell.innerHTML;
+	var editRowId = "name_"+actElmId;
+	
+	var actInput = "<input type='text' name='activityText' id='"+editRowId+"' value='" + oldValue + "' class='activityAreaEdit' />";
+	nameCell.innerHTML = actInput;
 
-	actRow.children[2].innerHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='"
+	actRow.children[AdminConstants.activityModifyCellIdx].innerHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='"
 			+ saveIcon + "' onclick=\"saveActivity('" + actElmId + "'," + actDbId + "," + projDbId + ")\"/>";
-	actRow.children[3].innerHTML = "<img alt='Delete' align='middle' class='icon' title='" + activityDeleteTitle
+	actRow.children[AdminConstants.activityDeleteCellIdx].innerHTML = "<img alt='Delete' align='middle' class='icon' title='" + activityDeleteTitle
 			+ "' src='" + deleteIcon + "' onclick=\"deleteActivity('" + actId + "'," + actDbId + ")\"/>";
+		
+	focus(editRowId);
 }
 
 /**
@@ -352,94 +362,84 @@ function saveProject(divID, projDbId, projNameId, copyProjElmId) {
 	var projText = $("#" + projNameId).val();
 
 	if (projText != "") {
-		var jsonData = null;
-
-		var copyProj = document.getElementById(copyProjElmId);
-		var copyProjId = 0;
-
-		for ( var i = 0; i < copyProj.options.length; i++) {
-			if (copyProj.options[i].selected) {
-				copyProjId = copyProj.options[i].value;
-				break;
-			}
-		}
-
+		var copyProjId = getDropDownValueAsInt(copyProjElmId);
+		
 		$.post(
-				JSON_URL,
-				{
-					operation : "SAVE_PROJECT",
-					id : projDbId,
-					text : projText,
-					refId : copyProjId
-				},
-				function(data) {
+			JSON_URL,
+			{
+				operation : "SAVE_PROJECT",
+				id : projDbId,
+				text : projText,
+				refId : copyProjId
+			},
+			function(data) {
 
-					jsonData = data;
+				var jsonData = data;
 
-					if (jsonData.error) {
-						displayAlert(jsonData.error);
-					} else {
-						var projectId = jsonData.code;
-						var projectText = jsonData.value;
+				if (jsonData.error) {
+					displayAlert(jsonData.error);
+				} else {
+					var projectId = jsonData.code;
+					var projectText = jsonData.value;
 
-						if (projDbId <= 0) {
+					if (projDbId <= 0) {
 
-							var projRowId = 'project_' + projectId + '_title';
-							var statusId = 'project_status_' + projectId;
+						var projRowId = 'project_' + projectId + '_title';
+						var statusId = 'project_status_' + projectId;
 
-							var newHTML = "<table class='projectTable' id='"
-									+ projectText
-									+ "'><colgroup><col style='width: 88%' /><col style='width: 6%' /><col style='width: 6%' /></colgroup>";
-							newHTML = newHTML + "<tbody>";
-							newHTML = newHTML + "<tr id='" + projRowId + "'>";
-							newHTML = newHTML + "<td class='projectArea'>" + projectText + "</td>";
-							newHTML = newHTML
-									+ "<td align='center'><img alt='Edit' align='middle' class='icon' title='"
-									+ editTitle + "' src='" + editIcon + "' onclick=\"editProject('"
-									+ projRowId + "'," + projectId + ")\" /></td>";
-							newHTML = newHTML
-									+ "<td align='center'><img alt='Delete' align='middle' class='icon' title='"
-									+ projectDeleteTitle + "' src='" + deleteIcon
-									+ "' onclick=\"deleteProject('" + projectText + "'," + projectId
-									+ ")\" /></td>";
-							newHTML = newHTML + "</tr>";
+						var newHTML = "<table class='projectTable' id='"
+								+ projectText
+								+ "'><colgroup><col style='width: 88%' /><col style='width: 6%' /><col style='width: 6%' /></colgroup>";
+						newHTML = newHTML + "<tbody>";
+						newHTML = newHTML + "<tr id='" + projRowId + "'>";
+						newHTML = newHTML + "<td class='projectArea'>" + projectText + "</td>";
+						newHTML = newHTML
+								+ "<td align='center'><img alt='Edit' align='middle' class='icon' title='"
+								+ editTitle + "' src='" + editIcon + "' onclick=\"editProject('"
+								+ projRowId + "'," + projectId + ")\" /></td>";
+						newHTML = newHTML
+								+ "<td align='center'><img alt='Delete' align='middle' class='icon' title='"
+								+ projectDeleteTitle + "' src='" + deleteIcon
+								+ "' onclick=\"deleteProject('" + projectText + "'," + projectId
+								+ ")\" /></td>";
+						newHTML = newHTML + "</tr>";
 
-							var projLeadRowId = projectText + "_lead";
-							var projLeadId = 0;
-							newHTML = newHTML + "<tr id='" + projLeadRowId + "'>";
-							newHTML = newHTML + "<td class='leadArea'>Please select...</td>";
-							newHTML = newHTML
-									+ "<td align='center' colspan='2'><img alt='Edit Lead' align='middle' class='icon' title='"
-									+ editTitle + "' src='" + editIcon + "' onclick=\"editLead('"
-									+ projLeadRowId + "'," + projectId + "," + projLeadId + ")\" /></td>";
-							newHTML = newHTML + "</tr>";
+						var projLeadRowId = projectText + "_lead";
+						var projLeadId = 0;
+						newHTML = newHTML + "<tr id='" + projLeadRowId + "'>";
+						newHTML = newHTML + "<td class='leadArea'>Please select...</td>";
+						newHTML = newHTML
+								+ "<td align='center' colspan='2'><img alt='Edit Lead' align='middle' class='icon' title='"
+								+ editTitle + "' src='" + editIcon + "' onclick=\"editLead('"
+								+ projLeadRowId + "'," + projectId + "," + projLeadId + ")\" /></td>";
+						newHTML = newHTML + "</tr>";
 
-							newHTML = newHTML + "</tbody>";
-							newHTML = newHTML + "<tfoot><tr>";
-							newHTML = newHTML + "<td align='left'>&nbsp;Active&nbsp;<input id='" + statusId
-									+ "' type='checkbox' value='true' onchange=\"toggleProjectStatus("
-									+ projectId + ",'" + statusId + "','" + projRowId + "')\"/></td>";
-							newHTML = newHTML + "<td colspan='2' align='right'>";
-							newHTML = newHTML
-									+ "<input type='button' value='Add Activity' class='button' onclick=\"addNewActivity('"
-									+ projectText + "'," + projectId + ")\" />";
-							newHTML = newHTML + "</td></tfoot>";
-							newHTML = newHTML + "</table>";
+						newHTML = newHTML + "</tbody>";
+						newHTML = newHTML + "<tfoot><tr>";
+						newHTML = newHTML + "<td align='left'>&nbsp;Active&nbsp;<input id='" + statusId
+								+ "' type='checkbox' value='true' onchange=\"toggleProjectStatus("
+								+ projectId + ",'" + statusId + "','" + projRowId + "')\"/></td>";
+						newHTML = newHTML + "<td colspan='2' align='right'>";
+						newHTML = newHTML
+								+ "<input type='button' value='Add Activity' class='button' onclick=\"addNewActivity('"
+								+ projectText + "'," + projectId + ")\" />";
+						newHTML = newHTML + "</td></tfoot>";
+						newHTML = newHTML + "</table>";
 
-							$("#" + divID).append(newHTML);
-							$("#" + projNameId).val("");
-						} else {
-							var row = document.getElementById(divID);
-							row.cells[0].innerHTML = projectText;
-							var editHTML = "<img alt='Edit' align='middle' class='icon' title='" + editTitle
-									+ "' src='" + editIcon + "' onclick=\"editProject('" + divID + "',"
-									+ projectId + ")\" />";
-							row.cells[1].innerHTML = editHTML;
-						}
-
+						$("#" + divID).append(newHTML);
+						$("#" + projNameId).val("");
 						displayAlert("Project Created");
+					} else {
+						var row = document.getElementById(divID);
+						row.cells[0].innerHTML = projectText;
+						var editHTML = "<img alt='Edit' align='middle' class='icon' title='" + editTitle
+								+ "' src='" + editIcon + "' onclick=\"editProject('" + divID + "',"
+								+ projectId + ")\" />";
+						row.cells[1].innerHTML = editHTML;
+						displayAlert("Project Updated");
 					}
-				}, JSON_RESULT_TYPE);
+				}
+			}, JSON_RESULT_TYPE);
 	} else {
 		displayAlert(errorMsgNoData);
 	}
