@@ -1,6 +1,7 @@
 var MIN_INDEX = 0.96;
 var MAX_INDEX = 0.99;
 var MIN_DEFECT_RATIO = 0.01;
+var MIN_SPE_RATIO = 0.90;
 
 var metricEntryDate = null;
 
@@ -35,6 +36,7 @@ var CalculatedMetrics = function() {
 	var cpi = 0.0;
 	var spi = 0.0;
 	var ratio = 0.0;
+	var speRatio = 0.0;
 }
 
 /**
@@ -119,6 +121,7 @@ function saveModifiedMetrics(rowHtmlId, prevRowHtmlId, projectDbId, metricDbId, 
 			var cpi = 0;
 			var spi = 0;
 			var ratio = 0;
+			var speRatio = 0;
 
 			if (trimToNull(prevRowHtmlId) == null) {
 
@@ -148,6 +151,7 @@ function saveModifiedMetrics(rowHtmlId, prevRowHtmlId, projectDbId, metricDbId, 
 			cpi = getPreciseValue(ev / ac, 3);
 			spi = getPreciseValue(ac / pv, 3);
 			ratio = getPreciseValue(defects / spe, 3);
+			speRatio = getPreciseValue(spe, pv);
 
 			//update the modified row
 			selectedRow.cells[1].innerHTML = pv;
@@ -871,6 +875,14 @@ function applyQualityRules(calculated) {
 		addError("spe", "This SPE results in poor defect ratio : " + ratio);
 		addError("defects", "This defect count results in poor defect ratio : " + ratio);
 	}
+	
+	// Check speRatio >= MIN_SPE_RATIO
+	if (calculated.speRatio < MIN_SPE_RATIO) {
+		hasError = true;
+		var speRatio = calculated.speRatio;
+		addError("spe", "This SPE results in poor SPE ratio : " + speRatio);
+		addError("pv", "This pv results in poor SPE ratio : " + speRatio);
+	}
 
 	return hasError;
 }
@@ -897,6 +909,7 @@ function validateEnteredMetrics(estimate, entered) {
 		calculatedMetrics.cpi = entered.ev / entered.ac;
 		calculatedMetrics.spi = entered.ev / entered.pv;
 		calculatedMetrics.ratio = entered.defects / entered.spe;
+		calculatedMetrics.speRatio = entered.spe / entered.pv;
 
 		//logical OR used to force conditional validation
 		hasError = applyDataSanityRules(entered) || applyQualityRules(calculatedMetrics);
@@ -1036,5 +1049,99 @@ $(function() {
 	    collapsible : true,
 	    active : 0
 	});
+	
+	$("#weekImg").click(function() {
+		$("#weekpicker").datepicker('show');
+	});
+
+	{
+		var startDate;
+		var endDate;
+
+		var selectCurrentWeek = function() {
+			window.setTimeout(function() {
+				$('.ui-weekpicker').find('.ui-datepicker-current-day a').addClass('ui-state-active').removeClass('ui-state-default');
+			}, 1);
+		};
+		
+		var setDates = function(input, targetCalendarFieldId) {
+			var $input = $(input);
+			var selectedDate = $input.datepicker('getDate');
+
+			if (selectedDate !== null) {
+				var dateObj = new Date(selectedDate);
+				var firstDay = $input.datepicker("option", "firstDay");
+				var dayAdjustment = dateObj.getDay() - firstDay;
+
+				if (dayAdjustment < 0) {
+					dayAdjustment += 7;
+				}
+
+				// get the week start & end day
+				startDate = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate() - dayAdjustment);
+				endDate = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate() - dayAdjustment + 6);
+				
+				// store the week start day
+				if (targetCalendarFieldId == "weekArea") {
+					weekStartDate = $.datepicker.formatDate('dd.mm.yy', startDate);
+				}
+
+				// create the display text
+				var weekDetails = $.datepicker.formatDate('dd M', startDate) + ' - ';
+				var year = $.datepicker.formatDate('yy', endDate);
+				weekDetails = weekDetails + $.datepicker.formatDate('dd M', endDate) + ', ' + year;
+				
+				// set the formatted date in textbox
+				$("#" + targetCalendarFieldId).val(weekDetails);
+			}
+		};
+		
+		$('#weekpicker').datepicker({
+			beforeShow : function() {
+				$('#ui-datepicker-div').addClass('ui-weekpicker');
+				selectCurrentWeek();
+			},
+			onClose : function() {
+				$('#ui-datepicker-div').removeClass('ui-weekpicker');
+			},
+			showOtherMonths : true,
+			selectOtherMonths : true,
+			changeMonth : true,
+			changeYear : true,
+			firstDay : 1,
+			showWeek : true,
+			onSelect : function(dateText, inst) {
+				setDates(this, "weekArea");
+				$(this).datepicker("hide");
+				setDateLabels(startDate);
+				selectCurrentWeek();
+				$(this).change();
+			},
+			beforeShowDay : function(date) {
+				var cssClass = '';
+
+				if (date >= startDate && date <= endDate) {
+					cssClass = 'ui-datepicker-current-day';
+				}
+
+				return [ true, cssClass ];
+			},
+			onChangeMonthYear : function(year, month, inst) {
+				selectCurrentWeek();
+			}
+		});
+
+		setDates('#weekpicker');
+
+		var $calendarTR = $('.ui-weekpicker .ui-datepicker-calendar tr');
+		
+		$calendarTR.live('mousemove', function() {
+			$(this).find('td a').addClass('ui-state-hover');
+		});
+		
+		$calendarTR.live('mouseleave', function() {
+			$(this).find('td a').removeClass('ui-state-hover');
+		});
+	}
 	
 });
