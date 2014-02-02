@@ -12,20 +12,21 @@
 
 <%-- Main content --%>
 <div id="content">
-	<p>Select Project</p>
-	<div id="searchBar">
+	<div id="messageBar"></div>
+	<div class="thin"><p>Select Project</p></div>
+	<div id="searchBar" class="topPadding">
 		<form action="RapidBoard" id="rapidForm" name="rapidForm" method="POST">
 			<c:set var="selectedProjId" value="${projectId}" />
 			<c:set var="selectedUserId" value="${userId}" />
-			<div style="display: inline; padding: 0; margin: 0">
-				<select id="projectSelect" size="1" name="projectId" class="dateSearch" title="Select Project">
+			<div class="thin">
+				<select id="projectSelect" size="1" name="projectId" class="dropDown" title="Select Project">
 					<option value="0" selected="selected">Select A Project</option>
 					<c:forEach var="project" items="${PROJECT_LIST.projects}">
 						<option value="${project.code}" <c:if test="${selectedProjId == project.code}">selected="selected"</c:if>>${project.value}</option>
 					</c:forEach>
 				</select>
 			</div>
-			<div style="display: inline; padding: 0; padding-left: 1em; margin: 0">
+			<div class="thin leftPadding">
 				<input type="button" value="Show Rapid Board" class="button" onclick="getRapidBoardData('rapidForm','projectSelect')"/>
 			</div>
 		</form>
