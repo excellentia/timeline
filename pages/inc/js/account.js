@@ -16,9 +16,11 @@ function editAccountSettings(rowElmId, userDbId) {
 			maxlen = 50;
 		}
 		
-		selectedRow.cells[1].innerHTML = "<input type='text' value='" + selectedRow.cells[1].innerHTML + "' class='accountAreaEdit' maxlength='"+maxlen+"'/>";
-		selectedRow.cells[2].innerHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='" + saveIcon + "' onclick=\"saveAccountSettings('" + rowElmId + "'," + userDbId + ")\" />";
+		var editId = "edit_"+rowElmId;
 		
+		selectedRow.cells[1].innerHTML = "<input type='text' id = '"+editId+"' value='" + selectedRow.cells[1].innerHTML + "' class='accountAreaEdit' maxlength='"+maxlen+"'/>";
+		selectedRow.cells[2].innerHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='" + saveIcon + "' onclick=\"saveAccountSettings('" + rowElmId + "'," + userDbId + ")\" />";
+		focus(editId);
 	} else {
 		displayAlert("Editing Not Allowed.");
 	}
