@@ -2346,7 +2346,6 @@ public class TimelineServiceImpl implements TimelineService {
 			criteria.createAlias("week", "wk");
 			criteria.createAlias("project", "proj");
 			criteria.createAlias("activity", "act");
-			criteria.createAlias("task", "tsk");
 
 			User user = (User) session.get(User.class, userId);
 
@@ -2365,6 +2364,7 @@ public class TimelineServiceImpl implements TimelineService {
 			}
 
 			if (taskId > 0) {
+				criteria.createAlias("task", "tsk");
 				criteria.add(Restrictions.eq("tsk.id", taskId));
 			}
 
