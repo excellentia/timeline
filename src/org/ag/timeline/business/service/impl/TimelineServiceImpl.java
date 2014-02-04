@@ -53,6 +53,7 @@ import org.ag.timeline.presentation.transferobject.reply.UserSearchReply;
 import org.ag.timeline.presentation.transferobject.reply.WeekReply;
 import org.ag.timeline.presentation.transferobject.reply.WeeklyUserReply;
 import org.ag.timeline.presentation.transferobject.reply.agile.RapidBoardReply;
+import org.ag.timeline.presentation.transferobject.reply.agile.TaskDetailReply;
 import org.ag.timeline.presentation.transferobject.reply.audit.AuditDataReply;
 import org.ag.timeline.presentation.transferobject.reply.audit.AuditDetailRow;
 import org.ag.timeline.presentation.transferobject.reply.audit.AuditRow;
@@ -4789,5 +4790,144 @@ public class TimelineServiceImpl implements TimelineService {
 
 		return reply;
 
+	}
+
+	@Override
+	public TaskDetailReply getTaskDetails(TaskSearchParameter searchParameters) throws TimelineException {
+
+		Session session = null;
+		Transaction transaction = null;
+		final TaskDetailReply reply = new TaskDetailReply();
+
+		try {
+			// read data, hence using normal session()
+			session = getNormalSession();
+			transaction = session.beginTransaction();
+
+			long time = System.nanoTime();
+			Long taskId = 0l;
+
+			if (searchParameters != null) {
+
+				taskId = searchParameters.getTaskId();
+
+				if (taskId > 0) {
+
+					Task task = (Task) session.get(Task.class, taskId);
+
+					if (task != null) {
+
+						// populate details
+						reply.addTaskDetailRow(task);
+
+						// get Task Time entries
+						{
+							Criteria criteria = session.createCriteria(TimeData.class);
+							criteria.createAlias("task", "task");
+							criteria.add(Restrictions.eq("task.id", taskId));
+
+							criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+							criteria.addOrder(Order.desc("week"));
+
+							@SuppressWarnings("unchecked")
+							List<TimeData> list = criteria.list();
+
+							if ((list != null) && (list.size() > 0)) {
+								for (TimeData timeData : list) {
+									if (timeData != null) {
+										reply.addTaskTimeRow(timeData);
+									}
+								}
+							}
+						}
+
+						Map<Long, String> userMap = new HashMap<Long, String>();
+
+						{
+							Criteria criteria = session.createCriteria(User.class);
+							criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+							@SuppressWarnings("unchecked")
+							List<User> list = criteria.list();
+
+							if ((list != null) && (list.size() > 0)) {
+
+								for (User user : list) {
+									userMap.put(user.getId(), user.getUserName());
+								}
+							}
+						}
+
+						// get Task stage changes
+						{
+							Criteria criteria = session.createCriteria(AuditRecord.class);
+							criteria.add(Restrictions.and(Restrictions.eq("entityId", taskId),
+									Restrictions.eq("dataType", TimelineConstants.AuditDataType.TASK.getTypeId())));
+
+							criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+							criteria.addOrder(Order.desc("operationTime"));
+
+							@SuppressWarnings("unchecked")
+							List<AuditRecord> list = criteria.list();
+
+							if ((list != null) && (list.size() > 0)) {
+
+								for (AuditRecord auditRecord : list) {
+
+									if ((auditRecord != null) && (auditRecord.getDetails() != null)) {
+
+										for (AuditRecordDetail detail : auditRecord.getDetails()) {
+
+											if ((detail != null)
+													&& ("activity".equalsIgnoreCase(detail.getFieldName()))) {
+
+												reply.addTaskStageRow(detail.getNewValue(),
+														auditRecord.getOperationTime(),
+														userMap.get(auditRecord.getUserId()));
+
+												break;
+											}
+										}
+									}
+								}
+							}
+						}
+
+					} else {
+						// No results found
+						reply.setErrorMessage("Specified task does not exist in System.");
+					}
+
+				} else {
+					// No results found
+					reply.setErrorMessage("Invalid Task Specified.");
+				}
+			}
+
+			TextHelper.logMessage("getTaskDetails()", time);
+
+			// commit the transaction
+			transaction.commit();
+
+		} catch (HibernateException hibernateException) {
+
+			// rollback transaction
+			if (transaction != null) {
+				transaction.rollback();
+			}
+
+			hibernateException.printStackTrace();
+
+			// create a reply for error message
+			reply.setErrorMessage("Search failed due to Technical Reasons.");
+
+		} finally {
+			// close the session
+			if (session != null) {
+				session.close();
+			}
+		}
+
+		return reply;
 	}
 }

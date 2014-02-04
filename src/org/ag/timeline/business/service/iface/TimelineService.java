@@ -26,6 +26,7 @@ import org.ag.timeline.presentation.transferobject.reply.UserSearchReply;
 import org.ag.timeline.presentation.transferobject.reply.WeekReply;
 import org.ag.timeline.presentation.transferobject.reply.WeeklyUserReply;
 import org.ag.timeline.presentation.transferobject.reply.agile.RapidBoardReply;
+import org.ag.timeline.presentation.transferobject.reply.agile.TaskDetailReply;
 import org.ag.timeline.presentation.transferobject.reply.audit.AuditDataReply;
 import org.ag.timeline.presentation.transferobject.reply.metrics.ProjectDetailMetricsReply;
 import org.ag.timeline.presentation.transferobject.reply.metrics.ProjectEstimatesReply;
@@ -98,7 +99,7 @@ public interface TimelineService {
 	public ProjectDetailMetricsReply getProjectDetailMetricsReport(final ProjectDetailMetricsSearchParameters searchParameters) throws TimelineException;
 	
 	public RapidBoardReply getRapidBoardData(final ProjectSearchParameter searchParameters) throws TimelineException;
-
+	public TaskDetailReply getTaskDetails(final TaskSearchParameter searchParameters) throws TimelineException;
 	public void systemManagement() throws TimelineException;
 
 }

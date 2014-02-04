@@ -33,9 +33,6 @@ public class ReportDetailAction extends SecureBaseAction {
 
 	@Override
 	public String secureExecute() throws Exception {
-		
-		
-		
 		return SUCCESS;
 	}
 

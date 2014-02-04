@@ -61,7 +61,7 @@ public interface TimelineConstants {
 		TIME_DATA(3, "Time Entry Data"),
 		USER(4, "User Data"),
 		METRICS(5, "Metrics"),
-		TASK(5, "Task");
+		TASK(6, "Task");
 
 		private final int typeId;
 
@@ -222,7 +222,8 @@ public interface TimelineConstants {
 		SEARCH_PROJECT_METRICS(true),
 		SEARCH_PROJECT_DETAIL_METRICS(true),
 		SEARCH_ESTIMATES(true),
-		REPORT_DETAIL(false);
+		REPORT_DETAIL(false),
+		SEARCH_TASK_DETAIL(false);
 //		SEARCH_PROJECT_STAGES(true),
 //		SEARCH_POSSIBLE_STAGES(true),
 //		SAVE_STAGE(true),

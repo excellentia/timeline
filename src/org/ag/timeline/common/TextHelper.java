@@ -30,8 +30,7 @@ public class TextHelper {
 	private static final DateFormat AUDIT_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
 	private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
-	
-	
+
 	//
 	// private static final long MILLISEC_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -444,7 +443,7 @@ public class TextHelper {
 			System.out.println("[Timeline] " + msg);
 		}
 	}
-	
+
 	public static final void logMessage(String msg, long time) {
 		if (LOGGING_ON) {
 			System.out.println("[Timeline] " + msg + " > Time taken : " + ((System.nanoTime() - time) / 1000000));
@@ -484,9 +483,9 @@ public class TextHelper {
 
 		return val;
 	}
-	
+
 	public static String getDisplayWeek(final Date startDate, final Date endDate, final String defaultLabel) {
-		
+
 		String val = TextHelper.trimToNull(TextHelper.getDisplayWeek(startDate, endDate));
 
 		if (val == null) {
@@ -522,7 +521,7 @@ public class TextHelper {
 
 		return list;
 	}
-	
+
 	public static void main(String[] args) {
 		{
 			Date date = getValidDate("01.07.2012");
@@ -552,7 +551,7 @@ public class TextHelper {
 			{
 				Calendar calendar = Calendar.getInstance();
 				calendar.setTime(currentDate);
-//				calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+				// calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
 				calendar.add(Calendar.DAY_OF_YEAR, 6);
 				calendar.set(Calendar.HOUR_OF_DAY, 0);
 				calendar.set(Calendar.MINUTE, 0);
@@ -565,19 +564,17 @@ public class TextHelper {
 
 			System.out.println(TextHelper.getDisplayWeek(currentDate, TextHelper.getDateAfter(currentDate, 6)));
 		}
-		
+
 		System.out.println("===============================");
 
 		{
 			Date date = new Date();
-			System.out.println("Day Start : "+ getAuditTimestamp(getAuditDayStartTimestamp(date)));
-			System.out.println("Day End : "+ getAuditTimestamp(getAuditDayEndTimestamp(date)));
-			
+			System.out.println("Day Start : " + getAuditTimestamp(getAuditDayStartTimestamp(date)));
+			System.out.println("Day End : " + getAuditTimestamp(getAuditDayEndTimestamp(date)));
+
 			System.out.println("Week Start Date :" + getFirstDayOfWeek(date));
 			System.out.println("Week End Date :" + getLastDayOfWeek(date));
 		}
-		
-		
 
 	}
 }
