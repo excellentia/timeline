@@ -70,6 +70,10 @@ public class SummaryReportReply extends BusinessReply {
 		return this.userTimeMap.get(projectId);
 	}
 
+	/**
+	 * @param projectId
+	 * @return
+	 */
 	public double getProjectTime(final long projectId) {
 		double time = 0d;
 		
