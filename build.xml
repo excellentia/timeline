@@ -73,4 +73,12 @@
 		<echo>Creating WAR</echo>
 		<war destfile="${deploy.root}/timeline.war" basedir="${deploy.target}"/>
 	</target>
+
+	<!-- Creates a zip -->
+	<target name="zip">
+		<zip destfile="./misc/timeline-copy.zip">
+			<zipfileset dir="." excludes=".project .classpath LICENSE README.md pages/inc/css/jquery-ui-1.8.24.custom.css .git .settings META-INF/** WEB-INF/** pages/inc/icons/** pages/inc/images/** pages/inc/jquery/**"/>
+		</zip>
+	</target>
+
 </project>
