@@ -53,15 +53,13 @@
 			</c:if>
 		</c:if>
 	</div>
-	<%-- 
 	<div id="light" class="white_content" style="margin: 0; padding: 0.5em;">
-		<div id="quickTaskTimeEntry" style="display: inline; width: 100%; height: 95%; clear: both"></div>
+		<div id="taskDetails" style="display: inline; width: 100%; height: 95%; clear: both"></div>
 		<div id="closeBar" style="display: inline; width: 100%; padding-top: 0.5em; height: 5%; text-align: right; float: right; clear: both">
 			<a href="javascript:void(0)" onclick="hideTimeEntryOverLay('quickTaskTimeEntry')" title="Click to Close / Press Esc">Close</a>
 		</div>
 	</div>
 	<div id="fade" class="black_overlay"></div>
-	--%>
 </div>
 <%-- Footer Setup --%>
 <%@ include file="inc/footer.inc.jsp"%>

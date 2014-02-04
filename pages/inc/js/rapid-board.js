@@ -1,3 +1,5 @@
+var TASK_DETAILS_ACTION = "TaskDetails.action";
+
 function getRapidBoardData(formId,selectElmId) {
 	
 	var projDbId = getDropDownValueAsInt(selectElmId);
@@ -141,6 +143,37 @@ function saveTaskTime() {
 	}, JSON_RESULT_TYPE);
 }
 
+function showTaskDetails(taskDbId) {
+
+	if (taskDbId > 0) {
+	
+		$.post(TASK_DETAILS_ACTION, {
+			taskId : taskDbId
+		}, function(data) {
+
+			var htmlText = data;
+
+			if (checkValidText(htmlText)) {
+				var targetElm = document.getElementById("taskDetails");
+				targetElm.innerHTML = htmlText;
+				
+				document.getElementById('light').style.display='block';
+				document.getElementById('fade').style.display='block';
+
+				document.onkeydown = function(evt) {
+					evt = evt || window.event;
+					if (evt.keyCode == 27) {
+						hideTimeEntryOverLay("taskDetails");
+					}
+				};
+				
+				$("#light").draggable();
+			}
+			
+		}, TEXT_RESULT_TYPE);
+	}
+}
+
 $(function() {
 
 	var classNam = 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all center-text';
@@ -167,15 +200,14 @@ $(function() {
 	}).disableSelection();
 	
 	/* double click event */
-	$('sortableLI').dblclick(function() {
+	$('.sortableLI').dblclick(function() {
 		var taskElmId = ""+ $(this).attr('id');
-		//var taskText = ""+ $(this).text();
 		var taskDbId = getDbId(taskElmId,"task_");
 		//quickTaskTimeEntry(taskElmId, taskText, taskDbId);
+		showTaskDetails(taskDbId);
 	});
 	
 });
-
 
 
 

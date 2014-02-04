@@ -10,6 +10,7 @@
 	<constant name="struts.action.excludePattern" value="/ajax" />
 
 	<package name="timeline" namespace="/" extends="struts-default">
+	
 		<action name="Login" class="org.ag.timeline.presentation.action.LoginAction">
 			<result name="success" type="redirect">/MyTime</result>
 			<result name="error">pages/login.jsp</result>
@@ -56,6 +57,11 @@
 
 		<action name="Tasks" class="org.ag.timeline.presentation.action.TaskAction">
 			<result name="success">pages/tasks.jsp</result>
+			<result name="error">pages/login.jsp</result>
+		</action>
+		
+		<action name="TaskDetails" class="org.ag.timeline.presentation.action.TaskDetailAction">
+			<result name="success">pages/tasks-details.inc.jsp</result>
 			<result name="error">pages/login.jsp</result>
 		</action>
 
