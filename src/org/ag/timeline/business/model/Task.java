@@ -144,8 +144,8 @@ public class Task extends AbstractModel {
 	public String getDescription() {
 		StringBuilder builder = new StringBuilder(this.getProject().getName());
 		builder.append(TimelineConstants.COMMA);
-		builder.append(this.getActivity().getName());
-		builder.append(TimelineConstants.COMMA);
+//		builder.append(this.getActivity().getName());
+//		builder.append(TimelineConstants.COMMA);
 		builder.append(this.getText());
 		return builder.toString();
 	}
