@@ -40,19 +40,6 @@
 						</c:if>
 					</select>
 				</div>
-				<%-- Users --%>
-				<%--
-				<c:if test="${SESSION_USER.admin}">
-					<div style="display: inline; padding: 0; margin: 0">
-						<select id="newTaskUserId" size="1" name="newTaskUserId" class="dateSearch" title="Select User">
-							<option value="0" <c:if test="${newTaskUserId == 0}">selected="selected"</c:if>>All Users</option>
-							<c:forEach var="user" items="${USER_LIST.users}">
-								<option value="${user.id}" <c:if test="${newTaskUserId == user.id}">selected="selected"</c:if>>${user.userName}</option>
-							</c:forEach>
-						</select>
-					</div>
-				</c:if>
-				 --%>
 				<div style="display: inline; padding: 0; margin: 0; margin-left: 1em;">
 					<%--<input type="button" value="Create" class="button" style="height: 1.5em;" onclick="createTask(${SESSION_USER.admin})" /> --%>
 					<input type="button" value="Create" class="button" style="height: 1.5em;" onclick="createTask()" />
@@ -94,21 +81,7 @@
 						<option value="2" <c:if test="${taskStatusId == 2}">selected="selected"</c:if>>Inactive</option>
 					</select>
 				</div>
-				<%-- Users --%>
-				<%-- 
-				<c:if test="${SESSION_USER.admin}">
-					<div style="display: inline; padding: 0; margin: 0">
-						<select id="searchUserId" size="1" name="searchUserId" class="dateSearch" title="Select User">
-							<option value="0" <c:if test="${selectedUserId == 0}">selected="selected"</c:if>>All Users</option>
-							<c:forEach var="user" items="${USER_LIST.users}">
-								<option value="${user.id}" <c:if test="${selectedUserId == user.id}">selected="selected"</c:if>>${user.userName}</option>
-							</c:forEach>
-						</select>
-					</div>
-				</c:if>
-				 --%>
 				<div style="display: inline; padding: 0; margin: 0; margin-left: 1em;">
-				<%--	<input type="button" value="Search" class="button" style="height: 1.5em;" onclick="searchTasks(${SESSION_USER.admin})" />  --%>
 					<input type="button" value="Search" class="button" style="height: 1.5em;" onclick="searchTasks()" />
 				</div>
 			</div>
@@ -124,18 +97,18 @@
 								<table style="width: 70%;">
 									<colgroup>
 										<col style="width: 16%" />
-										<%--<col style="width: 12%" /> --%>
 										<col style="width: 24%" />
-										<col style="width: 52%" />
+										<col style="width: 44%" />
+										<col style="width: 8%" />
 										<col style="width: 4%" />
 										<col style="width: 4%" />
 									</colgroup>
 									<thead>
 										<tr>
 											<th>Activity</th>
-											<%--<th>User</th> --%>
 											<th>Task</th>
 											<th>Description</th>
+											<th>Active ?</th>
 											<th colspan="2">&nbsp;</th>
 										</tr>
 									</thead>
@@ -147,11 +120,13 @@
 												<c:set var="taskCount" value="${taskCount+1}"/>
 												<tr id="${rowId}">
 													<td>${taskReply.getActivityName(activityId)}</td>
-													<%--<td>${taskReply.getTaskUserName(task.code)}</td>--%>
 													<td>${task.value}</td>
 													<td>${taskReply.getTaskDetail(task.code)}</td>
+													<td align="center" title="Toggle Task Status">
+														<c:set var="taskCheckId" value="task_check_${task.code}"/>
+														<input id="${taskCheckId}" type='checkbox' value='${task.status}' <c:if test="${task.status}">checked="checked"</c:if> onchange="toggleTaskStatus('${rowId}','${taskCheckId}',${task.code})" />
+													</td>
 													<td align="center">
-														<%--<img alt="Edit" align="middle" class="icon" title="${taskNameEditTitle}" src="${editIconPath}" onclick="editTask(false,${SESSION_USER.admin},'${rowId}',${task.code})"/>  --%>
 														<img alt="Edit" align="middle" class="icon" title="${taskNameEditTitle}" src="${editIconPath}" onclick="editTask(false,'${rowId}',${task.code})"/>
 													</td>
 													<td align="center">
@@ -163,7 +138,6 @@
 									</tbody>
 								</table>
 							</div>	
-										
 						</c:forEach>
 					</div>
 					<div style="margin-top: 1em;"><p class="thin" style="font-size: 1em;font-weight: normal;">Total Tasks Found : </p><p class="thin" id="count" style="font-size: 1em;font-weight: normal;">${taskCount}</p></div>
@@ -175,5 +149,3 @@
 </div>
 <%-- Footer Setup --%>
 <%@ include file="inc/footer.inc.jsp"%>
-
-
