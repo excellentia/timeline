@@ -32,8 +32,6 @@ public class TaskReply extends BusinessReply {
 
 	private Map<Long, String> taskDetailMap = null;
 	
-//	private Map<Long, String> taskUserNameMap = null;
-
 	private Map<Long, Set<Long>> projectActivityIdMap = null;
 
 	private Map<Long, Set<CodeValueStatus>> activityTasksMap = null;
@@ -42,7 +40,6 @@ public class TaskReply extends BusinessReply {
 		this.projectNameMap = new HashMap<Long, String>();
 		this.activityNameMap = new HashMap<Long, String>();
 		this.taskDetailMap = new HashMap<Long, String>();
-//		this.taskUserNameMap = new HashMap<Long, String>();
 		this.projectActivityIdMap = new HashMap<Long, Set<Long>>();
 		this.activityTasksMap = new HashMap<Long, Set<CodeValueStatus>>();
 	}
@@ -103,7 +100,6 @@ public class TaskReply extends BusinessReply {
 			taskSet.add(new CodeValueStatus(taskId, task.getText(), task.isActive()));
 			this.activityTasksMap.put(actId, taskSet);
 			this.taskDetailMap.put(taskId, task.getDetails());
-//			this.taskUserNameMap.put(taskId, task.getUser().getAbbrvUserName());
 		}
 	}
 
@@ -166,16 +162,6 @@ public class TaskReply extends BusinessReply {
 		return name;
 	}
 	
-//	public String getTaskUserName(final long taskId) {
-//		String name = null;
-//
-//		if (this.taskUserNameMap != null) {
-//			name = this.taskUserNameMap.get(taskId);
-//		}
-//
-//		return name;
-//	}
-
 	public List<Long> getProjectIds() {
 		List<Long> list = new ArrayList<Long>();
 
