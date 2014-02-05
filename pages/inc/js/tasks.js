@@ -472,7 +472,38 @@ function searchTasks() {
 			$(taskAccId).accordion(accOptions);
 		}
 	}, JSON_RESULT_TYPE);
+}
 
+function toggleTaskStatus(rowElmId, chkElmId, taskDbId) {
+
+	var checkInput = document.getElementById(chkElmId);
+
+	if ((taskDbId > 0) && (checkInput != null)) {
+
+		var taskStatus = checkInput.checked;
+
+		$.post(JSON_URL, {
+			operation : "SAVE_TASK_STATUS",
+			id : taskDbId,
+			status : taskStatus
+		}, function(data) {
+
+			jsonData = data;
+
+			if (jsonData.error) {
+				displayAlert(jsonData.error);
+			} else {
+				var taskRow = document.getElementById(rowElmId);
+				
+				if (taskStatus) {
+					taskRow.className = "activeEntity";
+				} else {
+					taskRow.className = "inActiveEntity";
+				}
+			}
+		}, JSON_RESULT_TYPE);
+	}
+	
 }
 
 $(function() {
