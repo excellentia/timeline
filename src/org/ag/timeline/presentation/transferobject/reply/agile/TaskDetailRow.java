@@ -18,7 +18,11 @@ public class TaskDetailRow {
 
 	private String projectName = null;
 
+	private String createUserName = null;
+
 	private Date taskCreateDate = null;
+
+	private boolean active = false;
 
 	/**
 	 * Getter for taskName.
@@ -110,6 +114,42 @@ public class TaskDetailRow {
 		this.taskCreateDate = taskCreateDate;
 	}
 
+	/**
+	 * Getter for active.
+	 * 
+	 * @return the active.
+	 */
+	public boolean isActive() {
+		return this.active;
+	}
+
+	/**
+	 * Setter for active.
+	 * 
+	 * @param active the active to set.
+	 */
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	/**
+	 * Getter for createUserName.
+	 * 
+	 * @return the createUserName.
+	 */
+	public String getCreateUserName() {
+		return this.createUserName;
+	}
+
+	/**
+	 * Setter for createUserName.
+	 * 
+	 * @param createUserName the createUserName to set.
+	 */
+	public void setCreateUserName(String createUserName) {
+		this.createUserName = createUserName;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -125,8 +165,12 @@ public class TaskDetailRow {
 		builder.append(activeStageName);
 		builder.append(", projectName=");
 		builder.append(projectName);
+		builder.append(", createUserName=");
+		builder.append(createUserName);
 		builder.append(", taskCreateDate=");
 		builder.append(taskCreateDate);
+		builder.append(", active=");
+		builder.append(active);
 		builder.append("]");
 		return builder.toString();
 	}

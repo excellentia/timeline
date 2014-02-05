@@ -71,7 +71,7 @@ public class TaskDetailReply extends BusinessReply {
 		return this.timeRows;
 	}
 
-	public void addTaskDetailRow(Task task) {
+	public void addTaskDetailRow(Task task, String createUserName) {
 
 		if (task != null) {
 			this.detailRow = new TaskDetailRow();
@@ -80,6 +80,8 @@ public class TaskDetailReply extends BusinessReply {
 			this.detailRow.setProjectName(task.getActivity().getProject().getName());
 			this.detailRow.setTaskDescription(task.getDetails());
 			this.detailRow.setTaskCreateDate(task.getCreateDate());
+			this.detailRow.setActive(task.isActive());
+			this.detailRow.setCreateUserName(createUserName);
 		}
 	}
 
