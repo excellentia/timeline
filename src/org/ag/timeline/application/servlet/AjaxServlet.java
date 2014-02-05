@@ -727,9 +727,9 @@ public class AjaxServlet extends HttpServlet {
 			final long activityId = getLongRequestValue(TimelineConstants.AjaxRequestParam.activityId, request);
 			final long taskId = getLongRequestValue(TimelineConstants.AjaxRequestParam.taskId, request);
 			final long statusId = getLongRequestValue(TimelineConstants.AjaxRequestParam.status, request);
-			
+
 			final TaskSearchParameter searchParameters = new TaskSearchParameter();
-			
+
 			searchParameters.setProjectId(projectId);
 			searchParameters.setActivityId(activityId);
 			searchParameters.setTaskId(taskId);
@@ -737,7 +737,7 @@ public class AjaxServlet extends HttpServlet {
 			// set search all
 			if ((statusId == 0) || ((projectId == 0) && (activityId == 0) && (taskId == 0))) {
 				searchParameters.setSearchAllTasks(Boolean.TRUE);
-			} else if(statusId == 1) {
+			} else if (statusId == 1) {
 				searchParameters.setSearchActiveTasks(Boolean.TRUE);
 			}
 
@@ -1702,8 +1702,7 @@ public class AjaxServlet extends HttpServlet {
 				modifyUserPreferences(request, response);
 			} else if (TimelineConstants.OperationType.SEARCH_ENTRIES.toString().equalsIgnoreCase(typeStr)) {
 				searchEntries(request, response);
-			} else if (TimelineConstants.OperationType.SEARCH_USERS_WITHOUT_ENTRIES.toString()
-					.equalsIgnoreCase(typeStr)) {
+			} else if (TimelineConstants.OperationType.SEARCH_USERS_WITHOUT_ENTRIES.toString().equalsIgnoreCase(typeStr)) {
 				searchUsersWithoutEntries(request, response);
 			} else if (TimelineConstants.OperationType.REPORT_DETAIL.toString().equalsIgnoreCase(typeStr)) {
 				getReportDetails(request, response);
@@ -1721,7 +1720,10 @@ public class AjaxServlet extends HttpServlet {
 				modifyTaskStage(request, response);
 			} else if (TimelineConstants.OperationType.DELETE_TASK.toString().equalsIgnoreCase(typeStr)) {
 				deleteTask(request, response);
+			} else if (TimelineConstants.OperationType.SAVE_TASK_STATUS.toString().equalsIgnoreCase(typeStr)) {
+				saveEntityStatus(request, response, TimelineConstants.StatusEntity.TASK);
 			}
+
 		} else {
 			handleInvalidRequest(request, response);
 		}

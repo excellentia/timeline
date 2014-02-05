@@ -32,7 +32,7 @@ public interface TimelineConstants {
 	public String WEEK_SEPARATOR = " - ";
 
 	public static enum StatusEntity {
-		PROJECT, USER;
+		PROJECT, USER, TASK;
 
 		public final String getText() {
 			return this.toString();
@@ -204,6 +204,7 @@ public interface TimelineConstants {
 		SAVE_USER_STATUS(true),
 		SAVE_TIME_ENTRY(false),
 		SAVE_TASK(false),
+		SAVE_TASK_STATUS(false),
 		SAVE_ESTIMATES(true),
 		SAVE_METRIC_DETAILS(true),
 		DELETE_PROJECT(true),
