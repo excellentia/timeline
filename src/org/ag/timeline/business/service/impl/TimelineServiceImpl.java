@@ -3183,6 +3183,20 @@ public class TimelineServiceImpl implements TimelineService {
 							}
 						}
 							break;
+							
+						case TASK: {
+							Task task = (Task) session.get(Task.class, id);
+
+							if (task == null) {
+								hasError = true;
+								reply.setErrorMessage("Specified Task is not present in System.");
+							} else {
+								task.setActive(input.isActive());
+								session.update(task);
+								retVal = task.getText();
+							}
+						}
+							break;
 
 						default:
 							hasError = true;
@@ -4816,9 +4830,26 @@ public class TimelineServiceImpl implements TimelineService {
 					Task task = (Task) session.get(Task.class, taskId);
 
 					if (task != null) {
+						
+						Map<Long, String> userMap = new HashMap<Long, String>();
+
+						{
+							Criteria criteria = session.createCriteria(User.class);
+							criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+
+							@SuppressWarnings("unchecked")
+							List<User> list = criteria.list();
+
+							if ((list != null) && (list.size() > 0)) {
+
+								for (User user : list) {
+									userMap.put(user.getId(), user.getUserName());
+								}
+							}
+						}
 
 						// populate details
-						reply.addTaskDetailRow(task);
+						reply.addTaskDetailRow(task, userMap.get(task.getCreateUserId()));
 
 						// get Task Time entries
 						{
@@ -4837,23 +4868,6 @@ public class TimelineServiceImpl implements TimelineService {
 									if (timeData != null) {
 										reply.addTaskTimeRow(timeData);
 									}
-								}
-							}
-						}
-
-						Map<Long, String> userMap = new HashMap<Long, String>();
-
-						{
-							Criteria criteria = session.createCriteria(User.class);
-							criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
-
-							@SuppressWarnings("unchecked")
-							List<User> list = criteria.list();
-
-							if ((list != null) && (list.size() > 0)) {
-
-								for (User user : list) {
-									userMap.put(user.getId(), user.getUserName());
 								}
 							}
 						}
