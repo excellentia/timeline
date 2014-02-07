@@ -24,6 +24,8 @@ public class TaskDetailRow {
 
 	private boolean active = false;
 
+	private long storyPoints = 0;
+
 	/**
 	 * Getter for taskName.
 	 * 
@@ -150,8 +152,27 @@ public class TaskDetailRow {
 		this.createUserName = createUserName;
 	}
 
+	/**
+	 * Getter for storyPoints.
+	 * 
+	 * @return the storyPoints
+	 */
+	public long getStoryPoints() {
+		return storyPoints;
+	}
+
+	/**
+	 * Setter for storyPoints.
+	 * 
+	 * @param storyPoints the storyPoints to set
+	 */
+	public void setStoryPoints(long storyPoints) {
+		this.storyPoints = storyPoints;
+	}
+
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -171,6 +192,8 @@ public class TaskDetailRow {
 		builder.append(taskCreateDate);
 		builder.append(", active=");
 		builder.append(active);
+		builder.append(", storyPoints=");
+		builder.append(storyPoints);
 		builder.append("]");
 		return builder.toString();
 	}
