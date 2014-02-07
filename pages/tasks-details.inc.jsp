@@ -1,6 +1,5 @@
 <%-- TLD inclusion --%>
 <%@ include file="inc/includes.inc.jsp"%>
-
 <div>
 	<div style="padding-bottom: 2em;">
 		<table style="width: 100%;">
@@ -12,17 +11,11 @@
 			</colgroup>
 			<thead>
 				<tr>
-					<th colspan="4" style="background: #609AFA; color: white">Task Details</th>
+					<th colspan="4" style="background: #609AFA; color: white">Task Details - ${detail.taskName}</th>
 				</tr>
 			</thead>
 			<tbody>
 				<c:set var="detail" value="${reply.detailRow}" />
-				<tr>
-					<td class="label">Task</td>
-					<td>${detail.taskName}</td>
-					<td class="label">Active</td>
-					<td>${detail.active}</td>
-				</tr>
 				<tr>
 					<td class="label">Project</td>
 					<td>${detail.projectName}</td>
@@ -34,6 +27,12 @@
 					<td>${detail.createUserName}</td>
 					<td class="label">Date Created</td>
 					<td><fmt:formatDate value="${detail.taskCreateDate}" pattern="dd MMM yyyy"/></td>
+				</tr>
+				<tr>
+					<td class="label">Active</td>
+					<td>${detail.active}</td>
+					<td class="label">Story Points</td>
+					<td>${detail.storyPoints}</td>
 				</tr>
 				<tr>
 					<td class="label">Description</td>

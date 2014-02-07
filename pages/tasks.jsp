@@ -94,11 +94,12 @@
 								<a href="#taskSection${idx.count}">${taskReply.getProjectName(projectId)}</a>
 							</h3>
 							<div>
-								<table style="width: 70%;">
+								<table style="width: 80%;">
 									<colgroup>
 										<col style="width: 16%" />
 										<col style="width: 24%" />
-										<col style="width: 44%" />
+										<col style="width: 40%" />
+										<col style="width: 4%" />
 										<col style="width: 8%" />
 										<col style="width: 4%" />
 										<col style="width: 4%" />
@@ -108,6 +109,7 @@
 											<th>Activity</th>
 											<th>Task</th>
 											<th>Description</th>
+											<th>Active ?</th>
 											<th>Active ?</th>
 											<th colspan="2">&nbsp;</th>
 										</tr>
