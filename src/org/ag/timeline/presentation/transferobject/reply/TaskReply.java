@@ -15,6 +15,7 @@ import org.ag.timeline.business.model.Activity;
 import org.ag.timeline.business.model.Project;
 import org.ag.timeline.business.model.Task;
 import org.ag.timeline.common.CodeValueComparator;
+import org.ag.timeline.presentation.transferobject.common.CodeValue;
 import org.ag.timeline.presentation.transferobject.common.CodeValueStatus;
 
 /**
@@ -30,7 +31,7 @@ public class TaskReply extends BusinessReply {
 
 	private Map<Long, String> activityNameMap = null;
 
-	private Map<Long, String> taskDetailMap = null;
+	private Map<Long, CodeValue> taskDetailMap = null;
 	
 	private Map<Long, Set<Long>> projectActivityIdMap = null;
 
@@ -39,7 +40,7 @@ public class TaskReply extends BusinessReply {
 	public TaskReply() {
 		this.projectNameMap = new HashMap<Long, String>();
 		this.activityNameMap = new HashMap<Long, String>();
-		this.taskDetailMap = new HashMap<Long, String>();
+		this.taskDetailMap = new HashMap<Long, CodeValue>();
 		this.projectActivityIdMap = new HashMap<Long, Set<Long>>();
 		this.activityTasksMap = new HashMap<Long, Set<CodeValueStatus>>();
 	}
@@ -99,7 +100,7 @@ public class TaskReply extends BusinessReply {
 
 			taskSet.add(new CodeValueStatus(taskId, task.getText(), task.isActive()));
 			this.activityTasksMap.put(actId, taskSet);
-			this.taskDetailMap.put(taskId, task.getDetails());
+			this.taskDetailMap.put(taskId, new CodeValue(task.getStoryPoints(), task.getDetails()));
 		}
 	}
 
@@ -155,11 +156,21 @@ public class TaskReply extends BusinessReply {
 	public String getTaskDetail(final long taskId) {
 		String name = null;
 
-		if (this.taskDetailMap != null) {
-			name = this.taskDetailMap.get(taskId);
+		if ((this.taskDetailMap != null) & (this.taskDetailMap.containsKey(taskId))) {
+			name = this.taskDetailMap.get(taskId).getValue();
 		}
 
 		return name;
+	}
+	
+	public long getTaskStoryPoints(final long taskId) {
+		long size = 0;
+
+		if ((this.taskDetailMap != null) & (this.taskDetailMap.containsKey(taskId))) {
+			size = this.taskDetailMap.get(taskId).getCode();
+		}
+
+		return size;
 	}
 	
 	public List<Long> getProjectIds() {
