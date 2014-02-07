@@ -22,7 +22,9 @@ public class Task extends AbstractModel {
 	private String details = null;
 
 	private boolean active = true;
-
+	
+	private long storyPoints = 0;
+	
 	/**
 	 * Getter for project.
 	 * 
@@ -116,26 +118,42 @@ public class Task extends AbstractModel {
 	public void setActive(boolean active) {
 		this.active = active;
 	}
+	
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Getter for storyPoints.
+	 * @return the storyPoints
+	 */
+	public long getStoryPoints() {
+		return storyPoints;
+	}
+
+	/**
+	 * Setter for storyPoints.
+	 * @param storyPoints the storyPoints to set
+	 */
+	public void setStoryPoints(long storyPoints) {
+		this.storyPoints = storyPoints;
+	}
+
+	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Task [id=");
-		builder.append(super.getId());
-		builder.append(", project=");
+		builder.append("Task [project=");
 		builder.append(project);
 		builder.append(", activity=");
 		builder.append(activity);
 		builder.append(", text=");
 		builder.append(text);
-		builder.append(", active=");
-		builder.append(active);
 		builder.append(", details=");
 		builder.append(details);
+		builder.append(", active=");
+		builder.append(active);
+		builder.append(", storyPoints=");
+		builder.append(storyPoints);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -144,8 +162,6 @@ public class Task extends AbstractModel {
 	public String getDescription() {
 		StringBuilder builder = new StringBuilder(this.getProject().getName());
 		builder.append(TimelineConstants.COMMA);
-//		builder.append(this.getActivity().getName());
-//		builder.append(TimelineConstants.COMMA);
 		builder.append(this.getText());
 		return builder.toString();
 	}

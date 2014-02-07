@@ -16,6 +16,7 @@
 		<property name="text" type="string" column="TEXT" not-null="true" />
 		<property name="details" type="string" column="DETAILS" />
 		<property name="active" type="boolean" column="ACTIVE" />
+		<property name="storyPoints" type="long" column="STORY_POINTS" />
 
 		<many-to-one name="project" class="Project" column="PROJECT_ID" cascade="none" not-null="true" />
 		<many-to-one name="activity" class="Activity" column="ACTIVITY_ID" cascade="none" not-null="true" />
