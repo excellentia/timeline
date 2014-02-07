@@ -427,3 +427,26 @@ function getTextInputValue(inputElmId) {
 	
 	return text;
 }
+
+function getBooleanInputValue(inputElmId) {
+	var val = false;
+
+	if (inputElmId != null) {
+		var text = trimToNull($("#" + inputElmId).val());
+
+		if (text != null) {
+
+			switch (text.toLowerCase()) {
+				case "true":
+				case "on":
+				case "yes":
+					val = true;
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
+	return val;
+}
