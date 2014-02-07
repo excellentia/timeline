@@ -3,40 +3,40 @@ var newTaskRowCount = 0;
 var TaskConstants = {
 	newProjectSelectId : "newTaskProjectId",
 	newActivitySelectId : "newTaskActivityId",
-	//newUserSelectId : "newTaskUserId",
 	newTaskTextInputId : "newTaskText",
 	newTaskDescInputId : "newTaskDescription",
+	newTaskStatusInputId : "newTaskStatus",
 
 	newTaskBodyId : "newTaskBody",
 	newTaskDivId : "newTaskSection",
 
 	newTaskTextCellIdx : 2,
 	newTaskDescCellIdx : 3,
-	newTaskEditIconCellIdx : 4,
+	newTaskStatusCellIdx : 4,
+	newTaskEditIconCellIdx : 5,
+	
 	existTaskTextCellIdx : 1,
 	existTaskDescCellIdx : 2,
-	existTaskEditIconCellIdx : 3,
+	existTaskStatusCellIdx : 3,
+	existTaskEditIconCellIdx : 4,
 
 	existingProjSelectId : "searchProjectId",
 	existingActivitySelectId : "searchActivityId",
 	existingTaskStatusId : "taskStatusId",
-	//existingUserSelectId : "searchUserId",
 
 	taskSearchResultsDivId : "myTaskSearchResults",
 	taskResultsAccordionId : "taskSearchResultsAccordion"
 };
 
 var TaskData = function() {
-
 	var projDbId = 0;
 	var actDbId = 0;
-	//var usrDbId = 0;
 	var taskDbId = 0;
 	var taskText = null;
 	var taskDesc = null;
+	var active = false;
 };
 
-//function validateTaskData(isAdmin, checkText, data) {
 function validateTaskData(checkText, data) {
 
 	var errorMsg = null;
@@ -50,11 +50,7 @@ function validateTaskData(checkText, data) {
 			errorMsg = "Select A Project";
 		} else if (data.actDbId <= 0) {
 			errorMsg = "Select An Activity";
-		} 
-//		else if (isAdmin && (data.usrDbId <= 0)) {
-//			errorMsg = "Select A User";
-//		}
-		else if ((data.taskText == null) && (checkText)) {
+		} else if ((data.taskText == null) && (checkText)) {
 			errorMsg = "Enter Task Text";
 		}
 	}
@@ -66,17 +62,17 @@ function populateTaskData(isNew, existingTaskRowId, tskId) {
 
 	var projId = 0;
 	var actId = 0;
-//	var usrId = 0;
 	var text = null;
 	var desc = null;
+	var active = false;
 
 	if (existingTaskRowId == null) {
 
 		projId = getDropDownValueAsInt(TaskConstants.newProjectSelectId);
 		actId = getDropDownValueAsInt(TaskConstants.newActivitySelectId);
-//		usrId = getDropDownValueAsInt(TaskConstants.newUserSelectId);
 		text = getTextInputValue(TaskConstants.newTaskTextInputId);
 		desc = getTextInputValue(TaskConstants.newTaskDescInputId);
+		active = getBooleanInputValue(TaskConstants.newTaskStatusInputId);
 
 	} else {
 
@@ -89,20 +85,20 @@ function populateTaskData(isNew, existingTaskRowId, tskId) {
 				// task being edited was newly created
 				text = trimToNull(rowElm.cells[TaskConstants.newTaskTextCellIdx].children[0].value);
 				desc = trimToNull(rowElm.cells[TaskConstants.newTaskDescCellIdx].children[0].value);
+				active = rowElm.cells[TaskConstants.newTaskStatusCellIdx].children[0].checked;
 
 				projId = getDropDownValueAsInt(TaskConstants.newProjectSelectId);
 				actId = getDropDownValueAsInt(TaskConstants.newActivitySelectId);
-//				usrId = getDropDownValueAsInt(TaskConstants.newUserSelectId);
 
 			} else {
 
 				// task being edited was part of search results
 				text = trimToNull(rowElm.cells[TaskConstants.existTaskTextCellIdx].children[0].value);
 				desc = trimToNull(rowElm.cells[TaskConstants.existTaskDescCellIdx].children[0].value);
-
+				active = rowElm.cells[TaskConstants.existTaskStatusCellIdx].children[0].checked;
+				
 				projId = getDropDownValueAsInt(TaskConstants.existingProjSelectId);
 				actId = getDropDownValueAsInt(TaskConstants.existingActivitySelectId);
-//				usrId = getDropDownValueAsInt(TaskConstants.existingUserSelectId);
 			}
 
 		}
@@ -112,29 +108,18 @@ function populateTaskData(isNew, existingTaskRowId, tskId) {
 
 	data.projDbId = projId;
 	data.actDbId = actId;
-//	data.usrDbId = usrId;
 	data.taskDbId = tskId;
 	data.taskText = text;
 	data.taskDesc = desc;
+	data.active = active;
 
 	return data;
 }
 
-//function createTask(adminUser) {
 function createTask() {
 
-	// clear the target area
-	//$("#" + TaskConstants.newTaskDivId).html("");
-
 	var taskData = populateTaskData(true, null, 0);
-//	var taskValidationMsg = validateTaskData(adminUser, false, taskData);
 	var taskValidationMsg = validateTaskData(false, taskData);
-//	var userName = "Me";
-
-//	if (adminUser) {
-//		userName = getDropDownValueAsText(TaskConstants.newUserSelectId);
-//	}
-
 	var projName = projectArr[taskData.projDbId];
 	var actName = activityArr[taskData.actDbId];
 
@@ -149,9 +134,6 @@ function createTask() {
 		var deleteHTML = "<img alt='Delete' class='icon' title='" + taskDeleteTitle + "' src='" + deleteIcon
 				+ "' onclick=\"deleteTask('" + rowId + "'," + 0 + ")\" align='middle'>";
 
-//		var saveHTML = "<img alt='Save' align='middle' class='icon' title='" + taskSaveTitle + "' src='" + saveIcon
-//				+ "' onclick=\"saveTask(" + true + "," + adminUser + ",'" + rowId + "',0)\"/>";
-		
 		var saveHTML = "<img alt='Save' align='middle' class='icon' title='" + taskSaveTitle + "' src='" + saveIcon
 		+ "' onclick=\"saveTask(" + true + ",'" + rowId + "',0)\"/>";
 
@@ -163,9 +145,9 @@ function createTask() {
 			htmlText = htmlText + "<colgroup>";
 			htmlText = htmlText + "<col style='width: 15%' />";
 			htmlText = htmlText + "<col style='width: 15%' />";
-//			htmlText = htmlText + "<col style='width: 12%' />";
 			htmlText = htmlText + "<col style='width: 23%' />";
-			htmlText = htmlText + "<col style='width: 39%' />";
+			htmlText = htmlText + "<col style='width: 35%' />";
+			htmlText = htmlText + "<col style='width: 4%' />";
 			htmlText = htmlText + "<col style='width: 4%' />";
 			htmlText = htmlText + "<col style='width: 4%' />";
 			htmlText = htmlText + "</colgroup>";
@@ -174,9 +156,9 @@ function createTask() {
 			htmlText = htmlText + "<tr align='center'>";
 			htmlText = htmlText + "<th>Project</th>";
 			htmlText = htmlText + "<th>Activity</th>";
-//			htmlText = htmlText + "<th>User</th>";
 			htmlText = htmlText + "<th>Task</th>";
 			htmlText = htmlText + "<th>Description</th>";
+			htmlText = htmlText + "<th>Active ?</th>";
 			htmlText = htmlText + "<th colspan='2'>&nbsp;</th>";
 			htmlText = htmlText + "</tr>";
 			htmlText = htmlText + "</thead>";
@@ -184,13 +166,14 @@ function createTask() {
 			htmlText = htmlText + "<tr id ='" + rowId + "'>";
 			htmlText = htmlText + "<td>" + projName + "</td>";
 			htmlText = htmlText + "<td>" + actName + "</td>";
-//			htmlText = htmlText + "<td>" + userName + "</td>";
 			htmlText = htmlText
 					+ "<td><input type='text' class='activityAreaEdit' style='margin:0; padding-left:0.5em;' id='"
 					+ TaskConstants.newTaskTextInputId + "' maxlength='20'/></td>";
 			htmlText = htmlText
 					+ "<td><input type='text' class='activityAreaEdit' style='margin:0; padding-left:0.5em;' id='"
 					+ TaskConstants.newTaskDescInputId + "' maxlength='50'/></td>";
+			htmlText = htmlText  
+					+ "<td><input type='checkbox' id='" + TaskConstants.newTaskStatusInputId + "' checked='checked'/></td>";
 
 			htmlText = htmlText + "<td>" + saveHTML + "</td>";
 			htmlText = htmlText + "<td>" + deleteHTML + "</td>";
@@ -207,11 +190,12 @@ function createTask() {
 			bodyHTML = bodyHTML + "<tr id ='" + rowId + "'>";
 			bodyHTML = bodyHTML + "<td>" + projName + "</td>";
 			bodyHTML = bodyHTML + "<td>" + actName + "</td>";
-//			bodyHTML = bodyHTML + "<td>" + userName + "</td>";
 			bodyHTML = bodyHTML + "<td><input type='text' class='activityAreaEdit' id='"
 					+ TaskConstants.newTaskTextInputId + "' maxlength='20'/></td>";
 			bodyHTML = bodyHTML + "<td><input type='text' class='activityAreaEdit' id='"
 					+ TaskConstants.newTaskDescInputId + "' maxlength='50'/></td>";
+			bodyHTML = bodyHTML  
+			+ "<td><input type='checkbox' id='" + TaskConstants.newTaskStatusInputId + "' checked='checked'/></td>";
 
 			bodyHTML = bodyHTML + "<td>" + saveHTML + "</td>";
 			bodyHTML = bodyHTML + "<td>" + deleteHTML + "</td>";
@@ -268,14 +252,11 @@ function deleteTask(taskRowId, taskDbId) {
 	}
 };
 
-//function editTask(isNew, isAdmin, taskRowElmId, taskDbId) {
 function editTask(isNew, taskRowElmId, taskDbId) {
 
 	var text = null;
 	var desc = null;
-//	var saveHTML = "<img alt='Save' align='middle' class='icon' title='" + taskSaveTitle + "' src='" + saveIcon
-//			+ "' onclick=\"saveTask(" + isNew + "," + isAdmin + ",'" + taskRowElmId + "'," + taskDbId + ")\"/>";
-
+	
 	var saveHTML = "<img alt='Save' align='middle' class='icon' title='" + taskSaveTitle + "' src='" + saveIcon
 	+ "' onclick=\"saveTask(" + isNew + ",'" + taskRowElmId + "'," + taskDbId + ")\"/>";
 	
@@ -284,6 +265,7 @@ function editTask(isNew, taskRowElmId, taskDbId) {
 	if (isNew) {
 		text = taskRow.cells[TaskConstants.newTaskTextCellIdx].innerHTML;
 		desc = taskRow.cells[TaskConstants.newTaskDescCellIdx].innerHTML;
+		
 		taskRow.cells[TaskConstants.newTaskTextCellIdx].innerHTML = "<input type='text' class='activityAreaEdit' id='"
 				+ TaskConstants.taskTextInputId + "' value ='" + text + "'maxlength='20'/>";
 		taskRow.cells[TaskConstants.newTaskDescCellIdx].innerHTML = "<input type='text' class='activityAreaEdit' id='"
@@ -292,6 +274,7 @@ function editTask(isNew, taskRowElmId, taskDbId) {
 	} else {
 		text = taskRow.cells[TaskConstants.existTaskTextCellIdx].innerHTML;
 		desc = taskRow.cells[TaskConstants.existTaskDescCellIdx].innerHTML;
+		
 		taskRow.cells[TaskConstants.existTaskTextCellIdx].innerHTML = "<input type='text' class='activityAreaEdit' id='"
 				+ TaskConstants.taskTextInputId + "' value ='" + text + "'maxlength='20'/>";
 		taskRow.cells[TaskConstants.existTaskDescCellIdx].innerHTML = "<input type='text' class='activityAreaEdit' id='"
@@ -301,11 +284,9 @@ function editTask(isNew, taskRowElmId, taskDbId) {
 
 };
 
-//function saveTask(isNew, isAdmin, taskRowElmId, taskDbId) {
 function saveTask(isNew, taskRowElmId, taskDbId) {
 
 	var data = populateTaskData(isNew, taskRowElmId, taskDbId);
-//	var errMsg = validateTaskData(isAdmin, true, data);
 	var errMsg = validateTaskData(true, data);
 
 	if (errMsg == null) {
@@ -314,9 +295,9 @@ function saveTask(isNew, taskRowElmId, taskDbId) {
 			operation : "SAVE_TASK",
 			projectId : data.projDbId,
 			activityId : data.actDbId,
-//			userDbId : data.usrDbId,
 			taskId : data.taskDbId,
 			text : data.taskText,
+			status : data.active,
 			description : data.taskDesc
 		}, function(data) {
 
@@ -330,11 +311,6 @@ function saveTask(isNew, taskRowElmId, taskDbId) {
 				taskRow.id = taskRowId;
 
 				var desc = null;
-				// replace the save icon with edit icon
-//				var editHTML = "<img alt='Edit' align='middle' class='icon' title='" + taskEditTitle + "' src='"
-//						+ editIcon + "' onclick=\"editTask(" + isNew + "," + isAdmin + ",'" + taskRowId + "',"
-//						+ jsonData.code + ")\"/>";
-				
 				var editHTML = "<img alt='Edit' align='middle' class='icon' title='" + taskEditTitle + "' src='"
 				+ editIcon + "' onclick=\"editTask(" + isNew + ",'" + taskRowId + "',"
 				+ jsonData.code + ")\"/>";
@@ -359,7 +335,6 @@ function saveTask(isNew, taskRowElmId, taskDbId) {
 	}
 }
 
-//function searchTasks(isAdmin) {
 function searchTasks() {
 
 	var projId = getDropDownValueAsInt(TaskConstants.existingProjSelectId);
@@ -370,7 +345,6 @@ function searchTasks() {
 		operation : "TASKS",
 		projectId : projId,
 		activityId : actId,
-//		userDbId : usrId,
 		status : statusId
 	}, function(data) {
 
@@ -402,7 +376,6 @@ function searchTasks() {
 				searchHTML = searchHTML + "<table style='width: 70%;'>";
 				searchHTML = searchHTML + "<colgroup>";
 				searchHTML = searchHTML + "<col style='width: 16%' />";
-//				searchHTML = searchHTML + "<col style='width: 12%' />";
 				searchHTML = searchHTML + "<col style='width: 26%' />";
 				searchHTML = searchHTML + "<col style='width: 52%' />";
 				searchHTML = searchHTML + "<col style='width: 4%' />";
@@ -411,7 +384,6 @@ function searchTasks() {
 				searchHTML = searchHTML + "<thead>";
 				searchHTML = searchHTML + "<tr>";
 				searchHTML = searchHTML + "<th>Activity</th>";
-//				searchHTML = searchHTML + "<th>User</th>";
 				searchHTML = searchHTML + "<th>Task</th>";
 				searchHTML = searchHTML + "<th>Description</th>";
 				searchHTML = searchHTML + "<th colspan='2'>&nbsp;</th>";
@@ -430,7 +402,6 @@ function searchTasks() {
 						
 						searchHTML = searchHTML + "<tr id='"+rowId+"'>";
 						searchHTML = searchHTML + "<td>"+activity.activityName+"</td>";
-//						searchHTML = searchHTML + "<td>"+task.taskUser+"</td>";
 						searchHTML = searchHTML + "<td>"+task.taskName+"</td>";
 						searchHTML = searchHTML + "<td>";
 						
@@ -440,7 +411,6 @@ function searchTasks() {
 						
 						searchHTML = searchHTML + "</td>";
 						searchHTML = searchHTML + "<td align='center'>";
-//						searchHTML = searchHTML + "<img alt='Edit' align='middle' class='icon' title='"+taskEditTitle+"' src='"+editIcon+"' onclick=\"editTask(false,"+isAdmin+",'"+rowId+"',"+task.taskId+")\"/>";
 						searchHTML = searchHTML + "<img alt='Edit' align='middle' class='icon' title='"+taskEditTitle+"' src='"+editIcon+"' onclick=\"editTask(false,'"+rowId+"',"+task.taskId+")\"/>";
 						searchHTML = searchHTML + "</td>";
 						searchHTML = searchHTML + "<td align='center'>";
@@ -539,6 +509,4 @@ $(function() {
 			}
 		}
 	});
-
 });
-
