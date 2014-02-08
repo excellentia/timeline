@@ -97,10 +97,10 @@
 								<table style="width: 80%;">
 									<colgroup>
 										<col style="width: 16%" />
-										<col style="width: 24%" />
-										<col style="width: 40%" />
+										<col style="width: 26%" />
+										<col style="width: 44%" />
 										<col style="width: 4%" />
-										<col style="width: 8%" />
+										<col style="width: 4%" />
 										<col style="width: 4%" />
 										<col style="width: 4%" />
 									</colgroup>
@@ -109,7 +109,7 @@
 											<th>Activity</th>
 											<th>Task</th>
 											<th>Description</th>
-											<th>Active ?</th>
+											<th>Story Points</th>
 											<th>Active ?</th>
 											<th colspan="2">&nbsp;</th>
 										</tr>
@@ -124,6 +124,7 @@
 													<td>${taskReply.getActivityName(activityId)}</td>
 													<td>${task.value}</td>
 													<td>${taskReply.getTaskDetail(task.code)}</td>
+													<td>${taskReply.getTaskStoryPoints(task.code)}</td>
 													<td align="center" title="Toggle Task Status">
 														<c:set var="taskCheckId" value="task_check_${task.code}"/>
 														<input id="${taskCheckId}" type='checkbox' value='${task.status}' <c:if test="${task.status}">checked="checked"</c:if> onchange="toggleTaskStatus('${rowId}','${taskCheckId}',${task.code})" />
