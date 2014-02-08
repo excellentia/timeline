@@ -27,6 +27,8 @@ var searchEndDate = null;
 var searchProjId = null;
 var searchActId = null;
 
+var newEntryRowCount = 0;
+
 /**
  * Updates Weekly Sum of a given Time Entry Row.
  * 
@@ -378,6 +380,7 @@ function addEntryRow(tableID) {
 					var tbody = table.tBodies[0];
 					var rowCount = tbody.rows.length;
 					var newId = rowCount;
+					newEntryRowCount = rowCount;
 
 					var row = tbody.insertRow(rowCount);
 					var rowId = "entry_" + newId;
@@ -399,7 +402,6 @@ function addEntryRow(tableID) {
 					}
 					
 					var selectId = "project_" + newId;
-
 					var projectHTML = "<select class='timeEntrySelectEdit' size='1' id='" + selectId + "' onchange=\"populateActivities('" + selectId + "',null)\"><option value='0'>Select Project...</option>";
 					var optionHTML = '';
 
