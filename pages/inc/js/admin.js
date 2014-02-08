@@ -223,7 +223,7 @@ function editActivity(actElmId, actDbId, projDbId) {
 	var oldValue = nameCell.innerHTML;
 	var editRowId = "name_"+actElmId;
 	
-	var actInput = "<input type='text' name='activityText' id='"+editRowId+"' value='" + oldValue + "' class='activityAreaEdit' />";
+	var actInput = "<input type='text' name='activityText' id='"+editRowId+"' value='" + oldValue + "' class='activityAreaEdit' maxlength='20'/>";
 	nameCell.innerHTML = actInput;
 
 	actRow.children[AdminConstants.activityModifyCellIdx].innerHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='"
@@ -250,7 +250,7 @@ function addNewActivity(tableID, projDbId) {
 	var row = table.insertRow(rowCount - 1);
 	row.id = newId;
 
-	var activityHTML = "<input type='text' value='' class='activityAreaEdit' />";
+	var activityHTML = "<input type='text' value='' class='activityAreaEdit' maxlength='20'/>";
 	var saveHTML = "<img alt='Save' align='middle' class='icon' title='" + saveTitle + "' src='" + saveIcon
 			+ "' onclick=\"saveActivity('" + newId + "',0," + projDbId + ")\"/>";
 	var deleteHTML = "<img alt='Delete' align='middle' class='icon' title='" + activityDeleteTitle + "' src='"
@@ -542,7 +542,7 @@ function editProject(projTitleId, projDbId) {
 	var textId = projDbId + "_ajaxEdit";
 	var oldValue = row.cells[0].innerHTML;
 
-	var projectHTML = "<input type='text' id='" + textId + "' class='projectAreaEdit' value='" + oldValue + "' />";
+	var projectHTML = "<input type='text' id='" + textId + "' class='projectAreaEdit' value='" + oldValue + "' maxlength='20'/>";
 
 	row.cells[0].innerHTML = projectHTML;
 
