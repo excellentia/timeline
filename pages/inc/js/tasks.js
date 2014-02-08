@@ -5,6 +5,7 @@ var TaskConstants = {
 	newActivitySelectId : "newTaskActivityId",
 	newTaskTextInputId : "newTaskText",
 	newTaskDescInputId : "newTaskDescription",
+	newTaskSizeInputId : "newTaskSize",
 	newTaskStatusInputId : "newTaskStatus",
 
 	newTaskBodyId : "newTaskBody",
@@ -12,13 +13,15 @@ var TaskConstants = {
 
 	newTaskTextCellIdx : 2,
 	newTaskDescCellIdx : 3,
-	newTaskStatusCellIdx : 4,
-	newTaskEditIconCellIdx : 5,
+	newTaskSizeCellIdx : 4,
+	newTaskStatusCellIdx : 5,
+	newTaskEditIconCellIdx : 6,
 	
 	existTaskTextCellIdx : 1,
 	existTaskDescCellIdx : 2,
-	existTaskStatusCellIdx : 3,
-	existTaskEditIconCellIdx : 4,
+	existTaskSizeCellIdx : 3,
+	existTaskStatusCellIdx : 4,
+	existTaskEditIconCellIdx : 5,
 
 	existingProjSelectId : "searchProjectId",
 	existingActivitySelectId : "searchActivityId",
@@ -35,6 +38,7 @@ var TaskData = function() {
 	var taskText = null;
 	var taskDesc = null;
 	var active = false;
+	var storyPoints = 0;
 };
 
 function validateTaskData(checkText, data) {
@@ -52,6 +56,8 @@ function validateTaskData(checkText, data) {
 			errorMsg = "Select An Activity";
 		} else if ((data.taskText == null) && (checkText)) {
 			errorMsg = "Enter Task Text";
+		} else if(data.storyPoints < 0) {
+			errorMsg = "Story Points cannot be negative";
 		}
 	}
 
@@ -65,6 +71,7 @@ function populateTaskData(isNew, existingTaskRowId, tskId) {
 	var text = null;
 	var desc = null;
 	var active = false;
+	var storyPoints = 0;
 
 	if (existingTaskRowId == null) {
 
@@ -73,6 +80,7 @@ function populateTaskData(isNew, existingTaskRowId, tskId) {
 		text = getTextInputValue(TaskConstants.newTaskTextInputId);
 		desc = getTextInputValue(TaskConstants.newTaskDescInputId);
 		active = getBooleanInputValue(TaskConstants.newTaskStatusInputId);
+		storyPoints = getValidInt(getTextInputValue(TaskConstants.newTaskSizeInputId));
 
 	} else {
 
@@ -86,6 +94,7 @@ function populateTaskData(isNew, existingTaskRowId, tskId) {
 				text = trimToNull(rowElm.cells[TaskConstants.newTaskTextCellIdx].children[0].value);
 				desc = trimToNull(rowElm.cells[TaskConstants.newTaskDescCellIdx].children[0].value);
 				active = rowElm.cells[TaskConstants.newTaskStatusCellIdx].children[0].checked;
+				storyPoints = getValidInt(trimToNull(rowElm.cells[TaskConstants.newTaskSizeCellIdx].children[0].value));
 
 				projId = getDropDownValueAsInt(TaskConstants.newProjectSelectId);
 				actId = getDropDownValueAsInt(TaskConstants.newActivitySelectId);
@@ -96,6 +105,7 @@ function populateTaskData(isNew, existingTaskRowId, tskId) {
 				text = trimToNull(rowElm.cells[TaskConstants.existTaskTextCellIdx].children[0].value);
 				desc = trimToNull(rowElm.cells[TaskConstants.existTaskDescCellIdx].children[0].value);
 				active = rowElm.cells[TaskConstants.existTaskStatusCellIdx].children[0].checked;
+				storyPoints = getValidInt(trimToNull(rowElm.cells[TaskConstants.existTaskSizeCellIdx].children[0].value));
 				
 				projId = getDropDownValueAsInt(TaskConstants.existingProjSelectId);
 				actId = getDropDownValueAsInt(TaskConstants.existingActivitySelectId);
@@ -112,6 +122,7 @@ function populateTaskData(isNew, existingTaskRowId, tskId) {
 	data.taskText = text;
 	data.taskDesc = desc;
 	data.active = active;
+	data.storyPoints = storyPoints;
 
 	return data;
 }
@@ -140,14 +151,15 @@ function createTask() {
 		if (newTaskBody == null) {
 
 			var htmlText = "";
-			htmlText = htmlText + "<table style='width: 70%;'>";
+			htmlText = htmlText + "<table style='width: 80%;'>";
 
 			htmlText = htmlText + "<colgroup>";
-			htmlText = htmlText + "<col style='width: 15%' />";
-			htmlText = htmlText + "<col style='width: 15%' />";
-			htmlText = htmlText + "<col style='width: 23%' />";
-			htmlText = htmlText + "<col style='width: 35%' />";
-			htmlText = htmlText + "<col style='width: 4%' />";
+			htmlText = htmlText + "<col style='width: 12%' />";
+			htmlText = htmlText + "<col style='width: 12%' />";
+			htmlText = htmlText + "<col style='width: 20%' />";
+			htmlText = htmlText + "<col style='width: 36%' />";
+			htmlText = htmlText + "<col style='width: 6%' />";
+			htmlText = htmlText + "<col style='width: 6%' />";
 			htmlText = htmlText + "<col style='width: 4%' />";
 			htmlText = htmlText + "<col style='width: 4%' />";
 			htmlText = htmlText + "</colgroup>";
@@ -158,6 +170,7 @@ function createTask() {
 			htmlText = htmlText + "<th>Activity</th>";
 			htmlText = htmlText + "<th>Task</th>";
 			htmlText = htmlText + "<th>Description</th>";
+			htmlText = htmlText + "<th>Story Points</th>";
 			htmlText = htmlText + "<th>Active ?</th>";
 			htmlText = htmlText + "<th colspan='2'>&nbsp;</th>";
 			htmlText = htmlText + "</tr>";
@@ -166,14 +179,13 @@ function createTask() {
 			htmlText = htmlText + "<tr id ='" + rowId + "'>";
 			htmlText = htmlText + "<td>" + projName + "</td>";
 			htmlText = htmlText + "<td>" + actName + "</td>";
-			htmlText = htmlText
-					+ "<td><input type='text' class='activityAreaEdit' style='margin:0; padding-left:0.5em;' id='"
+			htmlText = htmlText	+ "<td><input type='text' class='activityAreaEdit' style='margin:0; padding-left:0.5em;' id='"
 					+ TaskConstants.newTaskTextInputId + "' maxlength='20'/></td>";
-			htmlText = htmlText
-					+ "<td><input type='text' class='activityAreaEdit' style='margin:0; padding-left:0.5em;' id='"
+			htmlText = htmlText	+ "<td><input type='text' class='activityAreaEdit' style='margin:0; padding-left:0.5em;' id='"
 					+ TaskConstants.newTaskDescInputId + "' maxlength='50'/></td>";
-			htmlText = htmlText  
-					+ "<td><input type='checkbox' id='" + TaskConstants.newTaskStatusInputId + "' checked='checked'/></td>";
+			htmlText = htmlText	+ "<td><input type='text' class='activityAreaEdit' style='margin:0; padding:0; width: 3em; text-align: center' id='"
+					+ TaskConstants.newTaskSizeInputId + "' maxlength='3' value = '0'/></td>";
+			htmlText = htmlText + "<td><input type='checkbox' id='" + TaskConstants.newTaskStatusInputId + "' checked='checked'/></td>";
 
 			htmlText = htmlText + "<td>" + saveHTML + "</td>";
 			htmlText = htmlText + "<td>" + deleteHTML + "</td>";
@@ -191,22 +203,20 @@ function createTask() {
 			bodyHTML = bodyHTML + "<td>" + projName + "</td>";
 			bodyHTML = bodyHTML + "<td>" + actName + "</td>";
 			bodyHTML = bodyHTML + "<td><input type='text' class='activityAreaEdit' id='"
-					+ TaskConstants.newTaskTextInputId + "' maxlength='20'/></td>";
+						+ TaskConstants.newTaskTextInputId + "' maxlength='20'/></td>";
 			bodyHTML = bodyHTML + "<td><input type='text' class='activityAreaEdit' id='"
-					+ TaskConstants.newTaskDescInputId + "' maxlength='50'/></td>";
-			bodyHTML = bodyHTML  
-			+ "<td><input type='checkbox' id='" + TaskConstants.newTaskStatusInputId + "' checked='checked'/></td>";
+						+ TaskConstants.newTaskDescInputId + "' maxlength='50'/></td>";
+			bodyHTML = bodyHTML + "<td><input type='text' class='activityAreaEdit' style='text-align: center' id='"
+						+ TaskConstants.newTaskSizeInputId + "' maxlength='3' value = '0'/></td>";
+			bodyHTML = bodyHTML + "<td><input type='checkbox' id='" + TaskConstants.newTaskStatusInputId + "' checked='checked'/></td>";
 
 			bodyHTML = bodyHTML + "<td>" + saveHTML + "</td>";
 			bodyHTML = bodyHTML + "<td>" + deleteHTML + "</td>";
 			bodyHTML = bodyHTML + "</tr>";
 
 			newTaskBody.innerHTML = bodyHTML;
-
 		}
-
 	} else {
-
 		displayAlert(taskValidationMsg);
 	}
 }
@@ -256,6 +266,7 @@ function editTask(isNew, taskRowElmId, taskDbId) {
 
 	var text = null;
 	var desc = null;
+	var size = 0;
 	
 	var saveHTML = "<img alt='Save' align='middle' class='icon' title='" + taskSaveTitle + "' src='" + saveIcon
 	+ "' onclick=\"saveTask(" + isNew + ",'" + taskRowElmId + "'," + taskDbId + ")\"/>";
@@ -265,20 +276,26 @@ function editTask(isNew, taskRowElmId, taskDbId) {
 	if (isNew) {
 		text = taskRow.cells[TaskConstants.newTaskTextCellIdx].innerHTML;
 		desc = taskRow.cells[TaskConstants.newTaskDescCellIdx].innerHTML;
+		size = taskRow.cells[TaskConstants.newTaskSizeCellIdx].innerHTML;
 		
 		taskRow.cells[TaskConstants.newTaskTextCellIdx].innerHTML = "<input type='text' class='activityAreaEdit' id='"
 				+ TaskConstants.taskTextInputId + "' value ='" + text + "'maxlength='20'/>";
 		taskRow.cells[TaskConstants.newTaskDescCellIdx].innerHTML = "<input type='text' class='activityAreaEdit' id='"
 				+ TaskConstants.taskDescInputId + "' value ='" + desc + "'maxlength='50'/>";
+		taskRow.cells[TaskConstants.newTaskSizeCellIdx].innerHTML = "<input type='text' class='activityAreaEdit' style='margin:0; padding: 0; text-align: center' "
+			+ TaskConstants.newTaskSizeInputId + " value ='" + size + "'maxlength='3'/>";
 		taskRow.cells[TaskConstants.newTaskEditIconCellIdx].innerHTML = saveHTML;
 	} else {
 		text = taskRow.cells[TaskConstants.existTaskTextCellIdx].innerHTML;
 		desc = taskRow.cells[TaskConstants.existTaskDescCellIdx].innerHTML;
+		size = taskRow.cells[TaskConstants.existTaskSizeCellIdx].innerHTML;
 		
-		taskRow.cells[TaskConstants.existTaskTextCellIdx].innerHTML = "<input type='text' class='activityAreaEdit' id='"
-				+ TaskConstants.taskTextInputId + "' value ='" + text + "'maxlength='20'/>";
-		taskRow.cells[TaskConstants.existTaskDescCellIdx].innerHTML = "<input type='text' class='activityAreaEdit' id='"
-				+ TaskConstants.taskDescInputId + "' value ='" + desc + "'maxlength='50'/>";
+		taskRow.cells[TaskConstants.existTaskTextCellIdx].innerHTML = "<input type='text' class='activityAreaEdit' "
+				+ "value ='" + text + "'maxlength='20'/>";
+		taskRow.cells[TaskConstants.existTaskDescCellIdx].innerHTML = "<input type='text' class='activityAreaEdit' "
+				+ "value ='" + desc + "'maxlength='50'/>";
+		taskRow.cells[TaskConstants.existTaskSizeCellIdx].innerHTML = "<input type='text' class='activityAreaEdit' style='margin:0; padding: 0; text-align: center' "
+				+ "value ='" + size + "'maxlength='3'/>";
 		taskRow.cells[TaskConstants.existTaskEditIconCellIdx].innerHTML = saveHTML;
 	}
 
@@ -298,7 +315,8 @@ function saveTask(isNew, taskRowElmId, taskDbId) {
 			taskId : data.taskDbId,
 			text : data.taskText,
 			status : data.active,
-			description : data.taskDesc
+			description : data.taskDesc,
+			size : data.storyPoints
 		}, function(data) {
 
 			var jsonData = data;
@@ -310,7 +328,10 @@ function saveTask(isNew, taskRowElmId, taskDbId) {
 				var taskRowId = "taskRow_" + jsonData.code;
 				taskRow.id = taskRowId;
 
+				var taskText = null;
 				var desc = null;
+				var size = null;
+				
 				var editHTML = "<img alt='Edit' align='middle' class='icon' title='" + taskEditTitle + "' src='"
 				+ editIcon + "' onclick=\"editTask(" + isNew + ",'" + taskRowId + "',"
 				+ jsonData.code + ")\"/>";
@@ -318,14 +339,26 @@ function saveTask(isNew, taskRowElmId, taskDbId) {
 
 				// replace the text boxes with plain text
 				if (isNew) {
-					taskRow.cells[TaskConstants.newTaskTextCellIdx].innerHTML = jsonData.value;
+					taskText = jsonData.value;
 					desc = taskRow.cells[TaskConstants.newTaskDescCellIdx].children[0].value;
+					size = taskRow.cells[TaskConstants.newTaskSizeCellIdx].children[0].value;
+					
+					taskRow.cells[TaskConstants.newTaskTextCellIdx].innerHTML = taskText;
 					taskRow.cells[TaskConstants.newTaskDescCellIdx].innerHTML = desc;
+					taskRow.cells[TaskConstants.newTaskSizeCellIdx].innerHTML = size;
+					
 					taskRow.cells[TaskConstants.newTaskEditIconCellIdx].innerHTML = editHTML;
+					
 				} else {
-					taskRow.cells[TaskConstants.existTaskTextCellIdx].innerHTML = jsonData.value;
+					
+					taskText = jsonData.value;
 					desc = taskRow.cells[TaskConstants.existTaskDescCellIdx].children[0].value;
+					size = taskRow.cells[TaskConstants.existTaskSizeCellIdx].children[0].value;
+					
+					taskRow.cells[TaskConstants.existTaskTextCellIdx].innerHTML = taskText;
 					taskRow.cells[TaskConstants.existTaskDescCellIdx].innerHTML = desc;
+					taskRow.cells[TaskConstants.existTaskSizeCellIdx].innerHTML = size; 
+					
 					taskRow.cells[TaskConstants.existTaskEditIconCellIdx].innerHTML = editHTML;
 				}
 			}
@@ -373,11 +406,13 @@ function searchTasks() {
 				
 				searchHTML = searchHTML + "<h3><a href='#taskSection'"+i+">" +project.projectName+ "</a></h3>";
 				searchHTML = searchHTML + "<div>";
-				searchHTML = searchHTML + "<table style='width: 70%;'>";
+				searchHTML = searchHTML + "<table style='width: 80%;'>";
 				searchHTML = searchHTML + "<colgroup>";
 				searchHTML = searchHTML + "<col style='width: 16%' />";
 				searchHTML = searchHTML + "<col style='width: 26%' />";
-				searchHTML = searchHTML + "<col style='width: 52%' />";
+				searchHTML = searchHTML + "<col style='width: 44%' />";
+				searchHTML = searchHTML + "<col style='width: 4%' />";
+				searchHTML = searchHTML + "<col style='width: 4%' />";
 				searchHTML = searchHTML + "<col style='width: 4%' />";
 				searchHTML = searchHTML + "<col style='width: 4%' />";
 				searchHTML = searchHTML + "</colgroup>";
@@ -386,10 +421,14 @@ function searchTasks() {
 				searchHTML = searchHTML + "<th>Activity</th>";
 				searchHTML = searchHTML + "<th>Task</th>";
 				searchHTML = searchHTML + "<th>Description</th>";
+				searchHTML = searchHTML + "<th>Story Points</th>";
+				searchHTML = searchHTML + "<th>Active ?</th>";
 				searchHTML = searchHTML + "<th colspan='2'>&nbsp;</th>";
 				searchHTML = searchHTML + "</tr>";
 				searchHTML = searchHTML + "</thead>";
 				searchHTML = searchHTML + "<tbody id='timeTable_body' class='reportBody'>";
+				
+				var checkElmId = null;
 				
 				for ( var j = 0; j < project.activities.length; j++) {
 					
@@ -399,14 +438,20 @@ function searchTasks() {
 						
 						task = activity.tasks[k];
 						rowId = "task_"+ task.taskId;
+						checkElmId = "task_check_" + task.taskId;
 						
 						searchHTML = searchHTML + "<tr id='"+rowId+"'>";
 						searchHTML = searchHTML + "<td>"+activity.activityName+"</td>";
 						searchHTML = searchHTML + "<td>"+task.taskName+"</td>";
+						searchHTML = searchHTML + "<td>"+trimToEmpty(task.taskDescription)+"</td>";
+						searchHTML = searchHTML + "<td>"+task.size+"</td>";
 						searchHTML = searchHTML + "<td>";
+						searchHTML = searchHTML + "<input type='checkbox' id='" + checkElmId + "' onchange =\"toggleTaskStatus('" + rowId +"','" + checkElmId + "',"+ task.taskId+")\" ";
 						
-						if(trimToNull(task.taskDescription) != null) {
-							searchHTML = searchHTML + task.taskDescription;
+						if(task.active) {
+							searchHTML = searchHTML + " checked='checked' />";
+						} else {
+							searchHTML = searchHTML + " />";
 						}
 						
 						searchHTML = searchHTML + "</td>";
