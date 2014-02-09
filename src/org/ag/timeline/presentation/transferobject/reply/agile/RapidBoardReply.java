@@ -4,6 +4,7 @@
 package org.ag.timeline.presentation.transferobject.reply.agile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.Map;
 import org.ag.timeline.business.model.Activity;
 import org.ag.timeline.business.model.Project;
 import org.ag.timeline.business.model.Task;
+import org.ag.timeline.common.CodeValueComparator;
 import org.ag.timeline.presentation.transferobject.common.CodeValue;
 import org.ag.timeline.presentation.transferobject.reply.BusinessReply;
 import org.ag.timeline.presentation.transferobject.reply.ProjectData;
@@ -58,6 +60,7 @@ public class RapidBoardReply extends BusinessReply {
 		if ((this.activityMap != null) && (this.activityMap.keySet() != null)) {
 			list = new ArrayList<Long>();
 			list.addAll(this.activityMap.keySet());
+			Collections.sort(list);
 		}
 
 		return list;
@@ -68,6 +71,7 @@ public class RapidBoardReply extends BusinessReply {
 
 		if ((this.activityTaskMap != null) && (this.activityTaskMap.keySet() != null)) {
 			list = this.activityTaskMap.get(activityId);
+			Collections.sort(list, new CodeValueComparator());
 		}
 
 		return list;
