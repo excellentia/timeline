@@ -3183,7 +3183,7 @@ public class TimelineServiceImpl implements TimelineService {
 							}
 						}
 							break;
-							
+
 						case TASK: {
 							Task task = (Task) session.get(Task.class, id);
 
@@ -3981,14 +3981,10 @@ public class TimelineServiceImpl implements TimelineService {
 					Long projectId = searchParameters.getProjectId();
 					Long activityId = searchParameters.getActivityId();
 					Long taskId = searchParameters.getTaskId();
-					// Long userId = searchParameters.getUserDbId();
 
-					if (projectId > 0) {
-						criteria.add(Restrictions.eq("project.id", projectId));
-					}
-
-					if (activityId > 0) {
-						criteria.add(Restrictions.eq("activity.id", activityId));
+					if ((projectId > 0) && (activityId > 0)) {
+						criteria.add(Restrictions.and(Restrictions.eq("project.id", projectId),
+								Restrictions.eq("activity.id", activityId)));
 					}
 
 					if (taskId > 0) {
@@ -4523,6 +4519,10 @@ public class TimelineServiceImpl implements TimelineService {
 						final Long projectId = activity.getProject().getId();
 						final String text = TextHelper.trimToNull(input.getTaskText());
 						final String details = TextHelper.trimToNull(input.getTaskDescription());
+						final long storyPoints = input.getStoryPoints();
+
+						// tasks created are active by default
+						final boolean active = Boolean.TRUE;
 
 						// check if existing task is present
 						Criteria criteria = session.createCriteria(Task.class);
@@ -4545,9 +4545,13 @@ public class TimelineServiceImpl implements TimelineService {
 							task.setActivity(activity);
 							task.setText(text);
 							task.setDetails(details);
+							task.setStoryPoints(storyPoints);
+							task.setActive(active);
 
+							// save task
 							session.saveOrUpdate(task);
 
+							// set success message in reply
 							reply.setSuccessMessage("Created Successfully");
 						}
 					} else {
@@ -4688,7 +4692,7 @@ public class TimelineServiceImpl implements TimelineService {
 		final CodeValueReply reply = new CodeValueReply();
 		Task task = null;
 
-		if ((input != null) && (input.getTaskId() > 0)
+		if ((input != null) && (input.getTaskId() > 0) && (input.getStoryPoints() >= 0)
 				&& ((input.getTaskText() != null) || (input.getActivityId() > 0))) {
 
 			try {
@@ -4756,6 +4760,24 @@ public class TimelineServiceImpl implements TimelineService {
 								hasError = true;
 							}
 
+						}
+					}
+
+					// check for storyPoints change
+					if (!hasError) {
+
+						final long storyPoints = input.getStoryPoints();
+
+						if (storyPoints >= 0) {
+
+							if (storyPoints != task.getStoryPoints()) {
+								task.setStoryPoints(storyPoints);
+							}
+
+						} else {
+							// incorrect storyPoints specified.
+							reply.setErrorMessage("Invalid Story Points specified.");
+							hasError = true;
 						}
 					}
 
@@ -4830,7 +4852,7 @@ public class TimelineServiceImpl implements TimelineService {
 					Task task = (Task) session.get(Task.class, taskId);
 
 					if (task != null) {
-						
+
 						Map<Long, String> userMap = new HashMap<Long, String>();
 
 						{
