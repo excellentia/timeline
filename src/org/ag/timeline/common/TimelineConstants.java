@@ -167,7 +167,8 @@ public interface TimelineConstants {
 		spe,
 		bug,
 		taskId,
-		description;
+		description,
+		size;
 
 		public static final AjaxRequestParam getParam(String text) {
 			AjaxRequestParam type = null;

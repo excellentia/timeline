@@ -110,6 +110,22 @@ public class TaskInput extends AbstractTimelineInput {
 	public void setTaskDescription(String text) {
 		this.task.setDetails(text);
 	}
+	
+	/**
+	 * Getter for storyPoints.
+	 * @return the storyPoints
+	 */
+	public long getStoryPoints() {
+		return this.task.getStoryPoints();
+	}
+
+	/**
+	 * Setter for storyPoints.
+	 * @param storyPoints the storyPoints to set
+	 */
+	public void setStoryPoints(long storyPoints) {
+		this.task.setStoryPoints(storyPoints);
+	}
 
 	/*
 	 * (non-Javadoc)
