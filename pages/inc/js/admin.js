@@ -3,6 +3,7 @@ var AdminConstants = {
 	activityModifyCellIdx : 1,
 	activityDeleteCellIdx : 2	
 };
+
 /**
  * Deletes a Project.
  * 
