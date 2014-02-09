@@ -80,7 +80,7 @@ function editTimeEntry(rowElmId, projDbId, actDbId, taskDbId, entryDbId) {
 		{
 			projSelId = "project_" + entryDbId;
 			
-			var projectHTML = "<select size='1' class='timeEntrySelectEdit' name='project' id='" + projSelId + "' onchange=\"populateActivities('" + projSelId + "', null)\"><option value='0'>Select Project...</option>";
+			var projectHTML = "<select size='1' class='timeEntrySelectEdit' name='project' id='" + projSelId + "' onchange=\"populateActivitiesAndTask('" + projSelId + "', null, true)\"><option value='0'>Select Project...</option>";
 			var optionHTML = "";
 			
 			if ((projectsAvailableJSON != null) && (projectsAvailableJSON.projects != null)) {
@@ -402,7 +402,7 @@ function addEntryRow(tableID) {
 					}
 					
 					var selectId = "project_" + newId;
-					var projectHTML = "<select class='timeEntrySelectEdit' size='1' id='" + selectId + "' onchange=\"populateActivities('" + selectId + "',null)\"><option value='0'>Select Project...</option>";
+					var projectHTML = "<select class='timeEntrySelectEdit' size='1' id='" + selectId + "' onchange=\"populateActivitiesAndTask('" + selectId + "',null,true)\"><option value='0'>Select Project...</option>";
 					var optionHTML = '';
 
 					for ( var i = 0; i < jsonData.projects.length; i++) {

@@ -12,7 +12,6 @@ var saveIcon = "./pages/inc/icons/save.png";
 var resetIcon = "./pages/inc/icons/reset.png";
 var adminIcon = "./pages/inc/icons/admin.png";
 var noteIcon = "./pages/inc/icons/note.png";
-//var calendarIcon = "./pages/inc/images/calendar.gif";
 var emailIcon ="./pages/inc/icons/email.png";
 var calendarIcon ="./pages/inc/icons/calendar.png";
 var addIcon ="./pages/inc/icons/add.png";
@@ -67,13 +66,7 @@ function focus(elementId) {
 	
 };
 
-/**
- * Populates the Activities of a project in a Drop Down.
- * 
- * @param projElmId
- * @param activityElmId
- */
-function populateActivities(projElmId, activityElmId) {
+function populateActivitiesAndTask(projElmId, activityElmId, handleTask) {
 
 	var selectElm = document.getElementById(projElmId);
 
@@ -95,9 +88,10 @@ function populateActivities(projElmId, activityElmId) {
 						
 					} else {
 					if (activityElmId == null) {
-						var actElmId = "activity_"+selectedProjectId;
+						var actElmId = "activity_"+selectedProjectId+"_"+newEntryRowCount;
 						var activitySelectHTML = "<select size='1' class='timeEntrySelectEdit' name='activity' id='" + actElmId + "' ";
 						activitySelectHTML = activitySelectHTML +"onchange=\"populateTasks('"+projElmId+"','" + actElmId+"',null)\">";
+						
 						var optionHTML = "<option value='0'>Select Activity</option>";
 
 						for ( var j = 0; j < jsonData.activities.length; j++) {
@@ -138,25 +132,43 @@ function populateActivities(projElmId, activityElmId) {
 				var newRow = selectElm.parentNode.parentNode;
 				newRow.cells[2].innerHTML = "";
 				newRow.cells[3].innerHTML = "";
+
+				if(handleTask) {
+					newRow.cells[4].innerHTML = "";
+				}
 			} else {
 				var selectElm = document.getElementById(activityElmId);
 				var optionHTML = "<option value='0' selected='selected'>All Activities</option>";
 				selectElm.innerHTML = optionHTML;
+				
+				if(handleTask) {
+					var taskSelectElm = document.getElementById("searchTaskId");
+					var optionHTML = "<option value='0' selected='selected'>All Tasks</option>";
+					taskSelectElm.innerHTML = optionHTML;					
+				}
 			}
 		}
 	}
 }
 
 /**
- * Populates the Tasks of a project and activity combination in a Drop Down.
+ * Populates the Activities of a project in a Drop Down.
+ * 
+ * @param projElmId
+ * @param activityElmId
+ */
+function populateActivities(projElmId, activityElmId) {
+	populateActivitiesAndTask(projElmId, activityElmId, false);	
+}
+
+/**
+ * Populates the Active Tasks of a project and activity combination in a Drop Down.
  * 
  * @param projElmId
  * @param actElmId
  * @param taskElmId
  */
 function populateTasks(projElmId, actElmId, taskElmId) {
-
-	
 
 	var selectElm = document.getElementById(projElmId);
 
@@ -174,7 +186,8 @@ function populateTasks(projElmId, actElmId, taskElmId) {
 					JSON_URL, {
 						operation : "TASKS",
 						projectId : selectedProjectId,
-						activityId : selectedActivityId
+						activityId : selectedActivityId,
+						status : 1
 					},
 					function(data) {
 						var jsonData = data;
@@ -235,8 +248,7 @@ function populateTasks(projElmId, actElmId, taskElmId) {
 								
 								if (taskElmId == null) {
 									//new time entry section
-									var selectElm = document.getElementById(actElmId);
-									var newRow = selectElm.parentNode.parentNode;
+									var newRow = document.getElementById("entry_"+newEntryRowCount);
 									newRow.cells[4].innerHTML = taskSelectHTML;
 								} else {
 									//search section
@@ -374,6 +386,23 @@ function trimToNull(strVal) {
 
 	if ((strVal != null) && (strVal.trim() != "") && (strVal.trim() != '') && (strVal != "null")) {
 		retVal = strVal.trim();
+	}
+
+	return retVal;
+}
+
+/**
+ * Utility Method - Trims an incoming String to empty("").
+ * 
+ * @param strVal
+ * @returns
+ */
+function trimToEmpty(strVal) {
+
+	var retVal = trimToNull(strVal);
+
+	if (retVal == null) {
+		retVal = "";
 	}
 
 	return retVal;

@@ -206,7 +206,7 @@ function createTask() {
 						+ TaskConstants.newTaskTextInputId + "' maxlength='20'/></td>";
 			bodyHTML = bodyHTML + "<td><input type='text' class='activityAreaEdit' id='"
 						+ TaskConstants.newTaskDescInputId + "' maxlength='50'/></td>";
-			bodyHTML = bodyHTML + "<td><input type='text' class='activityAreaEdit' style='text-align: center' id='"
+			bodyHTML = bodyHTML + "<td><input type='text' class='activityAreaEdit' style='margin:0; padding:0; width: 3em; text-align: center' id='"
 						+ TaskConstants.newTaskSizeInputId + "' maxlength='3' value = '0'/></td>";
 			bodyHTML = bodyHTML + "<td><input type='checkbox' id='" + TaskConstants.newTaskStatusInputId + "' checked='checked'/></td>";
 
