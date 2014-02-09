@@ -12,10 +12,6 @@ public class TaskStageRow implements Comparable<TaskStageRow> {
 
 	private String stageName = null;
 
-	// private Date startDate = null;
-
-	// private Date endDate = null;
-
 	private Date changeDate = null;
 
 	private String modifierUser = null;
@@ -37,42 +33,6 @@ public class TaskStageRow implements Comparable<TaskStageRow> {
 	public void setStageName(String stageName) {
 		this.stageName = stageName;
 	}
-
-	// /**
-	// * Getter for startDate.
-	// *
-	// * @return the startDate
-	// */
-	// public Date getStartDate() {
-	// return startDate;
-	// }
-	//
-	// /**
-	// * Setter for startDate.
-	// *
-	// * @param startDate the startDate to set
-	// */
-	// public void setStartDate(Date startDate) {
-	// this.startDate = startDate;
-	// }
-	//
-	// /**
-	// * Getter for endDate.
-	// *
-	// * @return the endDate
-	// */
-	// public Date getEndDate() {
-	// return endDate;
-	// }
-	//
-	// /**
-	// * Setter for endDate.
-	// *
-	// * @param endDate the endDate to set
-	// */
-	// public void setEndDate(Date endDate) {
-	// this.endDate = endDate;
-	// }
 
 	/**
 	 * Getter for modifierUser.
@@ -119,10 +79,6 @@ public class TaskStageRow implements Comparable<TaskStageRow> {
 		StringBuilder builder = new StringBuilder();
 		builder.append("TaskStageRow [stageName=");
 		builder.append(stageName);
-		// builder.append(", startDate=");
-		// builder.append(startDate);
-		// builder.append(", endDate=");
-		// builder.append(endDate);
 		builder.append(", changeDate=");
 		builder.append(changeDate);
 		builder.append(", modifierUser=");
