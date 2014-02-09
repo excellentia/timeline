@@ -378,6 +378,7 @@ final class AuditHelper {
 				map.put("active", "Active");
 				map.put("details", "Description");
 				map.put("activity", "Activity");
+				map.put("storyPoints", "Story Points");
 
 				entityFieldNameMap.put(Task.class.getSimpleName(), map);
 			}
