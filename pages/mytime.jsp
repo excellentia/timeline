@@ -110,7 +110,7 @@
 				</div>
 				<%-- Project --%>
 				<div style="display: inline; padding: 0; margin: 0; margin-left: 2em;">
-					<select id="searchProjectId" name="searchProjectId" size="1" class="dateSearch" title="Select Project" onchange="populateActivities('searchProjectId', 'searchActivityId')">
+					<select id="searchProjectId" name="searchProjectId" size="1" class="dateSearch" title="Select Project" onchange="populateActivitiesAndTask('searchProjectId', 'searchActivityId',true)">
 						<option value="0" <c:if test="${selectedProjId == 0}">selected="selected"</c:if>>All Projects</option>
 						<c:forEach var="project" items="${PROJECT_LIST.projects}">
 							<option value="${project.code}" <c:if test="${selectedProjId == project.code}">selected="selected"</c:if>>${project.value}</option>
