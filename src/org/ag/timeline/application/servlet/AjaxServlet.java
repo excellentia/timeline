@@ -432,11 +432,10 @@ public class AjaxServlet extends HttpServlet {
 
 										builder.append("{");
 										builder.append("\"taskId\" : \"").append(taskId).append("\",");
-										// builder.append("\"taskUser\" : \"").append(taskReply.getTaskUserName(taskId)).append("\",");
 										builder.append("\"taskName\" : \"").append(task.getValue()).append("\",");
 										builder.append("\"active\" : \"").append(task.isStatus()).append("\",");
-										builder.append("\"taskDescription\" : \"")
-												.append(taskReply.getTaskDetail(taskId)).append("\"");
+										builder.append("\"size\" : \"").append(taskReply.getTaskStoryPoints(taskId)).append("\",");
+										builder.append("\"taskDescription\" : \"").append(taskReply.getTaskDetail(taskId)).append("\"");
 										builder.append("},");
 									}
 
@@ -1513,8 +1512,9 @@ public class AjaxServlet extends HttpServlet {
 		final long taskId = getLongRequestValue(TimelineConstants.AjaxRequestParam.taskId, request);
 		final String taskText = getStringRequestValue(TimelineConstants.AjaxRequestParam.text, request);
 		final String taskDesc = getStringRequestValue(TimelineConstants.AjaxRequestParam.description, request);
+		final long size = getLongRequestValue(TimelineConstants.AjaxRequestParam.size, request);
 
-		if (taskText != null) {
+		if ((taskText != null) && (size >= 0)) {
 
 			boolean hasEnoughData = false;
 
@@ -1536,9 +1536,9 @@ public class AjaxServlet extends HttpServlet {
 					input.setActivityId(activityId);
 					input.setProjectId(projectId);
 					input.setTaskText(this.getFormattedTaskText(taskText));
-					// input.setUserDbId(userDbId);
 					input.setTaskDescription(taskDesc);
 					input.setTaskId(taskId);
+					input.setStoryPoints(size);
 
 					if (taskId > 0) {
 						reply = SERVICE.modifyTask(input);
