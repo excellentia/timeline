@@ -82,6 +82,7 @@ public class TaskDetailReply extends BusinessReply {
 			this.detailRow.setTaskCreateDate(task.getCreateDate());
 			this.detailRow.setActive(task.isActive());
 			this.detailRow.setCreateUserName(createUserName);
+			this.detailRow.setStoryPoints(task.getStoryPoints());
 		}
 	}
 
