@@ -28,6 +28,8 @@ public class RapidBoardReply extends BusinessReply {
 
 	private Map<Long, String> activityMap = null;
 
+	private Map<Long, Long> activitySizeMap = null;
+
 	private Map<Long, List<CodeValue>> activityTaskMap = null;
 
 	/**
@@ -38,6 +40,7 @@ public class RapidBoardReply extends BusinessReply {
 		this.projectData = new ProjectData();
 		this.activityMap = new HashMap<Long, String>();
 		this.activityTaskMap = new HashMap<Long, List<CodeValue>>();
+		this.activitySizeMap = new HashMap<Long, Long>();
 	}
 
 	/**
@@ -71,7 +74,10 @@ public class RapidBoardReply extends BusinessReply {
 
 		if ((this.activityTaskMap != null) && (this.activityTaskMap.keySet() != null)) {
 			list = this.activityTaskMap.get(activityId);
-			Collections.sort(list, new CodeValueComparator());
+			
+			if ((list != null) && (list.size() > 0)) {
+				Collections.sort(list, new CodeValueComparator());
+			}
 		}
 
 		return list;
@@ -143,7 +149,27 @@ public class RapidBoardReply extends BusinessReply {
 				taskList.add(new CodeValue(task.getId(), task.getText()));
 				this.activityTaskMap.put(activityId, taskList);
 				this.activityMap.put(task.getActivity().getId(), task.getActivity().getName());
+
+				long size = 0;
+
+				if (activitySizeMap.containsKey(activityId)) {
+					size = activitySizeMap.get(activityId);
+				}
+
+				size = size + task.getStoryPoints();
+				activitySizeMap.put(activityId, size);
+
 			}
 		}
+	}
+
+	public long getActivitySize(long activityId) {
+		long size = 0;
+
+		if ((this.activitySizeMap != null) && (this.activitySizeMap.containsKey(activityId))) {
+			size = this.activitySizeMap.get(activityId);
+		}
+
+		return size;
 	}
 }

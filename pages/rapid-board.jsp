@@ -45,6 +45,7 @@
 								</c:forEach>
 							</c:if>
 						</ul>
+						<div class="smallFont">&Sigma; Story Points : ${reply.getActivitySize(activityId)}</div>
 					</div>
 				</c:forEach>
 			</c:if>
