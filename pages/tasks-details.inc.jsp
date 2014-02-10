@@ -114,7 +114,7 @@
 				<tfoot>
 					<tr>
 						<td colspan="2" class="label" style="text-align: center">TOTAL</td>
-						<td style="text-align: center">${totalTime}</td>
+						<td style="text-align: center"><fmt:formatNumber value="${totalTime}" minFractionDigits="1" maxFractionDigits="1"/></td>
 					</tr>
 				</tfoot>
 				<c:remove var="totalTime" />
