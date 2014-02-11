@@ -229,7 +229,12 @@ public class ExportAction extends SecureBaseAction {
 		searchParameters.setEndDate(endDate);
 		searchParameters.setProjectId(this.exportProjectId);
 		searchParameters.setUserId(this.exportUserDbId);
-
+		
+		searchParameters.setStartWeekNum( TextHelper.getWeekNumber(startDate));
+		searchParameters.setStartYear( TextHelper.getYearForWeekDay(startDate));
+		searchParameters.setEndWeekNum( TextHelper.getWeekNumber(endDate));
+		searchParameters.setEndYear( TextHelper.getYearForWeekDay(endDate));
+		
 		TimeDataReply reply = service.searchTimeData(searchParameters);
 
 		ExcelManager manager = new ExcelManager();
