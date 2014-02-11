@@ -123,6 +123,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#autheticateUser(
 	 * org.ag.timeline.presentation.transferobject.input.AuthenticationInput)
@@ -216,6 +217,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#createActivity(org
 	 * .ag.timeline.presentation.transferobject.input.CodeValueInput)
@@ -315,6 +317,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#createProject(java
 	 * .lang.String)
@@ -415,12 +418,14 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#deleteProject(long)
 	 */
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#createTimeData(org
 	 * .ag.timeline.presentation.transferobject.input.TimeDataInput)
@@ -600,6 +605,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#modifyProject(long,
 	 * java.lang.String)
@@ -696,6 +702,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#deleteActivity(long)
 	 */
@@ -783,6 +790,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#modifyActivity(long,
 	 * long, java.lang.String)
@@ -869,6 +877,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#createUser(java.
 	 * lang.String, java.lang.String)
@@ -943,6 +952,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#modifyUser(long,
 	 * java.lang.String, java.lang.String)
@@ -1030,6 +1040,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#deleteUser(long)
 	 */
@@ -1098,6 +1109,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#resetUserCredentials
 	 * (long)
@@ -1435,6 +1447,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#deleteTimeData(long)
 	 */
@@ -1511,6 +1524,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#createUserPreferences
 	 * (long, long)
@@ -1627,6 +1641,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#deleteUserPreferences
 	 * (long)
@@ -1634,6 +1649,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#modifyTimeData(org
 	 * .ag.timeline.presentation.transferobject.input.TimeDataInput)
@@ -1768,6 +1784,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#modifyUser(org.ag
 	 * .timeline.presentation.transferobject.input.UserInput)
@@ -1827,26 +1844,26 @@ public class TimelineServiceImpl implements TimelineService {
 
 							if (type != null) {
 								switch (type) {
-									case ADMIN:
-										user.setAdmin(adminFlag);
-										break;
-									case FIRST_NAME:
-										user.setFirstName(first);
-										break;
-									case LAST_NAME:
-										user.setLastName(last);
-										break;
-									case PASSWORD:
-										user.setPassword(password);
-										break;
-									case USER_ID:
-										user.setUserId(userId);
-										break;
-									case ACTIVE:
-										user.setActive(activeFlag);
-										break;
-									default:
-										break;
+								case ADMIN:
+									user.setAdmin(adminFlag);
+									break;
+								case FIRST_NAME:
+									user.setFirstName(first);
+									break;
+								case LAST_NAME:
+									user.setLastName(last);
+									break;
+								case PASSWORD:
+									user.setPassword(password);
+									break;
+								case USER_ID:
+									user.setUserId(userId);
+									break;
+								case ACTIVE:
+									user.setActive(activeFlag);
+									break;
+								default:
+									break;
 								}
 							} else {
 								user.setFirstName(first);
@@ -1904,6 +1921,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#saveUserPreferences
 	 * (org.ag.timeline.presentation.transferobject.input.UserPreferencesInput)
@@ -1966,17 +1984,17 @@ public class TimelineServiceImpl implements TimelineService {
 
 						} else {
 							switch (type) {
-								case QUESTION:
-									preferences.setQuestion(question);
-									break;
-								case ANSWER:
-									preferences.setAnswer(answer);
-									break;
-								case EMAIL:
-									preferences.setEmail(email);
-									break;
-								default:
-									break;
+							case QUESTION:
+								preferences.setQuestion(question);
+								break;
+							case ANSWER:
+								preferences.setAnswer(answer);
+								break;
+							case EMAIL:
+								preferences.setEmail(email);
+								break;
+							default:
+								break;
 							}
 						}
 
@@ -2027,6 +2045,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#resetUserCredentials
 	 * (org.ag.timeline.presentation.transferobject.input.CodeValueInput)
@@ -2098,6 +2117,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchActivities
 	 * (org.
@@ -2196,6 +2216,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchProjects(org
 	 * .ag.timeline.presentation.transferobject.search.ProjectSearchParameter)
@@ -2214,14 +2235,14 @@ public class TimelineServiceImpl implements TimelineService {
 			long time = System.nanoTime();
 			Long projectId = 0l;
 			String projectName = null;
-			boolean searchActiveProjects = false;
-
+			TimelineConstants.EntityStatus status = null;
 			Criteria criteria = session.createCriteria(Project.class);
+			
 
 			if (searchParameters != null) {
 				projectId = searchParameters.getProjectId();
 				projectName = TextHelper.trimToNull(searchParameters.getProjectName());
-				searchActiveProjects = searchParameters.isSearchActiveProjects();
+				status = searchParameters.getEntityStatus();
 			}
 
 			if (projectId > 0) {
@@ -2232,8 +2253,21 @@ public class TimelineServiceImpl implements TimelineService {
 				criteria.add(Restrictions.ilike("name", projectName.toLowerCase(), MatchMode.ANYWHERE));
 			}
 
-			if (searchActiveProjects) {
-				criteria.add(Restrictions.eq("active", Boolean.TRUE));
+			if (status != null) {
+
+				switch (status) {
+				case ACTIVE:
+					criteria.add(Restrictions.eq("active", Boolean.TRUE));
+					break;
+
+				case INACTIVE:
+					criteria.add(Restrictions.eq("active", Boolean.FALSE));
+					break;
+
+				case ALL:
+				default:
+					break;
+				}
 			}
 
 			// add order
@@ -2296,6 +2330,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchTimeData(org
 	 * .ag.timeline.presentation.transferobject.search.TimeDataSearchParameters)
@@ -2472,6 +2507,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchUserPreferences
 	 * (org.ag.timeline.presentation.transferobject.search.
@@ -2554,6 +2590,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchUsers(org.
 	 * ag.timeline.presentation.transferobject.search.UserSearchParameter)
@@ -2657,6 +2694,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchWeeks(org.
 	 * ag.timeline.presentation.transferobject.search.WeekSearchParameter)
@@ -2745,6 +2783,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#systemManagement()
 	 */
@@ -2885,6 +2924,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchAuditData(
 	 * org.ag
@@ -3153,54 +3193,54 @@ public class TimelineServiceImpl implements TimelineService {
 					boolean hasError = false;
 
 					switch (entity) {
-						case PROJECT: {
-							Project project = (Project) session.get(Project.class, id);
+					case PROJECT: {
+						Project project = (Project) session.get(Project.class, id);
 
-							if (project == null) {
-								hasError = true;
-								reply.setErrorMessage("Specified Project is not present in system.");
-							} else {
-								project.setActive(input.isActive());
-								session.update(project);
-								retVal = project.getName();
-							}
-						}
-							break;
-
-						case USER: {
-							User user = (User) session.get(User.class, id);
-
-							if (user == null) {
-								hasError = true;
-								reply.setErrorMessage("Specified User is not present in system.");
-							} else if (id == RequestContext.getTimelineContext().getContextUserId()) {
-								hasError = true;
-								reply.setErrorMessage("User can not change own status.");
-							} else {
-								user.setActive(input.isActive());
-								session.update(user);
-								retVal = user.getUserName();
-							}
-						}
-							break;
-
-						case TASK: {
-							Task task = (Task) session.get(Task.class, id);
-
-							if (task == null) {
-								hasError = true;
-								reply.setErrorMessage("Specified Task is not present in System.");
-							} else {
-								task.setActive(input.isActive());
-								session.update(task);
-								retVal = task.getText();
-							}
-						}
-							break;
-
-						default:
+						if (project == null) {
 							hasError = true;
-							break;
+							reply.setErrorMessage("Specified Project is not present in system.");
+						} else {
+							project.setActive(input.isActive());
+							session.update(project);
+							retVal = project.getName();
+						}
+					}
+						break;
+
+					case USER: {
+						User user = (User) session.get(User.class, id);
+
+						if (user == null) {
+							hasError = true;
+							reply.setErrorMessage("Specified User is not present in system.");
+						} else if (id == RequestContext.getTimelineContext().getContextUserId()) {
+							hasError = true;
+							reply.setErrorMessage("User can not change own status.");
+						} else {
+							user.setActive(input.isActive());
+							session.update(user);
+							retVal = user.getUserName();
+						}
+					}
+						break;
+
+					case TASK: {
+						Task task = (Task) session.get(Task.class, id);
+
+						if (task == null) {
+							hasError = true;
+							reply.setErrorMessage("Specified Task is not present in System.");
+						} else {
+							task.setActive(input.isActive());
+							session.update(task);
+							retVal = task.getText();
+						}
+					}
+						break;
+
+					default:
+						hasError = true;
+						break;
 					}
 
 					if (!hasError) {
@@ -3957,6 +3997,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	@Override
 	public TaskReply searchTasks(TaskSearchParameter searchParameters) throws TimelineException {
+		
 		Session session = null;
 		Transaction transaction = null;
 		final TaskReply reply = new TaskReply();
@@ -3974,25 +4015,38 @@ public class TimelineServiceImpl implements TimelineService {
 				Criteria criteria = session.createCriteria(Task.class);
 				criteria.createAlias("project", "project");
 				criteria.createAlias("activity", "activity");
-				// criteria.createAlias("user", "user");
+				criteria.add(Restrictions.eq("project.active", Boolean.TRUE));
+				TimelineConstants.EntityStatus status = searchParameters.getEntityStatus();
 
-				if (!searchParameters.isSearchAllTasks()) {
+				if (status != null) {
 
-					Long projectId = searchParameters.getProjectId();
-					Long activityId = searchParameters.getActivityId();
-					Long taskId = searchParameters.getTaskId();
+					switch (status) {
+						case ACTIVE:
+						case INACTIVE: {
+							
+							final boolean onlyActive = status.equals(TimelineConstants.EntityStatus.ACTIVE);
+							Long projectId = searchParameters.getProjectId();
+							Long activityId = searchParameters.getActivityId();
+							Long taskId = searchParameters.getTaskId();
+	
+							if ((projectId > 0) && (activityId > 0)) {
+								criteria.add(Restrictions.and(Restrictions.eq("project.id", projectId),
+										Restrictions.eq("activity.id", activityId)));
+							}
+	
+							if (taskId > 0) {
+								criteria.add(Restrictions.eq("id", taskId));
+							}
+							
+							criteria.add(Restrictions.eq("active", onlyActive));
+						}
+						
+						break;
 
-					if ((projectId > 0) && (activityId > 0)) {
-						criteria.add(Restrictions.and(Restrictions.eq("project.id", projectId),
-								Restrictions.eq("activity.id", activityId)));
+					case ALL:
+					default:
+						break;
 					}
-
-					if (taskId > 0) {
-						criteria.add(Restrictions.eq("id", taskId));
-					}
-
-					// will search active/inactive tasks only
-					criteria.add(Restrictions.eq("active", searchParameters.isSearchActiveTasks()));
 				}
 
 				// add order
