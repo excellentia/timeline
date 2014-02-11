@@ -129,6 +129,35 @@ public interface TimelineConstants {
 		}
 	}
 
+	public static enum EntityStatus {
+		
+		ALL(0), ACTIVE(1), INACTIVE(2);
+
+		private final int typeId;
+
+		private EntityStatus(final int id) {
+			this.typeId = id;
+		}
+
+		public final int getTypeId() {
+			return this.typeId;
+		}
+
+		public static final EntityStatus getEntityStatus(final int typeId) {
+			EntityStatus retVal = null;
+			EntityStatus[] vals = EntityStatus.values();
+
+			for (EntityStatus op : vals) {
+				if (typeId == op.getTypeId()) {
+					retVal = op;
+					break;
+				}
+			}
+
+			return retVal;
+		}
+	}
+
 	public static enum AjaxRequestParam {
 		operation,
 		id,
