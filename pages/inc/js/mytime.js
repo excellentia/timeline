@@ -148,52 +148,59 @@ function editTimeEntry(rowElmId, projDbId, actDbId, taskDbId, entryDbId) {
 							status : 1
 						},
 						function(data) {
+						
 							var jsonData = data;
-							var elmId = 0;
-							var elmText = null;
 							
-							var project = null;
-							var activity = null;
-							var task = null;
-							
-							for ( var i = 0; i < jsonData.projects.length; i++) {
-							
-								project = jsonData.projects[i];
+							if(jsonData.error) {
+								activityRow.cells[TASK_CELLINDEX].innerHTML ="";
+								displayAlert("No Task Available For Selected Activity. Setup Tasks First.");
+							} else {
+								var elmId = 0;
+								var elmText = null;
 								
-								if(project.projectId == projDbId) {
+								var project = null;
+								var activity = null;
+								var task = null;
+								
+								for ( var i = 0; i < jsonData.projects.length; i++) {
+								
+									project = jsonData.projects[i];
 									
-									for ( var j = 0; j < project.activities.length; j++) {
+									if (project.projectId == projDbId) {
 										
-										activity =  project.activities[j];
-										
-										if(activity.activityId == actDbId) {
+										for ( var j = 0; j < project.activities.length; j++) {
 											
-											for ( var k = 0; k < activity.tasks.length; k++) {
+											activity =  project.activities[j];
+											
+											if(activity.activityId == actDbId) {
 												
-												task = activity.tasks[k];
-												
-												elmId = task.taskId;
-												elmText = task.taskName;
-												
-												taskOptionHTML = taskOptionHTML + "<option value='" + elmId + "'";
+												for ( var k = 0; k < activity.tasks.length; k++) {
+													
+													task = activity.tasks[k];
+													
+													elmId = task.taskId;
+													elmText = task.taskName;
+													
+													taskOptionHTML = taskOptionHTML + "<option value='" + elmId + "'";
 
-												if (taskDbId == elmId) {
-													taskOptionHTML = taskOptionHTML + " selected='selected' ";
+													if (taskDbId == elmId) {
+														taskOptionHTML = taskOptionHTML + " selected='selected' ";
+													}
+													
+													taskOptionHTML = taskOptionHTML + ">" + elmText + "</option>";
+													taskArr[elmId] = elmText;
 												}
 												
-												taskOptionHTML = taskOptionHTML + ">" + elmText + "</option>";
-												taskArr[elmId] = elmText;
+												break;
 											}
-											
-											break;
 										}
 									}
 								}
-							}
 
-							taskSelectHtml = taskSelectHtml + taskOptionHTML + "</select>";
-							activityRow.cells[TASK_CELLINDEX].innerHTML = taskSelectHtml;
-							activityRow.cells[TASK_CELLINDEX].id = taskSelectId;
+								taskSelectHtml = taskSelectHtml + taskOptionHTML + "</select>";
+								activityRow.cells[TASK_CELLINDEX].innerHTML = taskSelectHtml;
+								activityRow.cells[TASK_CELLINDEX].id = taskSelectId;
+							}
 					});
 				}
 			});
