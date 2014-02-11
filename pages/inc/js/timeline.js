@@ -63,7 +63,6 @@ function focus(elementId) {
 		$('#'+elementId).focus();
 	}
 	
-	
 };
 
 function populateActivitiesAndTask(projElmId, activityElmId, handleTask) {
