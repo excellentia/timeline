@@ -1,5 +1,6 @@
 package org.ag.timeline.presentation.action;
 
+import org.ag.timeline.common.TimelineConstants;
 import org.ag.timeline.presentation.transferobject.reply.TaskReply;
 import org.ag.timeline.presentation.transferobject.search.TaskSearchParameter;
 
@@ -15,7 +16,7 @@ public class TaskAction extends SecureBaseAction {
 	public String secureExecute() throws Exception {
 
 		TaskSearchParameter searchParameters = new TaskSearchParameter();
-		searchParameters.setSearchAllTasks(Boolean.TRUE);
+		searchParameters.setEntityStatus(TimelineConstants.EntityStatus.ALL);
 		taskReply = service.searchTasks(searchParameters);
 
 		return SUCCESS;
