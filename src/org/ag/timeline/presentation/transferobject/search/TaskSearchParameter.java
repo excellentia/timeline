@@ -14,8 +14,6 @@ public class TaskSearchParameter extends ActivitySearchParameter {
 
 	private Task task = null;
 
-	private boolean searchAllTasks = false;
-
 	/**
 	 * Constructor.
 	 */
@@ -59,29 +57,4 @@ public class TaskSearchParameter extends ActivitySearchParameter {
 		this.task.setText(taskName);
 	}
 
-	/**
-	 * Getter for searchAllTasks.
-	 * 
-	 * @return the searchAllTasks
-	 */
-	public boolean isSearchAllTasks() {
-		return searchAllTasks;
-	}
-
-	/**
-	 * Setter for searchAllTasks.
-	 * 
-	 * @param searchAllTasks the searchAllTasks to set
-	 */
-	public void setSearchAllTasks(boolean searchAllTasks) {
-		this.searchAllTasks = searchAllTasks;
-	}
-
-	public void setSearchActiveTasks(boolean active) {
-		this.task.setActive(active);
-	}
-
-	public boolean isSearchActiveTasks() {
-		return this.task.isActive();
-	}
 }

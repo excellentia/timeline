@@ -1,12 +1,13 @@
 package org.ag.timeline.presentation.transferobject.search;
 
 import org.ag.timeline.business.model.Project;
+import org.ag.timeline.common.TimelineConstants.EntityStatus;
 
 public class ProjectSearchParameter extends BasicSearchParameter {
 
 	private Project project = null;
 
-	private boolean searchActiveProjects = false;
+	private EntityStatus entityStatus = null;
 
 	/**
 	 * Constructor.
@@ -32,21 +33,21 @@ public class ProjectSearchParameter extends BasicSearchParameter {
 	}
 
 	/**
-	 * Getter for searchActiveProjects.
+	 * Getter for entityStatus.
 	 * 
-	 * @return the searchActiveProjects.
+	 * @return the entityStatus
 	 */
-	public boolean isSearchActiveProjects() {
-		return this.searchActiveProjects;
+	public EntityStatus getEntityStatus() {
+		return entityStatus;
 	}
 
 	/**
-	 * Setter for searchActiveProjects.
+	 * Setter for entityStatus.
 	 * 
-	 * @param searchActiveProjects the searchActiveProjects to set.
+	 * @param entityStatus the entityStatus to set
 	 */
-	public void setSearchActiveProjects(boolean searchActiveProjects) {
-		this.searchActiveProjects = searchActiveProjects;
+	public void setEntityStatus(EntityStatus entityStatus) {
+		this.entityStatus = entityStatus;
 	}
 
 }
