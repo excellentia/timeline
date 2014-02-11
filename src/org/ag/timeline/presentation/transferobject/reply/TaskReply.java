@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.ag.timeline.business.model.Activity;
 import org.ag.timeline.business.model.Project;
@@ -28,7 +29,7 @@ public class TaskReply extends BusinessReply {
 	// TODO:AG complete javadocs
 
 	private Map<Long, String> projectNameMap = null;
-
+	
 	private Map<Long, String> activityNameMap = null;
 
 	private Map<Long, CodeValue> taskDetailMap = null;
@@ -79,6 +80,7 @@ public class TaskReply extends BusinessReply {
 
 			// populate names
 			this.projectNameMap.put(projId, project.getName());
+			
 			this.activityNameMap.put(actId, activity.getName());
 
 			// populate activity Set
@@ -177,8 +179,14 @@ public class TaskReply extends BusinessReply {
 		List<Long> list = new ArrayList<Long>();
 
 		if (this.projectNameMap != null) {
-			list.addAll(this.projectNameMap.keySet());
-			Collections.sort(list);
+			
+			Map<String, Long> projectNameIdMap = new TreeMap<String, Long>();
+			
+			for (Long id : this.projectNameMap.keySet()) {
+				projectNameIdMap.put(this.projectNameMap.get(id), id);
+			}
+			
+			list.addAll(projectNameIdMap.values());
 		}
 
 		return list;
