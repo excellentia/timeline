@@ -192,16 +192,7 @@ function populateTasks(projElmId, actElmId, taskElmId) {
 					function(data) {
 						var jsonData = data;
 
-						if (jsonData.error) {
-						
-							//clear any previous tasks drop down
-							var selectElm = document.getElementById(actElmId);
-							var newRow = selectElm.parentNode.parentNode;
-							newRow.cells[4].innerHTML = "";
-							
-							displayAlert("No Task Available For Selected Activity. Setup Tasks First.");
-							
-						} else  {
+						if (!jsonData.error) {
 
 							var taskSelectId = null;
 							
@@ -255,6 +246,13 @@ function populateTasks(projElmId, actElmId, taskElmId) {
 									document.getElementById(taskElmId).innerHTML = taskSelectHTML;
 								}
 							}
+						} else {
+							//clear any previous tasks drop down
+							var selectElm = document.getElementById(actElmId);
+							var newRow = selectElm.parentNode.parentNode;
+							newRow.cells[4].innerHTML = "";
+							
+							displayAlert("No Task Available For Selected Activity. Setup Tasks First.");
 						}
 				}, JSON_RESULT_TYPE);
 			} 

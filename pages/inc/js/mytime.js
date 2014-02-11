@@ -105,7 +105,7 @@ function editTimeEntry(rowElmId, projDbId, actDbId, taskDbId, entryDbId) {
 		// activities
 		{
 			actSelectId = "activity_"+actDbId;
-			taskSelectId = "task_"+actDbId;
+			taskSelectId = "task_"+entryDbId;
 			
 			var activitySelectHTML = "<select size='1' name='activity' class='timeEntrySelectEdit' id='"
 			        + actSelectId + "' onchange=\"populateTasks('"+projSelId+"','"+actSelectId+"','"+taskSelectId+"')\">";
@@ -133,70 +133,72 @@ function editTimeEntry(rowElmId, projDbId, actDbId, taskDbId, entryDbId) {
 
 					activitySelectHTML = activitySelectHTML + optionHTML + "</select>";
 					activityRow.cells[2].innerHTML = activitySelectHTML;
+										
+					// tasks
+					{
+					var taskSelectHtml = "<select size='1' name='task' class='timeEntrySelectEdit'>";
+					var taskOptionHTML = "";
+
+					$.getJSON(
+						JSON_URL,
+						{
+							operation : "TASKS",
+							projectId : projDbId,
+							activityId : actDbId,
+							status : 1
+						},
+						function(data) {
+							var jsonData = data;
+							var elmId = 0;
+							var elmText = null;
+							
+							var project = null;
+							var activity = null;
+							var task = null;
+							
+							for ( var i = 0; i < jsonData.projects.length; i++) {
+							
+								project = jsonData.projects[i];
+								
+								if(project.projectId == projDbId) {
+									
+									for ( var j = 0; j < project.activities.length; j++) {
+										
+										activity =  project.activities[j];
+										
+										if(activity.activityId == actDbId) {
+											
+											for ( var k = 0; k < activity.tasks.length; k++) {
+												
+												task = activity.tasks[k];
+												
+												elmId = task.taskId;
+												elmText = task.taskName;
+												
+												taskOptionHTML = taskOptionHTML + "<option value='" + elmId + "'";
+
+												if (taskDbId == elmId) {
+													taskOptionHTML = taskOptionHTML + " selected='selected' ";
+												}
+												
+												taskOptionHTML = taskOptionHTML + ">" + elmText + "</option>";
+												taskArr[elmId] = elmText;
+											}
+											
+											break;
+										}
+									}
+								}
+							}
+
+							taskSelectHtml = taskSelectHtml + taskOptionHTML + "</select>";
+							activityRow.cells[TASK_CELLINDEX].innerHTML = taskSelectHtml;
+							activityRow.cells[TASK_CELLINDEX].id = taskSelectId;
+					});
+				}
 			});
 		}
 		
-		// tasks
-		{
-			var taskSelectHtml = "<select size='1' name='task' class='timeEntrySelectEdit' id='" + taskSelectId+ "'>";
-			var taskOptionHTML = "";
-
-			$.getJSON(
-				JSON_URL,
-				{
-					operation : "TASKS",
-					projectId : projDbId,
-					activityId : actDbId
-				},
-				function(data) {
-					var jsonData = data;
-					var elmId = 0;
-					var elmText = null;
-					
-					var project = null;
-					var activity = null;
-					var task = null;
-					
-					for ( var i = 0; i < jsonData.projects.length; i++) {
-					
-						project = jsonData.projects[i];
-						
-						if(project.projectId == projDbId) {
-							
-							for ( var j = 0; j < project.activities.length; j++) {
-								
-								activity =  project.activities[j];
-								
-								if(activity.activityId == actDbId) {
-									
-									for ( var k = 0; k < activity.tasks.length; k++) {
-										
-										task = activity.tasks[k];
-										
-										elmId = task.taskId;
-										elmText = task.taskName;
-										
-										taskOptionHTML = taskOptionHTML + "<option value='" + elmId + "'";
-
-										if (taskDbId == elmId) {
-											taskOptionHTML = taskOptionHTML + " selected='selected' ";
-										}
-										
-										taskOptionHTML = taskOptionHTML + ">" + elmText + "</option>";
-										taskArr[elmId] = elmText;
-									}
-									
-									break;
-								}
-							}
-						}
-					}
-
-					taskSelectHtml = taskSelectHtml + taskOptionHTML + "</select>";
-					activityRow.cells[TASK_CELLINDEX].innerHTML = taskSelectHtml;
-			});
-		}
-
 		// days
 		{
 			var selectPrefix = "<input type='text' class='timeEntryEdit' value='";
@@ -288,7 +290,7 @@ function saveTimeEntry(rowElmId, entryDbId, proxiedUserDbId) {
 			if ((timeData[i] != null) && (timeData[i] != "") && (!isNaN(timeData[i])) ) {
 				sum = sum + parseFloat(timeData[i], 10);
 			}
-			
+					
 		}
 
 		var weekStart = weekStartDate;
@@ -449,7 +451,8 @@ function addEntryRow(tableID) {
 					* Create Task Column
 					*/
 					newcell = row.insertCell(cellNum++);
-
+					newcell.id = "task_"+newEntryRowCount;
+					
 					/**
 					* Week Day
 					*/
@@ -652,7 +655,7 @@ function searchEntries(divId, tbodyElmId, accordId, adminUser) {
 								}
 
 								//task
-								weekHTML = weekHTML + "<td>" + entry.taskName + "</td>";
+								weekHTML = weekHTML + "<td id='task_"+entry.entryId+"'>" + entry.taskName + "</td>";
 								
 								//days
 								weekHTML = weekHTML + "<td>" + entry.day1 + "</td>";
@@ -666,7 +669,7 @@ function searchEntries(divId, tbodyElmId, accordId, adminUser) {
 
 								weekHTML = weekHTML
 									+ "<td align='center'><img alt='Edit' class='icon' title='"
-									+ editTitle + "' src='" + editIcon + "' onclick=\"editTimeEntry('"+ entryRowId + "'," + entry.projectId + "," + entry.activityId + "," + entry.entryId + ")\" align='middle'></td>";
+									+ editTitle + "' src='" + editIcon + "' onclick=\"editTimeEntry('"+ entryRowId + "'," + entry.projectId + "," + entry.activityId + "," + entry.taskId + "," + entry.entryId + ")\" align='middle'></td>";
 								weekHTML = weekHTML
 									+ "<td align='center'><img alt='Delete' class='icon' title='Delete this row' src='"
 									+ deleteIcon + "' onclick=\"deleteTimeEntry('" + entryRowId + "'," + entry.entryId + ")\" align='middle'></td>";
