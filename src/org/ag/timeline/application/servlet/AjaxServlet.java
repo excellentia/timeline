@@ -434,8 +434,10 @@ public class AjaxServlet extends HttpServlet {
 										builder.append("\"taskId\" : \"").append(taskId).append("\",");
 										builder.append("\"taskName\" : \"").append(task.getValue()).append("\",");
 										builder.append("\"active\" : \"").append(task.isStatus()).append("\",");
-										builder.append("\"size\" : \"").append(taskReply.getTaskStoryPoints(taskId)).append("\",");
-										builder.append("\"taskDescription\" : \"").append(taskReply.getTaskDetail(taskId)).append("\"");
+										builder.append("\"size\" : \"").append(taskReply.getTaskStoryPoints(taskId))
+												.append("\",");
+										builder.append("\"taskDescription\" : \"")
+												.append(taskReply.getTaskDetail(taskId)).append("\"");
 										builder.append("},");
 									}
 
@@ -513,11 +515,11 @@ public class AjaxServlet extends HttpServlet {
 
 		try {
 			final long id = getLongRequestValue(TimelineConstants.AjaxRequestParam.id, request);
-			final boolean searchActiveProjects = Boolean.valueOf(getStringRequestValue(
-					TimelineConstants.AjaxRequestParam.status, request));
+			final long searchScope = getLongRequestValue(TimelineConstants.AjaxRequestParam.status, request);
+
 			final ProjectSearchParameter searchParameters = new ProjectSearchParameter();
 			searchParameters.setProjectId(id);
-			searchParameters.setSearchActiveProjects(searchActiveProjects);
+			searchParameters.setEntityStatus(TimelineConstants.EntityStatus.getEntityStatus((int) searchScope));
 
 			ProjectReply reply = SERVICE.searchProjects(searchParameters);
 			String json = getJSON(reply);
@@ -722,6 +724,7 @@ public class AjaxServlet extends HttpServlet {
 		PrintWriter out = null;
 
 		try {
+
 			final long projectId = getLongRequestValue(TimelineConstants.AjaxRequestParam.projectId, request);
 			final long activityId = getLongRequestValue(TimelineConstants.AjaxRequestParam.activityId, request);
 			final long taskId = getLongRequestValue(TimelineConstants.AjaxRequestParam.taskId, request);
@@ -732,13 +735,7 @@ public class AjaxServlet extends HttpServlet {
 			searchParameters.setProjectId(projectId);
 			searchParameters.setActivityId(activityId);
 			searchParameters.setTaskId(taskId);
-
-			// set search all
-			if ((statusId == 0) || ((projectId == 0) && (activityId == 0) && (taskId == 0))) {
-				searchParameters.setSearchAllTasks(Boolean.TRUE);
-			} else if (statusId == 1) {
-				searchParameters.setSearchActiveTasks(Boolean.TRUE);
-			}
+			searchParameters.setEntityStatus(TimelineConstants.EntityStatus.getEntityStatus((int) statusId));
 
 			TaskReply reply = SERVICE.searchTasks(searchParameters);
 			String json = getJSON(reply);
@@ -877,23 +874,23 @@ public class AjaxServlet extends HttpServlet {
 				input.setType(type);
 
 				switch (type) {
-					case FIRST_NAME:
-						input.setFirstName(value);
-						break;
-					case LAST_NAME:
-						input.setLastName(value);
-						break;
-					case USER_ID:
-						input.setUserId(value);
-						break;
-					case PASSWORD:
-						input.setPassword(value);
-						break;
-					case ADMIN:
-						input.setAdmin(Boolean.valueOf(value));
-						break;
-					default:
-						break;
+				case FIRST_NAME:
+					input.setFirstName(value);
+					break;
+				case LAST_NAME:
+					input.setLastName(value);
+					break;
+				case USER_ID:
+					input.setUserId(value);
+					break;
+				case PASSWORD:
+					input.setPassword(value);
+					break;
+				case ADMIN:
+					input.setAdmin(Boolean.valueOf(value));
+					break;
+				default:
+					break;
 				}
 
 				try {
@@ -935,17 +932,17 @@ public class AjaxServlet extends HttpServlet {
 				input.setType(type);
 
 				switch (type) {
-					case QUESTION:
-						input.setQuestion(value);
-						break;
-					case ANSWER:
-						input.setAnswer(value);
-						break;
-					case EMAIL:
-						input.setEmail(value);
-						break;
-					default:
-						break;
+				case QUESTION:
+					input.setQuestion(value);
+					break;
+				case ANSWER:
+					input.setAnswer(value);
+					break;
+				case EMAIL:
+					input.setEmail(value);
+					break;
+				default:
+					break;
 				}
 
 				try {
@@ -1628,6 +1625,7 @@ public class AjaxServlet extends HttpServlet {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest
 	 * , javax.servlet.http.HttpServletResponse)
@@ -1639,6 +1637,7 @@ public class AjaxServlet extends HttpServlet {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest
 	 * , javax.servlet.http.HttpServletResponse)
@@ -1702,7 +1701,8 @@ public class AjaxServlet extends HttpServlet {
 				modifyUserPreferences(request, response);
 			} else if (TimelineConstants.OperationType.SEARCH_ENTRIES.toString().equalsIgnoreCase(typeStr)) {
 				searchEntries(request, response);
-			} else if (TimelineConstants.OperationType.SEARCH_USERS_WITHOUT_ENTRIES.toString().equalsIgnoreCase(typeStr)) {
+			} else if (TimelineConstants.OperationType.SEARCH_USERS_WITHOUT_ENTRIES.toString()
+					.equalsIgnoreCase(typeStr)) {
 				searchUsersWithoutEntries(request, response);
 			} else if (TimelineConstants.OperationType.REPORT_DETAIL.toString().equalsIgnoreCase(typeStr)) {
 				getReportDetails(request, response);
