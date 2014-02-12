@@ -253,14 +253,15 @@ function populateTasks(projElmId, actElmId, taskElmId) {
 						} else {
 							//clear any previous tasks drop down
 							if("searchActivityId" == actElmId) {
-								document.getElementById(taskElmId).innerHTML = "";
+								var optionHTML = "<option value='0' selected='selected'>All Tasks</option>";
+								document.getElementById(taskElmId).innerHTML = optionHTML;
 							} else {
 								var selectElm = document.getElementById(actElmId);
 								var newRow = selectElm.parentNode.parentNode;
 								newRow.cells[4].innerHTML = "";
+								displayAlert("No Task Available For Selected Activity. Setup Tasks First.");
 							}
 							
-							displayAlert("No Task Available For Selected Activity. Setup Tasks First.");
 						}
 				}, JSON_RESULT_TYPE);
 			} 
