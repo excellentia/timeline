@@ -329,6 +329,7 @@ final class AuditHelper {
 				Map<String, String> map = new HashMap<String, String>();
 				map.put("question", "Question");
 				map.put("answer", "Answer");
+				map.put("email", "Enterprise Id");
 
 				entityFieldNameMap.put(UserPreferences.class.getSimpleName(), map);
 			}
@@ -343,6 +344,10 @@ final class AuditHelper {
 				map.put("data_weekday_5", "Day 5 Time");
 				map.put("data_weekday_6", "Day 6 Time");
 				map.put("data_weekday_7", "Day 7 Time");
+				
+				map.put("project", "Project");
+				map.put("activity", "Activity");
+				map.put("task", "Task");
 
 				entityFieldNameMap.put(TimeData.class.getSimpleName(), map);
 			}
