@@ -198,8 +198,7 @@ $(function() {
 			modifyTask(movedTaskId, newStageId);
 		},
 		remove: function( event, ui ) {
-			var elmText = ""+$(event.originalEvent.target).attr("id");
-			alert(elmText);
+			
 		}		
 	}).disableSelection();
 	

@@ -41,11 +41,11 @@
 						<ul class="droptrue">
 							<c:if test="${(reply.hasTasks())}">
 								<c:forEach var="task" items="${reply.getActivityTasks(activityId)}">
-									<li id="task_${task.code}" size="${task.getTaskSize(task.code)}">${task.value}</li>
+									<li id="task_${task.code}" size="${reply.getTaskSize(task.code)}">${task.value}</li>
 								</c:forEach>
 							</c:if>
 						</ul>
-						<div class="smallFont"><div class="thin">&Sigma; Story Points : </div><div class="thin" id="sizeDiv">${reply.getActivitySize(activityId)}</div></div>
+						<div class="smallFont"><div class="thin">&Sigma; Story Points : </div><div class="thin sizeDiv">${reply.getActivitySize(activityId)}</div></div>
 					</div>
 				</c:forEach>
 			</c:if>
