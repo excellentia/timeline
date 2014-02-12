@@ -71,6 +71,7 @@ function populateActivitiesAndTask(projElmId, activityElmId, handleTask) {
 
 	if (selectElm != null) {
 		var selectedProjectId = getDropDownValueAsInt(projElmId);
+		var rowId = selectElm.parentNode.parentNode.id;
 
 		if (selectedProjectId > 0) {
 			$.getJSON(
@@ -87,7 +88,7 @@ function populateActivitiesAndTask(projElmId, activityElmId, handleTask) {
 						
 					} else {
 					if (activityElmId == null) {
-						var actElmId = "activity_"+selectedProjectId+"_"+newEntryRowCount;
+						var actElmId = "activity_"+rowId;
 						var activitySelectHTML = "<select size='1' class='timeEntrySelectEdit' name='activity' id='" + actElmId + "' ";
 						activitySelectHTML = activitySelectHTML +"onchange=\"populateTasks('"+projElmId+"','" + actElmId+"',null)\">";
 						
@@ -111,6 +112,11 @@ function populateActivitiesAndTask(projElmId, activityElmId, handleTask) {
 						}
 						
 						newRow.cells[3].innerHTML = leadNm;
+						
+						//clear tasks
+						if(handleTask) {
+							newRow.cells[4].innerHTML ="";
+						}						
 
 					} else {
 						var selectElm = document.getElementById(activityElmId);
@@ -237,8 +243,7 @@ function populateTasks(projElmId, actElmId, taskElmId) {
 								taskSelectHTML = taskSelectHTML + optionHTML + "</select>";
 								
 								if (taskElmId == null) {
-									//new time entry section
-									var newRow = document.getElementById("entry_"+newEntryRowCount);
+									var newRow = document.getElementById(projElmId).parentNode.parentNode;
 									newRow.cells[4].innerHTML = taskSelectHTML;
 								} else {
 									//search section
@@ -247,9 +252,13 @@ function populateTasks(projElmId, actElmId, taskElmId) {
 							}
 						} else {
 							//clear any previous tasks drop down
-							var selectElm = document.getElementById(actElmId);
-							var newRow = selectElm.parentNode.parentNode;
-							newRow.cells[4].innerHTML = "";
+							if("searchActivityId" == actElmId) {
+								document.getElementById(taskElmId).innerHTML = "";
+							} else {
+								var selectElm = document.getElementById(actElmId);
+								var newRow = selectElm.parentNode.parentNode;
+								newRow.cells[4].innerHTML = "";
+							}
 							
 							displayAlert("No Task Available For Selected Activity. Setup Tasks First.");
 						}

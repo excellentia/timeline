@@ -27,8 +27,6 @@ var searchEndDate = null;
 var searchProjId = null;
 var searchActId = null;
 
-var newEntryRowCount = 0;
-
 /**
  * Updates Weekly Sum of a given Time Entry Row.
  * 
@@ -389,8 +387,6 @@ function addEntryRow(tableID) {
 					var tbody = table.tBodies[0];
 					var rowCount = tbody.rows.length;
 					var newId = rowCount;
-					newEntryRowCount = rowCount;
-
 					var row = tbody.insertRow(rowCount);
 					var rowId = "entry_" + newId;
 					row.id = rowId;
@@ -458,7 +454,7 @@ function addEntryRow(tableID) {
 					* Create Task Column
 					*/
 					newcell = row.insertCell(cellNum++);
-					newcell.id = "task_"+newEntryRowCount;
+					newcell.id = "task_"+rowCount;
 					
 					/**
 					* Week Day
