@@ -196,8 +196,31 @@ $(function() {
 			var newStageId = getDbId(elmText,"stage_");
 			
 			modifyTask(movedTaskId, newStageId);
+			
+			var sizeElm = $(event.target).parent().find(".sizeDiv");
+			var originalSize = getValidInt($(sizeElm).text());
+			var taskSize = getValidInt($(event.originalEvent.target).attr("size"));
+
+			if (taskSize > 0) {
+			
+				//update the size
+				var newSize = originalSize + taskSize;
+				$(sizeElm).html(newSize);
+			}
+			
 		},
 		remove: function( event, ui ) {
+			
+			var sizeElm = $(event.target).parent().find(".sizeDiv");
+			var originalSize = getValidInt($(sizeElm).text());
+			var taskSize = getValidInt($(event.originalEvent.target).attr("size"));
+
+			if ((originalSize > 0) && (taskSize > 0)) {
+			
+				//update the size
+				var newSize = originalSize - taskSize;
+				$(sizeElm).html(newSize);
+			}
 			
 		}		
 	}).disableSelection();
