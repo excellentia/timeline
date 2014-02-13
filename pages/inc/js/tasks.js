@@ -202,9 +202,9 @@ function createTask() {
 			bodyHTML = bodyHTML + "<tr id ='" + rowId + "'>";
 			bodyHTML = bodyHTML + "<td>" + projName + "</td>";
 			bodyHTML = bodyHTML + "<td>" + actName + "</td>";
-			bodyHTML = bodyHTML + "<td><input type='text' class='activityAreaEdit' id='"
+			bodyHTML = bodyHTML + "<td><input type='text' class='activityAreaEdit' style='margin:0; padding-left:0.5em;' id='"
 						+ TaskConstants.newTaskTextInputId + "' maxlength='20'/></td>";
-			bodyHTML = bodyHTML + "<td><input type='text' class='activityAreaEdit' id='"
+			bodyHTML = bodyHTML + "<td><input type='text' class='activityAreaEdit' style='margin:0; padding-left:0.5em;' id='"
 						+ TaskConstants.newTaskDescInputId + "' maxlength='50'/></td>";
 			bodyHTML = bodyHTML + "<td><input type='text' class='activityAreaEdit' style='margin:0; padding:0; width: 3em; text-align: center' id='"
 						+ TaskConstants.newTaskSizeInputId + "' maxlength='3' value = '0'/></td>";
