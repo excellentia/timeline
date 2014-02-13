@@ -4795,6 +4795,20 @@ public class TimelineServiceImpl implements TimelineService {
 						} else {
 							task.setDetails(details);
 						}
+						
+						final long storyPoints = input.getStoryPoints();
+
+						if (storyPoints >= 0) {
+
+							if (storyPoints != task.getStoryPoints()) {
+								task.setStoryPoints(storyPoints);
+							}
+
+						} else {
+							// incorrect storyPoints specified.
+							reply.setErrorMessage("Invalid Story Points specified.");
+							hasError = true;
+						}
 					}
 
 					// check for activity change
@@ -4814,24 +4828,6 @@ public class TimelineServiceImpl implements TimelineService {
 								hasError = true;
 							}
 
-						}
-					}
-
-					// check for storyPoints change
-					if (!hasError) {
-
-						final long storyPoints = input.getStoryPoints();
-
-						if (storyPoints >= 0) {
-
-							if (storyPoints != task.getStoryPoints()) {
-								task.setStoryPoints(storyPoints);
-							}
-
-						} else {
-							// incorrect storyPoints specified.
-							reply.setErrorMessage("Invalid Story Points specified.");
-							hasError = true;
 						}
 					}
 
