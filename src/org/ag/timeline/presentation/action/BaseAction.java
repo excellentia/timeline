@@ -114,7 +114,6 @@ public abstract class BaseAction implements Action, SessionAware {
 
 		// get projects
 		ProjectSearchParameter projectSearchParameter = new ProjectSearchParameter();
-//		projectSearchParameter.setSearchActiveProjects(Boolean.TRUE);
 		projectSearchParameter.setEntityStatus(TimelineConstants.EntityStatus.ACTIVE);
 		ProjectReply projectReply = service.searchProjects(projectSearchParameter);
 
