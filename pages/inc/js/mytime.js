@@ -375,7 +375,7 @@ function addEntryRow(tableID) {
 			JSON_URL,
 			{
 				operation : "project",
-				status : "true"
+				status : 1
 			},
 			function(data) {
 				var jsonData = data;
@@ -1160,7 +1160,7 @@ $(function() {
 	
 	$.getJSON(JSON_URL, {
 		operation : "project",
-		status : "true"
+		status : 1
 	}, function(data) {
 		projectsAvailableJSON = data;
 
