@@ -14,14 +14,15 @@
 		<property name="name" type="string" not-null="true" column="NAME" />
 		<property name="active" type="boolean" column="ACTIVE" />
 		<property name="agile" type="boolean" column="AGILE" />
+		<property name="metricsEnabled" type="boolean" column="METRICS" />
 
 		<many-to-one name="lead" class="User" column="LEAD_ID" cascade="none" />
 
 		<set name="activities" cascade="all" inverse="true">
-			<key column="PROJECT_ID" not-null="true"/>
+			<key column="PROJECT_ID" not-null="true" />
 			<one-to-many class="Activity" />
 		</set>
-		
+
 		<property name="budgetAtCompletion" type="java.math.BigDecimal" column="BAC" />
 		<property name="startDate" type="java.util.Date" not-null="true" column="START_DATE" />
 		<property name="endDate" type="java.util.Date" not-null="true" column="END_DATE" />

@@ -1844,26 +1844,26 @@ public class TimelineServiceImpl implements TimelineService {
 
 							if (type != null) {
 								switch (type) {
-								case ADMIN:
-									user.setAdmin(adminFlag);
-									break;
-								case FIRST_NAME:
-									user.setFirstName(first);
-									break;
-								case LAST_NAME:
-									user.setLastName(last);
-									break;
-								case PASSWORD:
-									user.setPassword(password);
-									break;
-								case USER_ID:
-									user.setUserId(userId);
-									break;
-								case ACTIVE:
-									user.setActive(activeFlag);
-									break;
-								default:
-									break;
+									case ADMIN :
+										user.setAdmin(adminFlag);
+										break;
+									case FIRST_NAME :
+										user.setFirstName(first);
+										break;
+									case LAST_NAME :
+										user.setLastName(last);
+										break;
+									case PASSWORD :
+										user.setPassword(password);
+										break;
+									case USER_ID :
+										user.setUserId(userId);
+										break;
+									case ACTIVE :
+										user.setActive(activeFlag);
+										break;
+									default :
+										break;
 								}
 							} else {
 								user.setFirstName(first);
@@ -1984,17 +1984,17 @@ public class TimelineServiceImpl implements TimelineService {
 
 						} else {
 							switch (type) {
-							case QUESTION:
-								preferences.setQuestion(question);
-								break;
-							case ANSWER:
-								preferences.setAnswer(answer);
-								break;
-							case EMAIL:
-								preferences.setEmail(email);
-								break;
-							default:
-								break;
+								case QUESTION :
+									preferences.setQuestion(question);
+									break;
+								case ANSWER :
+									preferences.setAnswer(answer);
+									break;
+								case EMAIL :
+									preferences.setEmail(email);
+									break;
+								default :
+									break;
 							}
 						}
 
@@ -2237,7 +2237,6 @@ public class TimelineServiceImpl implements TimelineService {
 			String projectName = null;
 			TimelineConstants.EntityStatus status = null;
 			Criteria criteria = session.createCriteria(Project.class);
-			
 
 			if (searchParameters != null) {
 				projectId = searchParameters.getProjectId();
@@ -2256,17 +2255,17 @@ public class TimelineServiceImpl implements TimelineService {
 			if (status != null) {
 
 				switch (status) {
-				case ACTIVE:
-					criteria.add(Restrictions.eq("active", Boolean.TRUE));
-					break;
+					case ACTIVE :
+						criteria.add(Restrictions.eq("active", Boolean.TRUE));
+						break;
 
-				case INACTIVE:
-					criteria.add(Restrictions.eq("active", Boolean.FALSE));
-					break;
+					case INACTIVE :
+						criteria.add(Restrictions.eq("active", Boolean.FALSE));
+						break;
 
-				case ALL:
-				default:
-					break;
+					case ALL :
+					default :
+						break;
 				}
 			}
 
@@ -2288,6 +2287,7 @@ public class TimelineServiceImpl implements TimelineService {
 					projectData.setCode(project.getId());
 					projectData.setValue(project.getName());
 					projectData.setActive(project.isActive());
+					projectData.setMetricsEnabled(project.isMetricsEnabled());
 
 					if (project.getLead() != null) {
 						projectData.setLeadName(project.getLead().getUserName());
@@ -3178,6 +3178,7 @@ public class TimelineServiceImpl implements TimelineService {
 		final CodeValueReply reply = new CodeValueReply();
 
 		if (input != null) {
+			
 			TimelineConstants.StatusEntity entity = input.getEntity();
 			final Long id = input.getEntityId();
 
@@ -3193,54 +3194,72 @@ public class TimelineServiceImpl implements TimelineService {
 					boolean hasError = false;
 
 					switch (entity) {
-					case PROJECT: {
-						Project project = (Project) session.get(Project.class, id);
+						case PROJECT_ACTIVE_FLAG : {
+							Project project = (Project) session.get(Project.class, id);
 
-						if (project == null) {
-							hasError = true;
-							reply.setErrorMessage("Specified Project is not present in system.");
-						} else {
-							project.setActive(input.isActive());
-							session.update(project);
-							retVal = project.getName();
+							if (project == null) {
+								hasError = true;
+								reply.setErrorMessage("Specified Project is not present in system.");
+							} else {
+								project.setActive(input.isActive());
+								session.update(project);
+								retVal = project.getName();
+							}
+
+							break;
 						}
-					}
-						break;
 
-					case USER: {
-						User user = (User) session.get(User.class, id);
+						case PROJECT_METRICS_FLAG : {
+							Project project = (Project) session.get(Project.class, id);
 
-						if (user == null) {
-							hasError = true;
-							reply.setErrorMessage("Specified User is not present in system.");
-						} else if (id == RequestContext.getTimelineContext().getContextUserId()) {
-							hasError = true;
-							reply.setErrorMessage("User can not change own status.");
-						} else {
-							user.setActive(input.isActive());
-							session.update(user);
-							retVal = user.getUserName();
+							if (project == null) {
+								hasError = true;
+								reply.setErrorMessage("Specified Project is not present in system.");
+							} else {
+								project.setMetricsEnabled(input.isActive());
+								session.update(project);
+								retVal = project.getName();
+							}
+
+							break;
 						}
-					}
-						break;
 
-					case TASK: {
-						Task task = (Task) session.get(Task.class, id);
+						case USER_ACTIVE_FLAG : {
+							User user = (User) session.get(User.class, id);
 
-						if (task == null) {
-							hasError = true;
-							reply.setErrorMessage("Specified Task is not present in System.");
-						} else {
-							task.setActive(input.isActive());
-							session.update(task);
-							retVal = task.getText();
+							if (user == null) {
+								hasError = true;
+								reply.setErrorMessage("Specified User is not present in system.");
+							} else if (id == RequestContext.getTimelineContext().getContextUserId()) {
+								hasError = true;
+								reply.setErrorMessage("User can not change own status.");
+							} else {
+								user.setActive(input.isActive());
+								session.update(user);
+								retVal = user.getUserName();
+							}
+
+							break;
 						}
-					}
-						break;
 
-					default:
-						hasError = true;
-						break;
+						case TASK_ACTIVE_FLAG : {
+							Task task = (Task) session.get(Task.class, id);
+
+							if (task == null) {
+								hasError = true;
+								reply.setErrorMessage("Specified Task is not present in System.");
+							} else {
+								task.setActive(input.isActive());
+								session.update(task);
+								retVal = task.getText();
+							}
+
+							break;
+						}
+
+						default :
+							hasError = true;
+							break;
 					}
 
 					if (!hasError) {
@@ -3997,7 +4016,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 	@Override
 	public TaskReply searchTasks(TaskSearchParameter searchParameters) throws TimelineException {
-		
+
 		Session session = null;
 		Transaction transaction = null;
 		final TaskReply reply = new TaskReply();
@@ -4021,31 +4040,31 @@ public class TimelineServiceImpl implements TimelineService {
 				if (status != null) {
 
 					switch (status) {
-						case ACTIVE:
-						case INACTIVE: {
-							
+						case ACTIVE :
+						case INACTIVE : {
+
 							final boolean onlyActive = status.equals(TimelineConstants.EntityStatus.ACTIVE);
 							Long projectId = searchParameters.getProjectId();
 							Long activityId = searchParameters.getActivityId();
 							Long taskId = searchParameters.getTaskId();
-	
+
 							if ((projectId > 0) && (activityId > 0)) {
 								criteria.add(Restrictions.and(Restrictions.eq("project.id", projectId),
 										Restrictions.eq("activity.id", activityId)));
 							}
-	
+
 							if (taskId > 0) {
 								criteria.add(Restrictions.eq("id", taskId));
 							}
-							
+
 							criteria.add(Restrictions.eq("active", onlyActive));
 						}
-						
-						break;
 
-					case ALL:
-					default:
-						break;
+							break;
+
+						case ALL :
+						default :
+							break;
 					}
 				}
 
@@ -4226,6 +4245,7 @@ public class TimelineServiceImpl implements TimelineService {
 
 				Criteria criteria = session.createCriteria(Project.class);
 				criteria.add(Restrictions.eq("active", Boolean.TRUE));
+				criteria.add(Restrictions.eq("metricsEnabled", Boolean.TRUE));
 
 				if (!searchParameters.isSearchAllData() && (searchProjectId > 0)) {
 
@@ -4795,7 +4815,7 @@ public class TimelineServiceImpl implements TimelineService {
 						} else {
 							task.setDetails(details);
 						}
-						
+
 						final long storyPoints = input.getStoryPoints();
 
 						if (storyPoints >= 0) {

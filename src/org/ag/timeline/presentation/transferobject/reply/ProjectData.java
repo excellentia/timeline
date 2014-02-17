@@ -20,6 +20,8 @@ public class ProjectData extends CodeValue {
 	private long leadDbId = 0;
 
 	private boolean active = false;
+	
+	private boolean metricsEnabled = false;
 
 	/**
 	 * Getter for leadName.
@@ -75,4 +77,20 @@ public class ProjectData extends CodeValue {
 		this.active = active;
 	}
 
+	/**
+	 * Getter for metricsEnabled.
+	 * @return the metricsEnabled
+	 */
+	public boolean isMetricsEnabled() {
+		return metricsEnabled;
+	}
+
+	/**
+	 * Setter for metricsEnabled.
+	 * @param metricsEnabled the metricsEnabled to set
+	 */
+	public void setMetricsEnabled(boolean metricsEnabled) {
+		this.metricsEnabled = metricsEnabled;
+	}
+	
 }

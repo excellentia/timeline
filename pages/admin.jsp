@@ -127,8 +127,12 @@
 							<tfoot>
 								<tr>
 									<c:set var="statusId" value= "project_status_${project.code}" />
-									<td align="left" title="Toggle Project Status">
-										&nbsp;Active&nbsp;<input id="${statusId}" type='checkbox' value='${project.active}' <c:if test="${project.active}">checked="checked"</c:if> onchange="toggleProjectStatus(${project.code},'${statusId}','${projTitleId}')" />
+									<c:set var="metricStatusId" value= "project_metric_status_${project.code}" />
+									<td align="left" title="Toggle Project Flags">
+										<div class="thin">Active</div>
+										<div class="thin"><input id="${statusId}" type='checkbox' value='${project.active}' <c:if test="${project.active}">checked="checked"</c:if> onchange="toggleProjectStatus(${project.code},'${statusId}','${projTitleId}')" /></div>
+										<div class="thin leftPadding">Metrics</div>
+										<div class="thin"><input id="${metricStatusId}" type='checkbox' value='${project.metricsEnabled}' <c:if test="${project.metricsEnabled}">checked="checked"</c:if> onchange="toggleProjectMetricStatus(${project.code},'${metricStatusId}','${projTitleId}')" /></div>
 									</td>
 									<c:remove var="statusId"/>
 									<td colspan="2" align="right">

@@ -31,6 +31,8 @@ public class Project extends AbstractModel {
 
 	private boolean agile = true;
 
+	private boolean metricsEnabled = false;
+
 	/**
 	 * Getter for name.
 	 * 
@@ -226,13 +228,34 @@ public class Project extends AbstractModel {
 		return leadName;
 	}
 
+	/**
+	 * Getter for metricsEnabled.
+	 * 
+	 * @return the metricsEnabled
+	 */
+	public boolean isMetricsEnabled() {
+		return metricsEnabled;
+	}
+
+	/**
+	 * Setter for metricsEnabled.
+	 * 
+	 * @param metricsEnabled the metricsEnabled to set
+	 */
+	public void setMetricsEnabled(boolean metricsEnabled) {
+		this.metricsEnabled = metricsEnabled;
+	}
+
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
+
 		StringBuilder builder = new StringBuilder();
+
 		builder.append("Project [id=");
 		builder.append(super.getId());
 		builder.append(", name=");
@@ -262,9 +285,13 @@ public class Project extends AbstractModel {
 
 			builder.append("]");
 		}
+
 		builder.append(", active=");
 		builder.append(active);
+		builder.append(", metricsEnabled=");
+		builder.append(metricsEnabled);
 		builder.append("]");
+
 		return builder.toString();
 	}
 

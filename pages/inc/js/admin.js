@@ -315,6 +315,38 @@ function toggleProjectStatus(projDbId, inputId, projTitleId) {
 	}
 }
 
+function toggleProjectMetricStatus(projDbId, inputId, projTitleId) {
+
+	var checkInput = document.getElementById(inputId);
+
+	if (checkInput != null) {
+
+		var projectStatus = checkInput.checked;
+
+		$.post(JSON_URL, {
+			operation : "SAVE_PROJECT_METRICS_STATUS",
+			id : projDbId,
+			status : projectStatus
+		}, function(data) {
+
+			jsonData = data;
+
+			if (jsonData.error) {
+				displayAlert(jsonData.error);
+			} else {
+				// var projectId = jsonData.code;
+				var projectName = jsonData.value;
+				var projTitleArea = document.getElementById(projTitleId);
+				if (projectStatus) {
+					projTitleArea.className = "activeEntity";
+				} else {
+					projTitleArea.className = "inActiveEntity";
+				}
+			}
+		}, JSON_RESULT_TYPE);
+	}
+}
+
 function toggleDefaultActivity( rowElmId, actDbId, inputElmId) {
 	
 }
@@ -387,6 +419,7 @@ function saveProject(divID, projDbId, projNameId, copyProjElmId) {
 
 						var projRowId = 'project_' + projectId + '_title';
 						var statusId = 'project_status_' + projectId;
+						var metricStatusId = 'project_metrics_status_' + projectId;
 
 						var newHTML = "<table class='projectTable' id='"
 								+ projectText
@@ -417,9 +450,12 @@ function saveProject(divID, projDbId, projNameId, copyProjElmId) {
 
 						newHTML = newHTML + "</tbody>";
 						newHTML = newHTML + "<tfoot><tr>";
-						newHTML = newHTML + "<td align='left'>&nbsp;Active&nbsp;<input id='" + statusId
-								+ "' type='checkbox' value='true' onchange=\"toggleProjectStatus("
-								+ projectId + ",'" + statusId + "','" + projRowId + "')\"/></td>";
+						newHTML = newHTML + "<td align='left' title='Toggle Project Flags'>";
+						newHTML = newHTML + "<div class='thin'>Active</div>";
+						newHTML = newHTML + "<div class='thin'><input id='" + statusId + "' type='checkbox' value='true' onchange=\"toggleProjectStatus(" + projectId + ",'" + statusId + "','" + projRowId + "')\"/></div>";
+						newHTML = newHTML + "<div class='thin leftPadding'>Metrics</div>";
+						newHTML = newHTML + "<div class='thin'><input id='" + metricStatusId + "' type='checkbox' value='true' onchange=\"toggleProjectMetricStatus(" + projectId + ",'" + metricStatusId + "','" + projRowId + "')\"/></div>";
+						newHTML = newHTML + "</td>";
 						newHTML = newHTML + "<td colspan='2' align='right'>";
 						newHTML = newHTML
 								+ "<input type='button' value='Add Activity' class='button' onclick=\"addNewActivity('"

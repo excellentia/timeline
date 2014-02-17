@@ -874,23 +874,23 @@ public class AjaxServlet extends HttpServlet {
 				input.setType(type);
 
 				switch (type) {
-				case FIRST_NAME:
-					input.setFirstName(value);
-					break;
-				case LAST_NAME:
-					input.setLastName(value);
-					break;
-				case USER_ID:
-					input.setUserId(value);
-					break;
-				case PASSWORD:
-					input.setPassword(value);
-					break;
-				case ADMIN:
-					input.setAdmin(Boolean.valueOf(value));
-					break;
-				default:
-					break;
+					case FIRST_NAME :
+						input.setFirstName(value);
+						break;
+					case LAST_NAME :
+						input.setLastName(value);
+						break;
+					case USER_ID :
+						input.setUserId(value);
+						break;
+					case PASSWORD :
+						input.setPassword(value);
+						break;
+					case ADMIN :
+						input.setAdmin(Boolean.valueOf(value));
+						break;
+					default :
+						break;
 				}
 
 				try {
@@ -932,17 +932,17 @@ public class AjaxServlet extends HttpServlet {
 				input.setType(type);
 
 				switch (type) {
-				case QUESTION:
-					input.setQuestion(value);
-					break;
-				case ANSWER:
-					input.setAnswer(value);
-					break;
-				case EMAIL:
-					input.setEmail(value);
-					break;
-				default:
-					break;
+					case QUESTION :
+						input.setQuestion(value);
+						break;
+					case ANSWER :
+						input.setAnswer(value);
+						break;
+					case EMAIL :
+						input.setEmail(value);
+						break;
+					default :
+						break;
 				}
 
 				try {
@@ -1674,7 +1674,9 @@ public class AjaxServlet extends HttpServlet {
 			} else if (TimelineConstants.OperationType.SAVE_PROJECT.toString().equalsIgnoreCase(typeStr)) {
 				saveProject(request, response);
 			} else if (TimelineConstants.OperationType.SAVE_PROJECT_STATUS.toString().equalsIgnoreCase(typeStr)) {
-				saveEntityStatus(request, response, TimelineConstants.StatusEntity.PROJECT);
+				saveEntityStatus(request, response, TimelineConstants.StatusEntity.PROJECT_ACTIVE_FLAG);
+			} else if (TimelineConstants.OperationType.SAVE_PROJECT_METRICS_STATUS.toString().equalsIgnoreCase(typeStr)) {
+				saveEntityStatus(request, response, TimelineConstants.StatusEntity.PROJECT_METRICS_FLAG);
 			} else if (TimelineConstants.OperationType.DELETE_PROJECT.toString().equalsIgnoreCase(typeStr)) {
 				deleteProject(request, response);
 			} else if (TimelineConstants.OperationType.SAVE_LEAD.toString().equalsIgnoreCase(typeStr)) {
@@ -1686,7 +1688,7 @@ public class AjaxServlet extends HttpServlet {
 			} else if (TimelineConstants.OperationType.SAVE_USER.toString().equalsIgnoreCase(typeStr)) {
 				saveUser(request, response);
 			} else if (TimelineConstants.OperationType.SAVE_USER_STATUS.toString().equalsIgnoreCase(typeStr)) {
-				saveEntityStatus(request, response, TimelineConstants.StatusEntity.USER);
+				saveEntityStatus(request, response, TimelineConstants.StatusEntity.USER_ACTIVE_FLAG);
 			} else if (TimelineConstants.OperationType.DELETE_USER.toString().equalsIgnoreCase(typeStr)) {
 				deleteUser(request, response);
 			} else if (TimelineConstants.OperationType.RESET_USER.toString().equalsIgnoreCase(typeStr)) {
@@ -1721,7 +1723,7 @@ public class AjaxServlet extends HttpServlet {
 			} else if (TimelineConstants.OperationType.DELETE_TASK.toString().equalsIgnoreCase(typeStr)) {
 				deleteTask(request, response);
 			} else if (TimelineConstants.OperationType.SAVE_TASK_STATUS.toString().equalsIgnoreCase(typeStr)) {
-				saveEntityStatus(request, response, TimelineConstants.StatusEntity.TASK);
+				saveEntityStatus(request, response, TimelineConstants.StatusEntity.TASK_ACTIVE_FLAG);
 			}
 
 		} else {

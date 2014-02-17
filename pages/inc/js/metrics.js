@@ -95,7 +95,7 @@ function editMetricDetails(rowHtmlId, prevRowHtmlId, projectDbId, metricDbId, ba
 function saveModifiedMetrics(rowHtmlId, prevRowHtmlId, projectDbId, metricDbId, bac) {
 
 	//TODO:AG
-	displayAlert(rowHtmlId + " : " + prevRowHtmlId + " : " + projectDbId + " : " + metricDbId + " : " + bac);
+	//displayAlert(rowHtmlId + " : " + prevRowHtmlId + " : " + projectDbId + " : " + metricDbId + " : " + bac);
 
 	if ((rowHtmlId != null) && (projectDbId > 0) && (metricDbId > 0) && (bac > 0)) {
 
@@ -881,7 +881,7 @@ function applyQualityRules(calculated) {
 		hasError = true;
 		var speRatio = calculated.speRatio;
 		addError("spe", "This SPE results in poor SPE ratio : " + speRatio);
-		addError("pv", "This pv results in poor SPE ratio : " + speRatio);
+		addError("ev", "This EV results in poor SPE ratio : " + speRatio);
 	}
 
 	return hasError;
