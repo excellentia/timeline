@@ -36,16 +36,18 @@
 			<div class="portlet-header ui-widget-header ui-corner-all">Rapid Board - ${reply.projectData.value}</div>
 			<c:if test="${(reply.activityIdList != null)}">
 				<c:forEach var="activityId" items="${reply.activityIdList}">
-					<div class="stg-column">
-						<div class="portlet-header" id="stage_${activityId}">${reply.getActivityName(activityId)}</div>
-						<ul class="droptrue">
-							<c:if test="${(reply.hasTasks())}">
-								<c:forEach var="task" items="${reply.getActivityTasks(activityId)}">
-									<li id="task_${task.code}" size="${reply.getTaskSize(task.code)}">${task.value}</li>
-								</c:forEach>
-							</c:if>
-						</ul>
-						<div class="smallFont"><div class="thin">&Sigma; Story Points : </div><div class="thin sizeDiv">${reply.getActivitySize(activityId)}</div></div>
+					<div class="colHolder thin">
+						<div class="stg-column">
+							<div class="portlet-header subpart" id="stage_${activityId}">${reply.getActivityName(activityId)}</div>
+							<ul class="droptrue subpart">
+								<c:if test="${(reply.hasTasks())}">
+									<c:forEach var="task" items="${reply.getActivityTasks(activityId)}">
+										<li id="task_${task.code}" size="${reply.getTaskSize(task.code)}">${task.value}</li>
+									</c:forEach>
+								</c:if>
+							</ul>
+							<div class="smallFont subpart"><div class="thin">&Sigma; Story Points : </div><div class="thin sizeDiv">${reply.getActivitySize(activityId)}</div></div>
+						</div>
 					</div>
 				</c:forEach>
 			</c:if>
