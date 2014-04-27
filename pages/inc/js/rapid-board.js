@@ -184,7 +184,11 @@ $(function() {
 
 	$("ul.droptrue").addClass("portlet-content sortableUL");
 	$("ul.droptrue li").addClass("ui-state-highlight center-text sortableLI");
-
+	
+	$("div.colHolder").sortable({
+		connectWith: "div.colHolder"
+	});
+	
 	$( ".sortableUL" ).sortable({
 		connectWith: ".sortableUL",
 		receive: function(event, ui) {
@@ -233,8 +237,5 @@ $(function() {
 		showTaskDetails(taskDbId);
 	});
 	
+	$("div.colHolder").disableSelection();
 });
-
-
-
-
