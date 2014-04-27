@@ -85,7 +85,8 @@
 						<option value="${project.code}">${project.value}</option>
 					</c:forEach>
 				</select> 
-				<input type="button" value="Create Project" class="button" onclick="saveProject('projectSection',0, 'newProject','copyProjId')" />
+				&nbsp;&nbsp;Copy Tasks &nbsp;<input type="checkbox" id="copyTask" name="copyTask" title="Copy Tasks From Project"/>
+				&nbsp;&nbsp;<input type="button" value="Create Project" class="button" onclick="saveProject('projectSection',0, 'newProject','copyProjId','copyTask')" />
 			</div>
 			<div id="projectSection">
 				<c:if test="${(projectReply != null) && (projectReply.projects != null) && (projectReply.projects.size() > 0)}">
