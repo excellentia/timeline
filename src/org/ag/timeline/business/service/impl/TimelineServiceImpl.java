@@ -123,7 +123,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#autheticateUser(
 	 * org.ag.timeline.presentation.transferobject.input.AuthenticationInput)
@@ -217,7 +216,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#createActivity(org
 	 * .ag.timeline.presentation.transferobject.input.CodeValueInput)
@@ -317,7 +315,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#createProject(java
 	 * .lang.String)
@@ -359,6 +356,8 @@ public class TimelineServiceImpl implements TimelineService {
 
 						// Handle the Copy Project feature
 						final long copyProjId = input.getCopyProjectId();
+						boolean saveTasks = false;
+						List<Task> tasksList = new ArrayList<Task>();
 
 						if (copyProjId > 0) {
 
@@ -366,18 +365,46 @@ public class TimelineServiceImpl implements TimelineService {
 
 							if ((srcProj != null) && (srcProj.hasActivities())) {
 
-								Activity copy = null;
+								Activity copyAct = null;
+								Task copyTask = null;
+								boolean copyTasksFlag = input.isCopyTaskFlag();
 
-								for (Activity original : srcProj.getActivities()) {
-									copy = new Activity();
-									copy.setName(original.getName());
-									copy.setProject(project);
-									project.addChild(copy);
+								for (Activity originalActivity : srcProj.getActivities()) {
+									copyAct = new Activity();
+									
+									copyAct.setName(originalActivity.getName());
+									copyAct.setProject(project);
+
+									if (copyTasksFlag) {
+
+										for (Task originalTask : originalActivity.getTasks()) {
+											copyTask = new Task();
+											copyTask.setActive(originalTask.isActive());
+											copyTask.setDetails(originalTask.getDetails());
+											copyTask.setStoryPoints(originalTask.getStoryPoints());
+											copyTask.setText(originalTask.getText());
+
+											copyTask.setActivity(copyAct);
+											copyAct.addTask(copyTask);
+											tasksList.add(copyTask);
+											saveTasks = true;
+
+										}
+									}
+
+									project.addChild(copyAct);
 								}
 							}
 						}
 
 						session.save(project);
+
+						if (saveTasks) {
+							for (Task task : tasksList) {
+								session.save(task);
+							}
+						}
+
 						reply.setCodeValue(new CodeValue(project.getId(), project.getName()));
 
 						reply.setSuccessMessage("Created successfully.");
@@ -400,6 +427,8 @@ public class TimelineServiceImpl implements TimelineService {
 					// create a reply for error message
 					reply.setErrorMessage("Create failed due to Technical Reasons.");
 
+				} catch (Exception exception) {
+					exception.printStackTrace();
 				} finally {
 					// close the session
 					if (session != null) {
@@ -418,14 +447,12 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#deleteProject(long)
 	 */
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#createTimeData(org
 	 * .ag.timeline.presentation.transferobject.input.TimeDataInput)
@@ -605,7 +632,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#modifyProject(long,
 	 * java.lang.String)
@@ -702,7 +728,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#deleteActivity(long)
 	 */
@@ -790,7 +815,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#modifyActivity(long,
 	 * long, java.lang.String)
@@ -877,7 +901,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#createUser(java.
 	 * lang.String, java.lang.String)
@@ -952,7 +975,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#modifyUser(long,
 	 * java.lang.String, java.lang.String)
@@ -1040,7 +1062,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#deleteUser(long)
 	 */
@@ -1109,7 +1130,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#resetUserCredentials
 	 * (long)
@@ -1447,7 +1467,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#deleteTimeData(long)
 	 */
@@ -1524,7 +1543,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#createUserPreferences
 	 * (long, long)
@@ -1641,7 +1659,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#deleteUserPreferences
 	 * (long)
@@ -1649,7 +1666,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#modifyTimeData(org
 	 * .ag.timeline.presentation.transferobject.input.TimeDataInput)
@@ -1784,7 +1800,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#modifyUser(org.ag
 	 * .timeline.presentation.transferobject.input.UserInput)
@@ -1844,25 +1859,25 @@ public class TimelineServiceImpl implements TimelineService {
 
 							if (type != null) {
 								switch (type) {
-									case ADMIN :
+									case ADMIN:
 										user.setAdmin(adminFlag);
 										break;
-									case FIRST_NAME :
+									case FIRST_NAME:
 										user.setFirstName(first);
 										break;
-									case LAST_NAME :
+									case LAST_NAME:
 										user.setLastName(last);
 										break;
-									case PASSWORD :
+									case PASSWORD:
 										user.setPassword(password);
 										break;
-									case USER_ID :
+									case USER_ID:
 										user.setUserId(userId);
 										break;
-									case ACTIVE :
+									case ACTIVE:
 										user.setActive(activeFlag);
 										break;
-									default :
+									default:
 										break;
 								}
 							} else {
@@ -1921,7 +1936,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#saveUserPreferences
 	 * (org.ag.timeline.presentation.transferobject.input.UserPreferencesInput)
@@ -1984,16 +1998,16 @@ public class TimelineServiceImpl implements TimelineService {
 
 						} else {
 							switch (type) {
-								case QUESTION :
+								case QUESTION:
 									preferences.setQuestion(question);
 									break;
-								case ANSWER :
+								case ANSWER:
 									preferences.setAnswer(answer);
 									break;
-								case EMAIL :
+								case EMAIL:
 									preferences.setEmail(email);
 									break;
-								default :
+								default:
 									break;
 							}
 						}
@@ -2045,7 +2059,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#resetUserCredentials
 	 * (org.ag.timeline.presentation.transferobject.input.CodeValueInput)
@@ -2117,7 +2130,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchActivities
 	 * (org.
@@ -2216,7 +2228,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchProjects(org
 	 * .ag.timeline.presentation.transferobject.search.ProjectSearchParameter)
@@ -2255,16 +2266,16 @@ public class TimelineServiceImpl implements TimelineService {
 			if (status != null) {
 
 				switch (status) {
-					case ACTIVE :
+					case ACTIVE:
 						criteria.add(Restrictions.eq("active", Boolean.TRUE));
 						break;
 
-					case INACTIVE :
+					case INACTIVE:
 						criteria.add(Restrictions.eq("active", Boolean.FALSE));
 						break;
 
-					case ALL :
-					default :
+					case ALL:
+					default:
 						break;
 				}
 			}
@@ -2330,7 +2341,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchTimeData(org
 	 * .ag.timeline.presentation.transferobject.search.TimeDataSearchParameters)
@@ -2507,7 +2517,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchUserPreferences
 	 * (org.ag.timeline.presentation.transferobject.search.
@@ -2590,7 +2599,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchUsers(org.
 	 * ag.timeline.presentation.transferobject.search.UserSearchParameter)
@@ -2694,7 +2702,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchWeeks(org.
 	 * ag.timeline.presentation.transferobject.search.WeekSearchParameter)
@@ -2783,7 +2790,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#systemManagement()
 	 */
@@ -2924,7 +2930,6 @@ public class TimelineServiceImpl implements TimelineService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.ag.timeline.business.service.iface.TimelineIface#searchAuditData(
 	 * org.ag
@@ -3178,7 +3183,7 @@ public class TimelineServiceImpl implements TimelineService {
 		final CodeValueReply reply = new CodeValueReply();
 
 		if (input != null) {
-			
+
 			TimelineConstants.StatusEntity entity = input.getEntity();
 			final Long id = input.getEntityId();
 
@@ -3194,7 +3199,7 @@ public class TimelineServiceImpl implements TimelineService {
 					boolean hasError = false;
 
 					switch (entity) {
-						case PROJECT_ACTIVE_FLAG : {
+						case PROJECT_ACTIVE_FLAG: {
 							Project project = (Project) session.get(Project.class, id);
 
 							if (project == null) {
@@ -3209,7 +3214,7 @@ public class TimelineServiceImpl implements TimelineService {
 							break;
 						}
 
-						case PROJECT_METRICS_FLAG : {
+						case PROJECT_METRICS_FLAG: {
 							Project project = (Project) session.get(Project.class, id);
 
 							if (project == null) {
@@ -3224,7 +3229,7 @@ public class TimelineServiceImpl implements TimelineService {
 							break;
 						}
 
-						case USER_ACTIVE_FLAG : {
+						case USER_ACTIVE_FLAG: {
 							User user = (User) session.get(User.class, id);
 
 							if (user == null) {
@@ -3242,7 +3247,7 @@ public class TimelineServiceImpl implements TimelineService {
 							break;
 						}
 
-						case TASK_ACTIVE_FLAG : {
+						case TASK_ACTIVE_FLAG: {
 							Task task = (Task) session.get(Task.class, id);
 
 							if (task == null) {
@@ -3257,7 +3262,7 @@ public class TimelineServiceImpl implements TimelineService {
 							break;
 						}
 
-						default :
+						default:
 							hasError = true;
 							break;
 					}
@@ -4040,8 +4045,8 @@ public class TimelineServiceImpl implements TimelineService {
 				if (status != null) {
 
 					switch (status) {
-						case ACTIVE :
-						case INACTIVE : {
+						case ACTIVE:
+						case INACTIVE: {
 
 							final boolean onlyActive = status.equals(TimelineConstants.EntityStatus.ACTIVE);
 							Long projectId = searchParameters.getProjectId();
@@ -4062,8 +4067,8 @@ public class TimelineServiceImpl implements TimelineService {
 
 							break;
 
-						case ALL :
-						default :
+						case ALL:
+						default:
 							break;
 					}
 				}

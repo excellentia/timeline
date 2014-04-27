@@ -566,6 +566,7 @@ public class AjaxServlet extends HttpServlet {
 
 		final long id = getLongRequestValue(TimelineConstants.AjaxRequestParam.id, request);
 		final long copyProjectId = getLongRequestValue(TimelineConstants.AjaxRequestParam.refId, request);
+		final boolean copyTaskFlag = TextHelper.getBooleanValue(getStringRequestValue(TimelineConstants.AjaxRequestParam.status, request));
 		final String projectText = getStringRequestValue(TimelineConstants.AjaxRequestParam.text, request);
 		PrintWriter out = null;
 
@@ -575,6 +576,7 @@ public class AjaxServlet extends HttpServlet {
 			input.setNewLabelText(projectText);
 			input.setProjectId(id);
 			input.setCopyProjectId(copyProjectId);
+			input.setCopyTaskFlag(copyTaskFlag);
 
 			// set the status as Active by default
 			input.setActive(Boolean.TRUE);
