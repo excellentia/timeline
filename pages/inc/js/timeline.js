@@ -486,3 +486,14 @@ function getBooleanInputValue(inputElmId) {
 
 	return val;
 }
+
+function getCheckBoxStatus(checkElmId) {
+
+	var val = false;
+
+	if (checkElmId != null) {
+		val = $('#' + checkElmId).is(':checked');
+	}
+
+	return val;
+}
