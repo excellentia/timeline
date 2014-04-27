@@ -390,12 +390,13 @@ function toggleUserStatus(userDbId, inputId, userRowId) {
  * @param projDbId
  * @param projNameId
  */
-function saveProject(divID, projDbId, projNameId, copyProjElmId) {
+function saveProject(divID, projDbId, projNameId, copyProjElmId, copyTaskElmId) {
 
 	var projText = $("#" + projNameId).val();
 
 	if (projText != "") {
 		var copyProjId = getDropDownValueAsInt(copyProjElmId);
+		var copyTask = getCheckBoxStatus(copyTaskElmId);
 		
 		$.post(
 			JSON_URL,
@@ -403,7 +404,8 @@ function saveProject(divID, projDbId, projNameId, copyProjElmId) {
 				operation : "SAVE_PROJECT",
 				id : projDbId,
 				text : projText,
-				refId : copyProjId
+				refId : copyProjId,
+				status : copyTask
 			},
 			function(data) {
 
